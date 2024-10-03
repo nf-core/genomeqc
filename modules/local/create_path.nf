@@ -12,7 +12,7 @@ process CREATE_PATH {
 
     output:
     val meta                 , emit: meta
-    path "${prefix}.txt"     , emit: accession
+    path "${meta.id}.txt"     , emit: accession
     path "versions.yml"      , emit: versions
 
     when:
