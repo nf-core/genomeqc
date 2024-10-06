@@ -49,7 +49,7 @@ workflow GENOMEQC {
         }
         .set { ch_input }
 
-    ch_input.ncbi.view()
+    //ch_input.ncbi.view()
     //
     // MODULE: Run create_path
     //
@@ -60,7 +60,6 @@ workflow GENOMEQC {
     //
     // MODULE: Run ncbigenomedownlaod
     //
-
     NCBIGENOMEDOWNLOAD ( 
         CREATE_PATH.out.meta,
         CREATE_PATH.out.accession,
@@ -68,15 +67,6 @@ workflow GENOMEQC {
         'all'
     )
     ch_versions = ch_versions.mix(NCBIGENOMEDOWNLOAD.out.versions.first())
-
-    //
-    // MODULE: Run FastQC
-    //
-//    FASTQC (
-//        ch_samplesheet
-//    )
-//    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]})
-//    ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
     //
     // Collate and save software versions
