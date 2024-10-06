@@ -4,12 +4,15 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { FASTQC                 } from '../modules/nf-core/fastqc/main'
-include { MULTIQC                } from '../modules/nf-core/multiqc/main'
-include { paramsSummaryMap       } from 'plugin/nf-validation'
-include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
+include { NCBIGENOMEDOWNLOAD                } from '../modules/nf-core/ncbigenomedownload/main'
+include { CREATE_PATH                       } from '../modules/local/create_path'
+include { FASTQC                            } from '../modules/nf-core/fastqc/main'
+include { MULTIQC                           } from '../modules/nf-core/multiqc/main'
+include { paramsSummaryMap; fromSamplesheet } from 'plugin/nf-validation'
+include { paramsSummaryMultiqc              } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML            } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText            } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -27,14 +30,43 @@ workflow GENOMEQC {
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
 
+    Channel
+        .fromSamplesheet("input")
+        .map {
+            meta, refseq, fasta, gff ->
+                if (!refseq) {
+                    return [ meta, fasta, gff ]
+                } else {
+                    return [ meta, refseq ]
+                }
+        }
+//        .map {
+//            validateInputSamplesheet(it)
+//        }
+        .branch {
+            ncbi: it.size() == 2
+            local: it.size() == 3
+        }
+        .set { ch_input }
+
+    //ch_input.ncbi.view()
     //
-    // MODULE: Run FastQC
+    // MODULE: Run create_path
     //
-    FASTQC (
-        ch_samplesheet
+    CREATE_PATH (
+        ch_input.ncbi
     )
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]})
-    ch_versions = ch_versions.mix(FASTQC.out.versions.first())
+
+    //
+    // MODULE: Run ncbigenomedownlaod
+    //
+    NCBIGENOMEDOWNLOAD ( 
+        CREATE_PATH.out.meta,
+        CREATE_PATH.out.accession,
+        [],
+        'all'
+    )
+    ch_versions = ch_versions.mix(NCBIGENOMEDOWNLOAD.out.versions.first())
 
     //
     // Collate and save software versions
@@ -88,6 +120,8 @@ workflow GENOMEQC {
 
     emit:
     multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
+    //gff            = NCBIGENOMEDOWNLOAD.out.gff
+    //fasta          = NCBIGENOMEDOWNLOAD.out.fna
     versions       = ch_versions                 // channel: [ path(versions.yml) ]
 }
 
