@@ -140,21 +140,31 @@ workflow PIPELINE_COMPLETION {
 //
 def validateInputParameters() {
     genomeExistsError()
+    // Add ways of validating input parameters, e.g. for groups in ncbigenomedownload
 }
 
 //
 // Validate channels from input samplesheet
 //
 def validateInputSamplesheet(input) {
-    def (metas, fastqs) = input[1..2]
-
-    // Check that multiple runs of the same sample are of the same datatype i.e. single-end / paired-end
-    def endedness_ok = metas.collect{ it.single_end }.unique().size == 1
-    if (!endedness_ok) {
-        error("Please check input samplesheet -> Multiple runs of a sample must be of the same datatype i.e. single-end or paired-end: ${metas[0].id}")
+    def (meta, refseq, fasta, gff) = input
+    // As for now, there are only two input options: RefSeq ID or local files. The pipeline will throw an error if the sample sheet does not contain the proper information
+    // For the RefSeq ID option
+    if ( meta && refseq && !fasta && !gff ) {
+        return [ meta, refseq ]
+    // For the local files option
+    } else if ( meta && !refseq && fasta && gff) {
+        return [ meta, fasta, gff ]
+    } else {
+        error("You should supply the species name and either assemblie files or a RefSeq ID")
     }
+    // Check that multiple runs of the same sample are of the same datatype i.e. single-end / paired-end
+    //def endedness_ok = metas.collect{ it.single_end }.unique().size == 1
+    //if (!endedness_ok) {
+    //    error("Please check input samplesheet -> Multiple runs of a sample must be of the same datatype i.e. single-end or paired-end: ${metas[0].id}")
+    //}
 
-    return [ metas[0], fastqs ]
+    //return [ metas[0], fastqs ]
 }
 //
 // Get attribute from genome config file e.g. fasta
