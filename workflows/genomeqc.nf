@@ -4,8 +4,9 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { NCBIGENOMEDOWNLOAD                } from '../modules/nf-core/ncbigenomedownload/main'
 include { CREATE_PATH                       } from '../modules/local/create_path'
+include { NCBIGENOMEDOWNLOAD                } from '../modules/nf-core/ncbigenomedownload/main'
+include { BUSCO_BUSCO                       } from '../modules/nf-core/busco/busco/main'
 include { FASTQC                            } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                           } from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap                  } from 'plugin/nf-validation'
@@ -56,9 +57,22 @@ workflow GENOMEQC {
         CREATE_PATH.out.meta,
         CREATE_PATH.out.accession,
         [],
-        'all'
+        params.groups
     )
     ch_versions = ch_versions.mix(NCBIGENOMEDOWNLOAD.out.versions.first())
+
+    //
+    // MODULE: Run BUSCO
+    //
+
+    BUSCO_BUSCO (  
+        GFFREAD.out.proteins_busco, 
+        params.busco_mode,
+        params.busco_lineage,
+        params.busco_lineages_path ?: [],
+        params.busco_config ?: []
+    )
+    ch_versions = ch_versions.mix(BUSCO_BUSCO.out.versions.first())
 
     //
     // MODULE: Run FastQC
