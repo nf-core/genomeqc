@@ -7,6 +7,7 @@
 include { CREATE_PATH                       } from '../modules/local/create_path'
 include { NCBIGENOMEDOWNLOAD                } from '../modules/nf-core/ncbigenomedownload/main'
 include { BUSCO_BUSCO                       } from '../modules/nf-core/busco/busco/main'
+include { GFFREAD                           } from '../modules/local/gffread'
 include { FASTQC                            } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                           } from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap                  } from 'plugin/nf-validation'
@@ -60,6 +61,15 @@ workflow GENOMEQC {
         params.groups
     )
     ch_versions = ch_versions.mix(NCBIGENOMEDOWNLOAD.out.versions.first())
+    
+    //
+    // Run GFFREAD
+    //
+
+    GFFREAD ( 
+        NCBIGENOMEDOWNLOAD.out.fna.mix( ch_input.local.map { [it[0],file(it[1])] } ),
+        NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { [it[0],file(it[2])] } ) 
+    )
 
     //
     // MODULE: Run BUSCO
