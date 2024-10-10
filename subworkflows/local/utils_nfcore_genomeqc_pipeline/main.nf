@@ -156,7 +156,7 @@ def validateInputSamplesheet(input) {
     } else if ( meta && !refseq && fasta && gff) {
         return [ meta, fasta, gff ]
     } else {
-        error("Incorrent sample sheet format")
+        error("Please check input samplesheet -> Incorrent samplesheet format")
     }
     // Check that multiple runs of the same sample are of the same datatype i.e. single-end / paired-end
     //def endedness_ok = metas.collect{ it.single_end }.unique().size == 1
