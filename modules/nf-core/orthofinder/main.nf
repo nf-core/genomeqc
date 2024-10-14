@@ -33,7 +33,7 @@ process ORTHOFINDER {
         -p temp_pickle \\
         -f input \\
         -n $prefix \\
-        $include_command \\  
+        $include_command \\
         $args
 
     if [ -e input/OrthoFinder/Results_$prefix ]; then
