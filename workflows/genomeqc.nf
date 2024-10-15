@@ -6,8 +6,10 @@
 
 include { CREATE_PATH                       } from '../modules/local/create_path'
 include { NCBIGENOMEDOWNLOAD                } from '../modules/nf-core/ncbigenomedownload/main'
+include { LONGEST                           } from '../modules/local/longest'
+include { PIGZ_UNCOMPRESS                   } from '../modules/nf-core/pigz/uncompress/main'
 include { BUSCO_BUSCO                       } from '../modules/nf-core/busco/busco/main'
-include { GFFREAD                           } from '../modules/local/gffread'
+include { GFFREAD                           } from '../modules/nf-core/gffread/main'
 include { ORTHOFINDER                       } from '../modules/nf-core/orthofinder/main'
 include { FASTQC                            } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                           } from '../modules/nf-core/multiqc/main'
@@ -64,12 +66,30 @@ workflow GENOMEQC {
     ch_versions = ch_versions.mix(NCBIGENOMEDOWNLOAD.out.versions.first())
     
     //
+    // Run AGAT longest isoform
+    //
+
+    LONGEST (
+        NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { [it[0],file(it[2])] } )
+    )
+
+    //
+    // Run uncompressed, GFFREAD requires uncompressed fasta as input
+    //
+    // Running pigz uncompress should be optional
+
+    PIGZ_UNCOMPRESS (
+        NCBIGENOMEDOWNLOAD.out.fna.map { [it[0],file(it[1])] }.mix( ch_input.local.map { [it[0],file(it[1])] } )
+    )
+    
+    //
     // Run GFFREAD
     //
 
     GFFREAD ( 
-        NCBIGENOMEDOWNLOAD.out.fna.mix( ch_input.local.map { [it[0],file(it[1])] } ),
-        NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { [it[0],file(it[2])] } ) 
+        LONGEST.out.longest_proteins,
+        //NCBIGENOMEDOWNLOAD.out.fna.map { file(it[1]) }.mix( ch_input.local.map { file(it[1]) } )
+        PIGZ_UNCOMPRESS.out.file.map { file(it[1]) }.mix( ch_input.local.map { file(it[1]) } )
     )
 
 
@@ -82,8 +102,10 @@ workflow GENOMEQC {
     //    [GFFREAD.out.longest.collect()]
     //]
 
-    ortho_ch = GFFREAD.out.longest.collect().map { it-> [[id:"orthofinder"], it] }
+    ortho_ch = GFFREAD.out.gffread_fasta.map { it[1] }.collect().map { it-> [[id:"orthofinder"], it] }
 
+    ortho_ch.view()
+    
     //ortho_ch.view()
 
     ORTHOFINDER (
@@ -97,7 +119,7 @@ workflow GENOMEQC {
     //
 
     BUSCO_BUSCO (  
-        GFFREAD.out.proteins_busco, 
+        GFFREAD.out.gffread_fasta, 
         params.busco_mode,
         params.busco_lineage,
         params.busco_lineages_path ?: [],
