@@ -16,7 +16,6 @@ include { paramsSummaryMultiqc              } from '../subworkflows/nf-core/util
 include { softwareVersionsToYAML            } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText            } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
 include { validateInputSamplesheet          } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
-include { FASTA_EXPLORE_SEARCH_PLOT_TIDK    } from '../subworkflows/nf-core/fasta_explore_search_plot_tidk'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -65,20 +64,12 @@ workflow GENOMEQC {
     ch_versions = ch_versions.mix(NCBIGENOMEDOWNLOAD.out.versions.first())
     
     //
-    // MODULE: Run GFFREAD
+    // Run GFFREAD
     //
 
     GFFREAD ( 
         NCBIGENOMEDOWNLOAD.out.fna.mix( ch_input.local.map { [it[0],file(it[1])] } ),
         NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { [it[0],file(it[2])] } ) 
-    )
-
-    //
-    // SUBWORKFLOW: Run TIDK
-    //    
-
-    FASTA_EXPLORE_SEARCH_PLOT_TIDK (
-        NCBIGENOMEDOWNLOAD.out.fna.mix( ch_input.local.map { [it[0],file(it[1])] } ), []
     )
 
 
