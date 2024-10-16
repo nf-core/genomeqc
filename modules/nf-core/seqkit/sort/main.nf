@@ -21,7 +21,7 @@ process SEQKIT_SORT {
     script:
     def args        = task.ext.args ?: ''
     def args2       = task.ext.args2 ?: ''
-    prefix          = task.ext.prefix ?: "${meta.id}"
+    prefix = task.ext.prefix ?: "${meta.id}_sorted"  // Add "_sorted" to disambiguate
     def extension   = "fastq"
     if ("$fastx" ==~ /.+\.fasta|.+\.fasta.gz|.+\.fa|.+\.fa.gz|.+\.fas|.+\.fas.gz|.+\.fna|.+\.fna.gz|.+\.fsa|.+\.fsa.gz/ ) {
         extension   = "fasta"
