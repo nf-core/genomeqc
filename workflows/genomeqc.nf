@@ -4,20 +4,21 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { CREATE_PATH                       } from '../modules/local/create_path'
-include { NCBIGENOMEDOWNLOAD                } from '../modules/nf-core/ncbigenomedownload/main'
-include { LONGEST                           } from '../modules/local/longest'
-include { PIGZ_UNCOMPRESS                   } from '../modules/nf-core/pigz/uncompress/main'
-include { BUSCO_BUSCO                       } from '../modules/nf-core/busco/busco/main'
-include { GFFREAD                           } from '../modules/nf-core/gffread/main'
-include { ORTHOFINDER                       } from '../modules/nf-core/orthofinder/main'
-include { FASTQC                            } from '../modules/nf-core/fastqc/main'
-include { MULTIQC                           } from '../modules/nf-core/multiqc/main'
-include { paramsSummaryMap                  } from 'plugin/nf-validation'
-include { paramsSummaryMultiqc              } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML            } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText            } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
-include { validateInputSamplesheet          } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
+include { CREATE_PATH                         } from '../modules/local/create_path'
+include { NCBIGENOMEDOWNLOAD                  } from '../modules/nf-core/ncbigenomedownload/main'
+include { LONGEST                             } from '../modules/local/longest'
+include { PIGZ_UNCOMPRESS as UNCOMPRESS_FASTA } from '../modules/nf-core/pigz/uncompress/main'
+include { PIGZ_UNCOMPRESS as UNCOMPRESS_GFF   } from '../modules/nf-core/pigz/uncompress/main'
+include { BUSCO_BUSCO                         } from '../modules/nf-core/busco/busco/main'
+include { GFFREAD                             } from '../modules/nf-core/gffread/main'
+include { ORTHOFINDER                         } from '../modules/nf-core/orthofinder/main'
+include { FASTQC                              } from '../modules/nf-core/fastqc/main'
+include { MULTIQC                             } from '../modules/nf-core/multiqc/main'
+include { paramsSummaryMap                    } from 'plugin/nf-validation'
+include { paramsSummaryMultiqc                } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML              } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText              } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
+include { validateInputSamplesheet            } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,10 +46,10 @@ workflow GENOMEQC {
         }
         .set { ch_input }
 
-    ch_input.ncbi.view()
     //
     // MODULE: Run create_path
     //
+
     CREATE_PATH (
         ch_input.ncbi
     )
@@ -66,21 +67,45 @@ workflow GENOMEQC {
     ch_versions = ch_versions.mix(NCBIGENOMEDOWNLOAD.out.versions.first())
     
     //
+    // Define gff and fasta varliables
+    //
+
+    fasta = NCBIGENOMEDOWNLOAD.out.fna.mix( ch_input.local.map { [it[0],file(it[2])] } )
+    gff =   NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { [it[0],file(it[1])] } )
+    
+    // Uncompress fasta if necessary | Consider using brances as an alternative
+
+    if (fasta.map { it[1].endsWith(".gz") } ) {
+        ch_fasta = UNCOMPRESS_FASTA ( fasta ).file
+    } else {
+        ch_fasta = fasta
+    }
+    
+    // Uncompress gff if necessary
+
+    if (gff.map { it[1].endsWith(".gz") } ) {
+        ch_gff = UNCOMPRESS_GFF ( gff ).file
+    } else {
+        ch_gff = gff
+    }
+
+    //
     // Run AGAT longest isoform
     //
 
     LONGEST (
-        NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { [it[0],file(it[2])] } )
+        ch_gff
     )
 
     //
     // Run uncompressed, GFFREAD requires uncompressed fasta as input
     //
     // Running pigz uncompress should be optional
-
-    PIGZ_UNCOMPRESS (
-        NCBIGENOMEDOWNLOAD.out.fna.map { [it[0],file(it[1])] }.mix( ch_input.local.map { [it[0],file(it[1])] } )
-    )
+    
+    
+    //PIGZ_UNCOMPRESS (
+    //    NCBIGENOMEDOWNLOAD.out.fna.map { [it[0],file(it[1])] }.mix( ch_input.local.map { [it[0],file(it[1])] } )
+    //)
     
     //
     // Run GFFREAD
@@ -88,8 +113,7 @@ workflow GENOMEQC {
 
     GFFREAD ( 
         LONGEST.out.longest_proteins,
-        //NCBIGENOMEDOWNLOAD.out.fna.map { file(it[1]) }.mix( ch_input.local.map { file(it[1]) } )
-        PIGZ_UNCOMPRESS.out.file.map { file(it[1]) }.mix( ch_input.local.map { file(it[1]) } )
+        ch_fasta.map { file(it[1]) }
     )
 
 
