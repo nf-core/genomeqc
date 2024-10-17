@@ -19,6 +19,7 @@ include { paramsSummaryMultiqc                } from '../subworkflows/nf-core/ut
 include { softwareVersionsToYAML              } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText              } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
 include { validateInputSamplesheet            } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
+include { FASTA_EXPLORE_SEARCH_PLOT_TIDK      } from '../subworkflows/nf-core/fasta_explore_search_plot_tidk/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -88,6 +89,15 @@ workflow GENOMEQC {
     } else {
         ch_gff = gff
     }
+
+    //
+    // Run TIDK
+    //
+
+    FASTA_EXPLORE_SEARCH_PLOT_TIDK (
+        ch_fasta,
+        []
+    )
 
     //
     // Run AGAT longest isoform
