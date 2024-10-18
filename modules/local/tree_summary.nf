@@ -19,13 +19,7 @@ process TREE_SUMMARY {
     """
     # Run summary plot
     plot_tree_summary.pl ${tree}
-    
-    #md5sum "${prefix}.longest.gff3" > "${prefix}.longest.gff3.md5"
 
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        Perl version: \$(perl --version | grep "version" | sed 's/.*(//g' | sed 's/[)].*//')
-    END_VERSIONS
     """
 
 }

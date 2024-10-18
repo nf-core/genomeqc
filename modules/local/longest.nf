@@ -12,8 +12,6 @@ process LONGEST {
 
     output:
     tuple val (meta), path( "${meta.id}.longest.gff3" ),                emit: longest_proteins
-    tuple val (meta), path( "${meta.id}.stat.original.txt" ),           emit: agat_summary_original
-    tuple val (meta), path( "${meta.id}.stat.long.txt" ),               emit: agat_summary_longest
     path "versions.yml", emit: versions
 
     script:
@@ -21,10 +19,6 @@ process LONGEST {
     """
     # Run agat to find longest orf for each gene 
     agat_sp_keep_longest_isoform.pl -gff ${gff} -o ${prefix}.longest.gff3
-    
-    # Run a few summarisation scripts to report the actual genes being considered.
-    agat_sp_functional_statistics.pl --gff ${gff} -o ${prefix}.stat.original.txt
-    agat_sp_functional_statistics.pl --gff ${prefix}.longest.gff3 -o ${prefix}.stat.long.txt
     
     md5sum "${prefix}.longest.gff3" > "${prefix}.longest.gff3.md5"
 

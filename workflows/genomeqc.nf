@@ -122,61 +122,61 @@ workflow GENOMEQC {
     // Run GFFREAD
     //
 
-    GFFREAD ( 
-        LONGEST.out.longest_proteins,
-        ch_fasta.map { file(it[1]) }
-    )
+    //ch_fasta.view()
+    //LONGEST.out.longest_proteins.view()
+
+    ch_long_gff = LONGEST.out.longest_proteins
+    
+
+// Step 1: View the content of each channel before joining
+ch_long_gff.view()
+ch_fasta.view()
 
 
-    //
-    // MODULE: Run Orthofinder
-    //
+// Step 1: View the content of each channel before joining
+ch_gff_fasta = ch_long_gff.join(ch_fasta)
+    .map { wrapped_id, path1, path2 ->
+        // Log the wrapped_id to understand its structure
+        log.info "Wrapped ID: ${wrapped_id}"
 
-    //ortho_ch = [ 
-    //    [id:"orthofinder"],
-    //    [GFFREAD.out.longest.collect()]
-    //]
+        // Check if wrapped_id is valid and contains the expected structure
+        if (wrapped_id && wrapped_id.size() == 1) {
+            // Log the entire wrapped_id for debugging
+            log.info "Inspecting wrapped_id structure: ${wrapped_id}"
 
-    ortho_ch = GFFREAD.out.gffread_fasta.map { it[1] }.collect().map { it-> [[id:"orthofinder"], it] }
+            // Check if the wrapped_id is a single-element list containing a map
+            if (wrapped_id[0] instanceof Map) {
+                def id_map = wrapped_id[0]  // Get the first element which should be a map
+                
+                // Log the ID map for further inspection
+                log.info "ID Map: ${id_map}"
 
-    ORTHOFINDER (
-        ortho_ch,
-        [[],[]]
-    )
-    ch_versions = ch_versions.mix(ORTHOFINDER.out.versions)
+                // Check for the 'id' key
+                if (id_map.containsKey('id')) {
+                    def id = id_map['id']  // Safely get the id from the map
+                    log.info "Extracted ID: ${id}"
 
-    //
-    // MODULE: Run BUSCO
-    //
+                    // Create a tuple for (meta, gff) and keep fasta as is
+                    return [tuple(id, path1), path2]
+                } else {
+                    log.error "Invalid ID map structure for wrapped_id: ${wrapped_id}. Missing 'id' key."
+                    return null  // Handle the case where id is missing
+                }
+            } else {
+                // If it's not a map, try treating wrapped_id as a single string
+                log.warn "Wrapped ID is not a map, treating it as a string: ${wrapped_id[0]}"
+                def id = wrapped_id[0].toString()  // Convert the first element to string
+                return [tuple(id, path1), path2]
+            }
+        } else {
+            log.error "Invalid wrapped_id: ${wrapped_id}. Structure is not valid."
+            return null  // or throw an error if preferred
+        }
+    }
+    .filter { it != null } // Filter out any null results
 
-    BUSCO_BUSCO (  
-        GFFREAD.out.gffread_fasta, 
-        params.busco_mode,
-        params.busco_lineage,
-        params.busco_lineages_path ?: [],
-        params.busco_config ?: []
-    )
-    ch_versions = ch_versions.mix(BUSCO_BUSCO.out.versions.first())
 
-    //
-    // MODULE: Run TREE SUMMARY
-    //  
 
-    ORTHOFINDER.out.orthofinder.view()
-
-    //TREE_SUMMARY (
-    //    ORTHOFINDER.out.orthofinder
-    //    BUSCO_BUSCO.out.full_table.collect()
-    //)
-
-    //
-    // MODULE: Run FastQC
-    //
-//    FASTQC (
-//        ch_samplesheet
-//    )
-//    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]})
-//    ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
     //
     // Collate and save software versions
