@@ -14,6 +14,7 @@ include { GFFREAD                             } from '../modules/nf-core/gffread
 include { ORTHOFINDER                         } from '../modules/nf-core/orthofinder/main'
 include { FASTQC                              } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                             } from '../modules/nf-core/multiqc/main'
+include { TREE_SUMMARY                        } from '../modules/local/tree_summary'
 include { paramsSummaryMap                    } from 'plugin/nf-validation'
 include { paramsSummaryMultiqc                } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML              } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -138,10 +139,6 @@ workflow GENOMEQC {
 
     ortho_ch = GFFREAD.out.gffread_fasta.map { it[1] }.collect().map { it-> [[id:"orthofinder"], it] }
 
-    ortho_ch.view()
-    
-    //ortho_ch.view()
-
     ORTHOFINDER (
         ortho_ch,
         [[],[]]
@@ -160,6 +157,17 @@ workflow GENOMEQC {
         params.busco_config ?: []
     )
     ch_versions = ch_versions.mix(BUSCO_BUSCO.out.versions.first())
+
+    //
+    // MODULE: Run TREE SUMMARY
+    //  
+
+    ORTHOFINDER.out.orthofinder.view()
+
+    //TREE_SUMMARY (
+    //    ORTHOFINDER.out.orthofinder
+    //    BUSCO_BUSCO.out.full_table.collect()
+    //)
 
     //
     // MODULE: Run FastQC
