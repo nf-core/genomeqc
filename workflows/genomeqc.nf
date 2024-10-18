@@ -10,6 +10,8 @@ include { LONGEST                             } from '../modules/local/longest'
 include { PIGZ_UNCOMPRESS as UNCOMPRESS_FASTA } from '../modules/nf-core/pigz/uncompress/main'
 include { PIGZ_UNCOMPRESS as UNCOMPRESS_GFF   } from '../modules/nf-core/pigz/uncompress/main'
 include { BUSCO_BUSCO                         } from '../modules/nf-core/busco/busco/main'
+include { QUAST                               } from '../modules/nf-core/quast/main'
+include { AGAT_SPSTATISTICS                   } from '../modules/nf-core/agat/spstatistics/main'
 include { GFFREAD                             } from '../modules/nf-core/gffread/main'
 include { ORTHOFINDER                         } from '../modules/nf-core/orthofinder/main'
 include { FASTQC                              } from '../modules/nf-core/fastqc/main'
@@ -89,6 +91,24 @@ workflow GENOMEQC {
     } else {
         ch_gff = gff
     }
+
+    //
+    // Run Quast
+    //
+
+    QUAST (
+        ch_fasta,
+        [[],[]],
+        ch_gff
+    )
+
+    //
+    // Run AGAT Spstatistics
+    //
+
+    AGAT_SPSTATISTICS (
+        ch_gff
+    )
 
     //
     // Run TIDK
