@@ -1,6 +1,6 @@
 process TREE_SUMMARY {
 
-    tag "$meta.id"
+    tag "$meta1.id"
     label 'process_single'
 
     container = 'biocontainers/agat:1.3.0--pl5321hdfd78af_0'
@@ -8,14 +8,14 @@ process TREE_SUMMARY {
 
     input:
     tuple val(meta1), path(tree)
-    tuple val(meta2), path(busco)
+    path (busco)
 
     output:
-    path( "${meta1.id}.pdf" ),                emit: figure
+    path( "${meta1}.pdf" ),                emit: figure
     path( "versions.yml"    ),                emit: versions
 
     script:
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    def prefix = task.ext.prefix ?: "${meta1.id}"
     """
     # Run summary plot
     plot_tree_summary.pl ${tree}

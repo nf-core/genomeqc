@@ -122,16 +122,8 @@ workflow GENOMEQC {
     // Run GFFREAD
     //
 
-    //ch_fasta.view()
-    //LONGEST.out.longest_proteins.view()
-
     ch_long_gff = LONGEST.out.longest_proteins
     
-
-    // Step 1: View the content of each channel before joining
-    //ch_long_gff.view()
-    //ch_fasta.view()
-
     inputChannel = ch_long_gff.combine(ch_fasta, by: 0)
 
     // Split the input channel into two channels
@@ -139,18 +131,14 @@ workflow GENOMEQC {
         // Extracting the GFF path and ID
         [tuple[0], tuple[1]]
     }
-
     fnaChannel = inputChannel.map { tuple ->
         // Extracting only the FNA path
         tuple[2]
     }
 
-    // Usage example: Print the outputs of both channels
-    gffChannel.view()
-    fnaChannel.view()
-
     GFFREAD ( 
-        gffChannel , fnaChannel
+        gffChannel, 
+        fnaChannel
     )
 
     //
@@ -182,7 +170,11 @@ workflow GENOMEQC {
     // MODULE: Run TREE SUMMARY
     //  
 
-    ORTHOFINDER.out.orthofinder.view()
+
+    TREE_SUMMARY (
+        ORTHOFINDER.out.orthofinder,
+        BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file }
+    )
 
     //
     // Collate and save software versions
