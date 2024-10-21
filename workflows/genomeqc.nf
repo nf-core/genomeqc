@@ -6,15 +6,10 @@
 
 include { CREATE_PATH                         } from '../modules/local/create_path'
 include { NCBIGENOMEDOWNLOAD                  } from '../modules/nf-core/ncbigenomedownload/main'
-include { LONGEST                             } from '../modules/local/longest'
 include { PIGZ_UNCOMPRESS as UNCOMPRESS_FASTA } from '../modules/nf-core/pigz/uncompress/main'
 include { PIGZ_UNCOMPRESS as UNCOMPRESS_GFF   } from '../modules/nf-core/pigz/uncompress/main'
-include { BUSCO_BUSCO                         } from '../modules/nf-core/busco/busco/main'
-include { QUAST                               } from '../modules/nf-core/quast/main'
-include { AGAT_SPSTATISTICS                   } from '../modules/nf-core/agat/spstatistics/main'
-include { GFFREAD                             } from '../modules/nf-core/gffread/main'
-include { ORTHOFINDER                         } from '../modules/nf-core/orthofinder/main'
-include { FASTQC                              } from '../modules/nf-core/fastqc/main'
+include { GENOME                              } from '../subworkflows/local/genome'
+include { GENOME_AND_ANNOTATION               } from '../subworkflows/local/genome_and_annotation'
 include { MULTIQC                             } from '../modules/nf-core/multiqc/main'
 include { TREE_SUMMARY                        } from '../modules/local/tree_summary'
 include { paramsSummaryMap                    } from 'plugin/nf-validation'
@@ -42,7 +37,7 @@ workflow GENOMEQC {
 
     ch_samplesheet
         .map {
-            validateInputSamplesheet(it) // Input validation
+            validateInputSamplesheet(it) // Input validation (check local subworkflow)
         }
         .branch {
             ncbi: it.size() == 2
@@ -75,9 +70,9 @@ workflow GENOMEQC {
     //
 
     fasta = NCBIGENOMEDOWNLOAD.out.fna.mix( ch_input.local.map { [it[0],file(it[2])] } )
-    gff =   NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { [it[0],file(it[1])] } )
+    gff   = NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { [it[0],file(it[1])] } )
     
-    // Uncompress fasta if necessary | Consider using brances as an alternative
+    // Uncompress files if necessary | Consider using brances as an alternative
 
     if (fasta.map { it[1].endsWith(".gz") } ) {
         ch_fasta = UNCOMPRESS_FASTA ( fasta ).file
@@ -94,24 +89,6 @@ workflow GENOMEQC {
     }
 
     //
-    // Run Quast
-    //
-
-    QUAST (
-        ch_fasta,
-        [[],[]],
-        ch_gff
-    )
-
-    //
-    // Run AGAT Spstatistics
-    //
-
-    AGAT_SPSTATISTICS (
-        ch_gff
-    )
-
-    //
     // Run TIDK
     //
 
@@ -120,81 +97,27 @@ workflow GENOMEQC {
         []
     )
 
-    //
-    // Run AGAT longest isoform
-    //
+    // Run genome only or genome + gff
 
-    LONGEST (
-        ch_gff
-    )
-
-    //
-    // Run uncompressed, GFFREAD requires uncompressed fasta as input
-    //
-    // Running pigz uncompress should be optional
-    
-    
-    //PIGZ_UNCOMPRESS (
-    //    NCBIGENOMEDOWNLOAD.out.fna.map { [it[0],file(it[1])] }.mix( ch_input.local.map { [it[0],file(it[1])] } )
-    //)
-    
-    //
-    // Run GFFREAD
-    //
-
-    ch_long_gff = LONGEST.out.longest_proteins
-    
-    inputChannel = ch_long_gff.combine(ch_fasta, by: 0)
-
-    // Split the input channel into two channels
-    gffChannel = inputChannel.map { tuple ->
-        // Extracting the GFF path and ID
-        [tuple[0], tuple[1]]
+    if (params.genome_only) {
+        GENOME (
+            ch_fasta
+        )
+    } else {
+        GENOME_AND_ANNOTATION (
+            ch_fasta,
+            ch_gff
+        )
     }
-    fnaChannel = inputChannel.map { tuple ->
-        // Extracting only the FNA path
-        tuple[2]
-    }
-
-    GFFREAD ( 
-        gffChannel, 
-        fnaChannel
-    )
-
-    //
-    // MODULE: Run Orthofinder
-    //
-
-    ortho_ch = GFFREAD.out.gffread_fasta.map { it[1] }.collect().map { it-> [[id:"orthofinder"], it] }
-
-    ORTHOFINDER (
-        ortho_ch,
-        [[],[]]
-    )
-    ch_versions = ch_versions.mix(ORTHOFINDER.out.versions)
-
-    //
-    // MODULE: Run BUSCO
-    //
-
-    BUSCO_BUSCO (  
-        GFFREAD.out.gffread_fasta, 
-        params.busco_mode,
-        params.busco_lineage,
-        params.busco_lineages_path ?: [],
-        params.busco_config ?: []
-    )
-    ch_versions = ch_versions.mix(BUSCO_BUSCO.out.versions.first())
 
     //
     // MODULE: Run TREE SUMMARY
     //  
 
-
-    TREE_SUMMARY (
-        ORTHOFINDER.out.orthofinder,
-        BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file }
-    )
+ //   TREE_SUMMARY (
+ //       GENOME_AND_ANNOTATION.out.orthofinder,
+ //       GENOME_AND_ANNOTATION.out.busco
+ //   )
 
     //
     // Collate and save software versions
@@ -248,8 +171,6 @@ workflow GENOMEQC {
 
     emit:
     multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
-    //gff            = NCBIGENOMEDOWNLOAD.out.gff
-    //fasta          = NCBIGENOMEDOWNLOAD.out.fna
     versions       = ch_versions                 // channel: [ path(versions.yml) ]
 }
 
