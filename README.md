@@ -82,13 +82,15 @@ Each row represents a species, with its associated genome, gff or Refseq ID (to 
 
 Now, you can run the pipeline using:
 
-Right now, to download genomes, running locally with
-
 ```
-nextflow run main.nf -profile docker --input assets/samplesheet.csv --outdir results
+nextflow run main.nf -resume -profile docker,test --outdir results
 ```
 
-should work.
+or 
+
+```
+nextflow run main.nf -resume -profile docker --input assets/samplesheet.csv --outdir results
+```
 
 <!-- TODO nf-core: update the following command to include all required parameters for a minimal example -->
 
