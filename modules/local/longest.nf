@@ -1,5 +1,4 @@
 process LONGEST {
-
     tag "$meta.id"
     label 'process_single'
     label 'process_med_memory'
