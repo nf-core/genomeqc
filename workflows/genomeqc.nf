@@ -99,6 +99,22 @@ workflow GENOMEQC {
 
     // Run genome only or genome + gff
 
+    //
+    // Run AGAT longest isoform
+    //
+
+    LONGEST (
+        ch_gff
+    )
+
+    //
+    // Run GFFREAD
+    //
+
+    ch_long_gff = LONGEST.out.longest_proteins
+    
+    inputChannel = ch_long_gff.combine(ch_fasta, by: 0)
+
     if (params.genome_only) {
         GENOME (
             ch_fasta
