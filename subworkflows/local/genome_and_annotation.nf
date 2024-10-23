@@ -3,7 +3,8 @@ include { LONGEST                             } from '../../modules/local/longes
 include { BUSCO_BUSCO                         } from '../../modules/nf-core/busco/busco/main'
 include { QUAST                               } from '../../modules/nf-core/quast/main'
 include { AGAT_SPSTATISTICS                   } from '../../modules/nf-core/agat/spstatistics/main'
-include { GFFREAD                             } from '../../modules/nf-core/gffread/main'
+//include { GFFREAD                             } from '../../modules/nf-core/gffread/main'
+include { GFFREAD                             } from '../../modules/local/gffread'
 include { ORTHOFINDER                         } from '../../modules/nf-core/orthofinder/main'
 
 workflow GENOME_AND_ANNOTATION {
@@ -42,18 +43,18 @@ workflow GENOME_AND_ANNOTATION {
     // Run AGAT longest isoform
     //
 
-    LONGEST (
-        ch_gff
-    )
-    ch_versions = ch_versions.mix(LONGEST.out.versions.first())
-
-    //
-    // Run GFFREAD
-    //
-
-    ch_long_gff = LONGEST.out.longest_proteins
-    
-    inputChannel = ch_long_gff.combine(ch_fasta, by: 0)
+//    LONGEST (
+//        ch_gff
+//    )
+//    ch_versions = ch_versions.mix(LONGEST.out.versions.first())
+//
+//    //
+//    // Run GFFREAD
+//    //
+//
+//    ch_long_gff = LONGEST.out.longest_proteins
+//    
+    inputChannel = ch_gff.combine(ch_fasta, by: 0)
 
     // Split the input channel into two channels
     gffChannel = inputChannel.map { tuple ->
@@ -62,12 +63,12 @@ workflow GENOME_AND_ANNOTATION {
     }
     fnaChannel = inputChannel.map { tuple ->
         // Extracting only the FNA path
-        tuple[2]
+        [tuple[0], tuple[2]]
     }
 
     GFFREAD ( 
-        gffChannel,
-        fnaChannel
+        fnaChannel,
+        gffChannel
     )
     ch_versions = ch_versions.mix(GFFREAD.out.versions.first())
 
@@ -75,7 +76,11 @@ workflow GENOME_AND_ANNOTATION {
     // MODULE: Run Orthofinder
     //
 
-    ortho_ch = GFFREAD.out.gffread_fasta.map { it[1] }.collect().map { it -> [[id:"orthofinder"], it] }
+    GFFREAD.out.longest.view()
+
+    ortho_ch = GFFREAD.out.longest.collect().map { it -> [[id:"orthofinder"], it] }
+
+    ortho_ch.view()
 
     ORTHOFINDER (
         ortho_ch,
@@ -88,7 +93,7 @@ workflow GENOME_AND_ANNOTATION {
     //
 
     BUSCO_BUSCO (  
-        GFFREAD.out.gffread_fasta, 
+        GFFREAD.out.proteins_busco, 
         "proteins", // Hard coded, it's the only possible option
         params.busco_lineage,
         params.busco_lineages_path ?: [],

@@ -99,22 +99,6 @@ workflow GENOMEQC {
 
     // Run genome only or genome + gff
 
-    //
-    // Run AGAT longest isoform
-    //
-
-    LONGEST (
-        ch_gff
-    )
-
-    //
-    // Run GFFREAD
-    //
-
-    ch_long_gff = LONGEST.out.longest_proteins
-    
-    inputChannel = ch_long_gff.combine(ch_fasta, by: 0)
-
     if (params.genome_only) {
         GENOME (
             ch_fasta
@@ -130,10 +114,10 @@ workflow GENOMEQC {
     // MODULE: Run TREE SUMMARY
     //  
 
- //   TREE_SUMMARY (
- //       GENOME_AND_ANNOTATION.out.orthofinder,
- //       GENOME_AND_ANNOTATION.out.busco
- //   )
+    TREE_SUMMARY (
+        GENOME_AND_ANNOTATION.out.orthofinder,
+        GENOME_AND_ANNOTATION.out.busco
+    )
 
     //
     // Collate and save software versions
