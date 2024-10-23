@@ -1,5 +1,4 @@
 process TREE_SUMMARY {
-
     tag "$meta.id"
     label 'process_single'
 
@@ -14,6 +13,7 @@ process TREE_SUMMARY {
     path( "P*.pdf"          ),                emit: figure
     path( "versions.yml"    ),                emit: versions
 
+
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
@@ -26,7 +26,6 @@ process TREE_SUMMARY {
 
     # Combine QUAST ouput
     python3 ${projectDir}/bin/quast_2_table.py *quast.tsv -o Quast_to_plot.tsv -col N50,N90 -plot_types bar,bar
-
 
     # Run summary plot
     /usr/bin/Rscript ${projectDir}/bin/plot_tree_summary2.R ${tree}/Species_Tree/SpeciesTree_rooted_node_labels.txt Busco_to_plot.tsv
