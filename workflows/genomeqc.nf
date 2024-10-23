@@ -129,16 +129,6 @@ workflow GENOMEQC {
     )
 
     //
-    // Run uncompressed, GFFREAD requires uncompressed fasta as input
-    //
-    // Running pigz uncompress should be optional
-    
-    
-    //PIGZ_UNCOMPRESS (
-    //    NCBIGENOMEDOWNLOAD.out.fna.map { [it[0],file(it[1])] }.mix( ch_input.local.map { [it[0],file(it[1])] } )
-    //)
-    
-    //
     // Run GFFREAD
     //
 
@@ -195,6 +185,7 @@ workflow GENOMEQC {
         ORTHOFINDER.out.orthofinder,
         BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file }
     )
+
 
     //
     // Collate and save software versions
