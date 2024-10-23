@@ -39,6 +39,7 @@ workflow GENOMEQC {
 
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
+    ch_tree_data = Channel.empty()
 
     ch_samplesheet
         .map {
@@ -102,6 +103,7 @@ workflow GENOMEQC {
         [[],[]],
         ch_gff
     )
+    ch_tree_data = ch_tree_data.mix(QUAST.out.tsv.map { tuple -> tuple[1] })  
 
     //
     // Run AGAT Spstatistics
@@ -175,16 +177,18 @@ workflow GENOMEQC {
         params.busco_config ?: []
     )
     ch_versions = ch_versions.mix(BUSCO_BUSCO.out.versions.first())
+    ch_tree_data = ch_tree_data.mix(BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file }) 
 
+    
     //
     // MODULE: Run TREE SUMMARY
     //  
 
-
     TREE_SUMMARY (
         ORTHOFINDER.out.orthofinder,
-        BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file }
+        ch_tree_data.flatten().collect()
     )
+    
 
 
     //

@@ -62,31 +62,31 @@ Original automatic steps from nf-core pipeline create.
 First, prepare a `samplesheet.csv`, where your input data points to genomes + or annotations:
 
 ```csv
-sample,genome.fasta,annotation.gff
-Homo_sapiens,/path/to/genome.fasta,/path/to/annotation.gff3
-Gorilla_gorilla,/path/to/genome.fasta,
-Pan_paniscus,,/path/to/annotation.gff3
+species,refseq,fasta,gff
+Homo_sapiens,,/path/to/genome.fasta,/path/to/annotation.gff3
+Gorilla_gorilla,,/path/to/genome.fasta,
+Pan_paniscus,,/path/to/genome.fasta,/path/to/annotation.gff3
 ```
 
 Or to Refseq IDs of your species:
 
 ```csv
-sample,refseqID
-Pongo_abelii,GCF_028885655.2
-Macaca_mulatta,GCF_003339765.1
+species,refseq,fasta,gff
+Pongo_abelii,GCF_028885655.2,,
+Macaca_mulatta,GCF_003339765.1,,
 ```
 
-You can mix the two input types. Also, notice you can leave the genome or annotation absent.
+You can mix the two input types.
 
 Each row represents a species, with its associated genome, gff or Refseq ID (to autodownload the genome + gff).
 
-Now, you can run the pipeline using:
+You can run the pipeline using test profiles or example input samplesheets:
 
 ```
 nextflow run main.nf -resume -profile docker,test --outdir results
 ```
 
-or 
+or
 
 ```
 nextflow run main.nf -resume -profile docker --input assets/samplesheet.csv --outdir results
