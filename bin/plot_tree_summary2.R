@@ -219,7 +219,7 @@ if (length(plots) > 0) {
   combined_plot <- plot_grid(tree_plot, plot_grid(plotlist = plots, ncol = 1), ncol = 2, rel_widths = c(args$tree_size, 1 - args$tree_size))
   
   # Save the combined plot to a PDF file
-  ggsave("Phyloplot.pdf", plot = combined_plot, width = 10, height = 8)
+  ggsave("Phyloplot_busco.pdf", plot = combined_plot, width = 10, height = 8)
   
   # Save the legend to a separate PDF file if present
   if (!is.null(legend_plot)) {

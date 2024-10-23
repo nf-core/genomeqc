@@ -4,14 +4,14 @@ process TREE_SUMMARY {
     label 'process_single'
 
     container = 'ecoflowucl/genomeqc_tree:v1.3'
-    publishDir "$params.outdir/output_data/tree_plots" , mode: "${params.publish_dir_mode}", pattern:"*.pdf"
+    publishDir "$params.outdir/tree_plots" , mode: "${params.publish_dir_mode}", pattern:"Phyloplot_*.pdf"
 
     input:
     tuple val(meta), path(tree)
-    path (busco)
+    path  multiqc_files
 
     output:
-    path( "Phyloplot.pdf"   ),                emit: figure
+    path( "P*.pdf"          ),                emit: figure
     path( "versions.yml"    ),                emit: versions
 
     script:
@@ -24,9 +24,13 @@ process TREE_SUMMARY {
     sed -i \'s/\\.fasta//g\' Busco_combined_cut
     python3 ${projectDir}/bin/busco_2_table.py Busco_combined_cut Busco_to_plot.tsv
 
-    # Run summary plot
-    /usr/bin/Rscript ${projectDir}/bin/plot_tree_summary.R ${tree}/Species_Tree/SpeciesTree_rooted_node_labels.txt Busco_to_plot.tsv
+    # Combine QUAST ouput
+    python3 ${projectDir}/bin/quast_2_table.py *quast.tsv -o Quast_to_plot.tsv -col N50,N90 -plot_types bar,bar
 
+
+    # Run summary plot
+    /usr/bin/Rscript ${projectDir}/bin/plot_tree_summary2.R ${tree}/Species_Tree/SpeciesTree_rooted_node_labels.txt Busco_to_plot.tsv
+    /usr/bin/Rscript ${projectDir}/bin/plot_tree_summary.R ${tree}/Species_Tree/SpeciesTree_rooted_node_labels.txt Quast_to_plot.tsv
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         Perl version: \$(perl --version | grep "version" | sed 's/.*(//g' | sed 's/[)].*//')
