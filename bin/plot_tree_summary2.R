@@ -183,10 +183,53 @@ for (i in 2:length(column_headers)) {
     stacked_plot <- stacked_plot + theme(legend.position = "none")
     
     plots[[length(plots) + 1]] <- stacked_plot
+  } else if (plot_type == "pie") {
+    # Create a list to hold the pie charts for each row
+    pie_plots <- list()
+    
+    for (j in 1:nrow(data)) {
+      # Extract the values for the current row (species)
+      pie_data <- data[j, ] %>%
+        separate(column_name, into = paste0(column_name, "_", 1:4), sep = ",", convert = TRUE, extra = "drop") %>%
+        pivot_longer(cols = starts_with(column_name), names_to = "slice", values_to = "value") %>%
+        mutate(slice = factor(slice, levels = paste0(column_name, "_", 1:4)))
+
+      # Create the pie plot for this row (species)
+      pie_plot <- ggplot(pie_data, aes(x = "", y = value, fill = slice)) + 
+        geom_bar(stat = "identity", width = 1) + 
+        coord_polar(theta = "y") +  # Convert the bar plot to a pie chart
+        theme_void() +  # Remove axes and labels
+        theme(legend.position = "none")  # Remove the legend
+
+      # Save the pie chart for this species
+      pie_plots[[length(pie_plots) + 1]] <- pie_plot
+    }
+    
+    # Combine pie charts in a vertical grid (aligned with tree tips)
+    combined_pie_plot <- plot_grid(plotlist = pie_plots, ncol = 1, align = "v")
+    plots[[length(plots) + 1]] <- combined_pie_plot
   } else {
     cat("Unknown plot type:", plot_type, "for column:", column_name, "\n")
   }
 }
+
+
+# Combine the tree and the plots
+if (length(plots) > 0) {
+  combined_plot <- plot_grid(tree_plot, plot_grid(plotlist = plots, ncol = 1), ncol = 2, rel_widths = c(args$tree_size, 1 - args$tree_size))
+  
+  # Save the combined plot to a PDF file
+  ggsave("Phyloplot.pdf", plot = combined_plot, width = 10, height = 8)
+  
+  # Save the legend to a separate PDF file if present
+  if (!is.null(legend_plot)) {
+    legend_plot <- cowplot::plot_grid(legend_plot)
+    ggsave("Legend.pdf", plot = legend_plot, width = 10, height = 2)
+  }
+}
+
+
+
 
 # Debugging: Print the list of plots
 cat("List of plots:\n")
@@ -194,8 +237,7 @@ print(plots)
 
 # Combine the plots if there are any
 if (length(plots) > 0) {
-  combined_plot <- plot_grid(tree_plot, plot_grid(plotlist = plots, ncol = length(plots)), 
-                             ncol = 2, rel_widths = c(args$tree_size, 1 - args$tree_size))  # Adjust widths based on tree_size
+  combined_plot <- plot_grid(tree_plot, plot_grid(plotlist = plots, ncol = length(plots)), ncol = 2, rel_widths = c(args$tree_size, 1 - args$tree_size))  # Adjust widths based on tree_size
 
   # Save the combined plot to a PDF file
   ggsave("Phyloplot.pdf", plot = combined_plot, width = 10, height = 8)
