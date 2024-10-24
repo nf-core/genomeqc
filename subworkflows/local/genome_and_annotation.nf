@@ -82,11 +82,7 @@ workflow GENOME_AND_ANNOTATION {
     // MODULE: Run Orthofinder
     //
 
-    GFFREAD.out.longest.view()
-
     ortho_ch = GFFREAD.out.longest.collect().map { it -> [[id:"orthofinder"], it] }
-
-    ortho_ch.view()
 
     ORTHOFINDER (
         ortho_ch,
