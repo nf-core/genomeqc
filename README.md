@@ -12,9 +12,10 @@
 
 **ecoflow/genomeqc** is a bioinformatics pipeline that compares the quality of multiple genomes, along with their annotations.
 
-The pipeline takes a list of genomes and/or annotations (from raw files or Refseq IDs), and runs commonly used tools to assess their quality.
+The pipeline takes a list of genomes and annotations (from raw files or Refseq IDs), and runs commonly used tools to assess their quality.
 
-There are different ways you can run this pipeline. 1. Genome only, 2. Annotation only, or 3. Genome and Annotation.
+There will be three different ways you can run this pipeline. 1. Genome only, 2. Annotation only, or 3. Genome and Annotation. 
+**Only Genome plus Annotation is functional**
 
 <!-- TODO nf-core:
 For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#introduction
@@ -24,32 +25,26 @@ For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#intr
      workflows use the "tube map" design for that. See https://nf-co.re/docs/contributing/design_guidelines#examples for examples.   
 -->
 
-<!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline 
-Original automatic steps from nf-core pipeline create.
-1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
--->
-
-**Genome Only:**
-1. Downloads the genome files from NCBI `[NCBIGENOMEDOWNLOAD]` - Or you provide your own genomes
-2. Describes genome assembly:
-2a. `[BUSCO_BUSCO]`: Determines how complete is the genome compared to expected.
-2b. `[QUAST]`: Determines the N50, how contiguous the genome is.
-2c. More options
-3. Summary with MulitQC.
-
 **Genome and Annnotation:**
 1. Downloads the genome and gene annotation files from NCBI `[NCBIGENOMEDOWNLOAD]` - Or you provide your own genomes/annotations
 2. Describes genome assembly:
-2a. `[BUSCO_BUSCO]`: Determines how complete is the genome compared to expected.
+2a. `[BUSCO_BUSCO]`: Determines how complete is the genome compared to expected (protein mode).
 2b. `[QUAST]`: Determines the N50, how contiguous the genome is.
 2c. More options
 3. Describes your annotation : `[AGAT]`: Gene, feature, length, averages, counts. 
 4. Extract longest protein fasta sequences `[GFFREAD]`.
-5. Finds orthologous genes `[ORTHOFINDER_CAFE]`.
+5. Finds orthologous genes `[ORTHOFINDER]`.
 6. Summary with MulitQC.
 
-**Annnotation Only:**
+**Genome Only (in development):**
+1. Downloads the genome files from NCBI `[NCBIGENOMEDOWNLOAD]` - Or you provide your own genomes
+2. Describes genome assembly:
+2a. `[BUSCO_BUSCO]`: Determines how complete is the genome compared to expected (genome mode).
+2b. `[QUAST]`: Determines the N50, how contiguous the genome is.
+2c. More options
+3. Summary with MulitQC.
+
+**Annnotation Only (in development):**
 1. Downloads the gene annotation files from NCBI `[NCBIGENOMEDOWNLOAD]` - Or you provide your own annotations.
 2. Describes your annotation : `[AGAT]`: Gene, feature, length, averages, counts.
 3. Summary with MulitQC.
@@ -76,7 +71,7 @@ Pongo_abelii,GCF_028885655.2,,
 Macaca_mulatta,GCF_003339765.1,,
 ```
 
-You can mix the two input types.
+You can mix the two input types **(in development)**.
 
 Each row represents a species, with its associated genome, gff or Refseq ID (to autodownload the genome + gff).
 
