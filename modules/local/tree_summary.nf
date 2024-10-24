@@ -37,8 +37,8 @@ process TREE_SUMMARY {
     sed \'s/.prot.fa.largestIsoform.fa//g\' Quast_to_plot.tsv > Quast_to_plot_final.tsv
 
     # Run summary plot
-    /usr/bin/Rscript ${projectDir}/bin/plot_tree_summary2.R tree.nw Busco_to_plot_final.tsv
-    /usr/bin/Rscript ${projectDir}/bin/plot_tree_summary.R  tree.nw Quast_to_plot_final.tsv
+    /usr/bin/Rscript ${projectDir}/bin/plot_tree_summary2.R tree.nw Busco_to_plot_final.tsv --tree_size 0.6
+    /usr/bin/Rscript ${projectDir}/bin/plot_tree_summary.R  tree.nw Quast_to_plot_final.tsv --tree_size 0.6
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
