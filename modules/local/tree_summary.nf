@@ -17,10 +17,10 @@ process TREE_SUMMARY {
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
+
     #Remove unwanted extensions in the tree file
     sed \'s/\\.prot\\.fa\\.largestIsoform//g\' ${tree}/Species_Tree/SpeciesTree_rooted_node_labels.txt > tree.nw
     
-
     # Combine the BUSCO outputs
     head -qn 1 *.txt | head -n 1 > Busco_combined
     tail -q -n 1 *.txt          >> Busco_combined
@@ -39,6 +39,7 @@ process TREE_SUMMARY {
     # Run summary plot
     /usr/bin/Rscript ${projectDir}/bin/plot_tree_summary2.R tree.nw Busco_to_plot_final.tsv
     /usr/bin/Rscript ${projectDir}/bin/plot_tree_summary.R  tree.nw Quast_to_plot_final.tsv
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         Perl version: \$(perl --version | grep "version" | sed 's/.*(//g' | sed 's/[)].*//')

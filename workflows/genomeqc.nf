@@ -34,6 +34,7 @@ workflow GENOMEQC {
 
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
+    ch_tree_data = Channel.empty()
 
     ch_samplesheet
         .map {
@@ -99,6 +100,7 @@ workflow GENOMEQC {
 
     // Run genome only or genome + gff
 
+
     if (params.genome_only) {
         GENOME (
             ch_fasta
@@ -118,6 +120,7 @@ workflow GENOMEQC {
         GENOME_AND_ANNOTATION.out.orthofinder,
         GENOME_AND_ANNOTATION.out.tree_data
     )
+
 
     //
     // Collate and save software versions

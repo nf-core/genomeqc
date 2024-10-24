@@ -13,7 +13,6 @@ process CREATE_PATH {
     output:
     val meta                 , emit: meta
     path "${meta.id}.txt"    , emit: accession
-    path "versions.yml"      , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -22,10 +21,5 @@ process CREATE_PATH {
     def prefix         = task.ext.prefix ?: "${meta.id}"
     """
     echo $accession > ${prefix}.txt
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        quast: \$(/bin/echo --version 2>&1 | head -n1 | cut -d" " -f4)
-    END_VERSIONS
     """ 
 }
