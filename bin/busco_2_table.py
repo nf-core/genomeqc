@@ -26,7 +26,7 @@ with open(args.output_file, 'w') as f:
     # Write the header
     f.write('species\tbusco\n')
     # Insert 'NA<tab>stacked' as the second line
-    f.write('NA\tstacked\n')
+    f.write('NA\tpie\n')
 
 # Append the DataFrame content to the file without the header
 df_extracted.to_csv(args.output_file, sep='\t', index=False, mode='a', header=False)
