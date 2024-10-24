@@ -116,7 +116,7 @@ workflow GENOMEQC {
 
     TREE_SUMMARY (
         GENOME_AND_ANNOTATION.out.orthofinder,
-        GENOME_AND_ANNOTATION.out.busco
+        GENOME_AND_ANNOTATION.out.tree_data
     )
 
     //

@@ -16,6 +16,8 @@ workflow GENOME_AND_ANNOTATION {
     main:
 
     ch_versions = Channel.empty()
+    // For tree plot
+    ch_tree_data = Channel.empty()
 
     // TODO nf-core: substitute modules here for the modules of your subworkflow
 
@@ -29,6 +31,10 @@ workflow GENOME_AND_ANNOTATION {
         ch_gff
     )
     ch_versions = ch_versions.mix(QUAST.out.versions.first())
+
+    // For tree
+
+    ch_tree_data = ch_tree_data.mix(QUAST.out.tsv.map { tuple -> tuple[1] })
 
     //
     // Run AGAT Spstatistics
@@ -101,9 +107,12 @@ workflow GENOME_AND_ANNOTATION {
     )
     ch_versions = ch_versions.mix(BUSCO_BUSCO.out.versions.first())
 
+    ch_tree_data = ch_tree_data.mix(BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file })
+
     emit:
     orthofinder = ORTHOFINDER.out.orthofinder // channel: [ val(meta), [folder] ]
-    busco = BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file }
+    //busco = BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file }
+    tree_data = ch_tree_data.flatten().collect()
 
     versions = ch_versions                     // channel: [ versions.yml ]
 }
