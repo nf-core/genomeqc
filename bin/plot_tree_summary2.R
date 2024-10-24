@@ -88,7 +88,7 @@ tree_plot <- ggtree(tree) +
   geom_tiplab() + 
   coord_cartesian(clip="off") +
   ggtitle("Phylogenetic Tree") +
-  theme(plot.margin = margin(10, 150, 10, 10))  # Increase margins
+  theme(plot.margin = margin(10, 70, 10, 10))  # Increase margins
 
 pdf ("Tree_only.pdf")
 tree_plot

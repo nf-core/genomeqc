@@ -129,7 +129,7 @@ for (i in 2:length(column_headers)) {
   if (plot_type == "bar") {
     bar_plot <- ggplot(data, aes(x = as.numeric(!!sym(column_name)), y = factor(species, levels = rev(tree$tip.label)))) + 
       geom_bar(stat = "identity", fill = "darkblue") + 
-      geom_text(aes(label = !!sym(column_name)), hjust = -0.1, size = args$text_size) +  # Add text labels
+      geom_text(aes(label = as.numeric(!!sym(column_name)), x = 0), hjust = -0.1, color = "white", size = args$text_size) +  # Place text at the base of the bar
       theme_minimal() + 
       theme(axis.title.y = element_blank(), 
             axis.text.y = element_blank(),
@@ -137,8 +137,10 @@ for (i in 2:length(column_headers)) {
             axis.title.x = element_blank(), 
             axis.text.x = element_blank(),
             axis.ticks.x = element_blank(),
-            panel.grid.major.y = element_blank(),  # Remove horizontal grid lines
-            panel.grid.minor.y = element_blank(),
+            panel.grid.major = element_blank(),  # Remove vertical grid lines
+            panel.grid.minor = element_blank(),  # Remove minor grid lines
+            panel.background = element_blank(),  # Remove grey background
+            plot.background = element_blank(),   # Remove any outer plot background
             plot.margin = margin(0, 0, 0, 0)) + 
       labs(x = column_name) +
       ggtitle(column_name)
