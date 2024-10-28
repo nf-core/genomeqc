@@ -100,20 +100,48 @@ workflow GENOMEQC {
         []
     )
 
-    // FIXME: Meryl+Merqury -- this should probably go into one of the subworkflows?
-    // meryl count
-    MERYL_COUNT(
-        ch_fasta,
-        params.kvalue 
-    )
-    ch_meryl_db = MERYL_COUNT.out.meryl_db
-    ch_versions = ch_versions.mix(MERYL_COUNT.out.versions.first())
-    // meryl union sum
-    MERYL_UNIONSUM(
-        ch_meryl_db,
-        params.kvalue
-    )
-    ch_meryl_union = MERYL_UNIONSUM.out.meryl_db
+    // Merqury: Evaluate genome assemblies with k-mers and more
+    // https://github.com/marbl/merqury
+    // MODULE: MERYL_COUNT
+    // FIXME: this is placeholder now because it's just running merqury on the assembly, not the reads!
+    // if (params.reads) { only run this if you supply reads }
+    if (!params.merqury_skip) {
+        MERYL_COUNT(
+            ch_fasta, // very wrong!
+            params.kvalue 
+        )
+        ch_meryl_db = MERYL_COUNT.out.meryl_db
+        ch_versions = ch_versions.mix(MERYL_COUNT.out.versions.first())
+        // MODULE: MERYL_UNIONSUM
+        MERYL_UNIONSUM(
+            ch_meryl_db,
+            params.kvalue
+        )
+        ch_meryl_union = MERYL_UNIONSUM.out.meryl_db
+        ch_versions = ch_versions.mix(MERYL_UNIONSUM.out.versions.first())
+        // MODULE: MERQURY_MERQURY
+        ch_meryl_union
+            | join(
+                ch_fasta
+                // | map { meta, fq, fastas -> [ meta, fastas ] } // fixme add this back in once actually get fqs
+            )
+            | view
+            | set {ch_merqury_inputs}
+        MERQURY_MERQURY ( ch_merqury_inputs )
+        ch_merqury_qv                           = MERQURY_MERQURY.out.assembly_qv
+        ch_merqury_stats                        = MERQURY_MERQURY.out.stats
+        ch_merqury_spectra_cn_fl_png            = MERQURY_MERQURY.out.spectra_cn_fl_png
+        ch_merqury_spectra_asm_fl_png           = MERQURY_MERQURY.out.spectra_asm_fl_png
+        ch_hapmers_blob_png                     = MERQURY_MERQURY.out.hapmers_blob_png
+        ch_merqury_outputs                      = ch_merqury_qv
+                                                | mix(ch_merqury_stats)
+                                                | mix(ch_merqury_spectra_cn_fl_png)
+                                                | mix(ch_merqury_spectra_asm_fl_png)
+                                                | mix(ch_hapmers_blob_png)
+                                                | flatMap { meta, data -> data }
+        ch_versions                             = ch_versions.mix(MERQURY_MERQURY.out.versions.first())
+    }
+
 
 
 
