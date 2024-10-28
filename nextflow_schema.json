@@ -332,7 +332,13 @@
         },
         "kvalue": {
             "type": "integer",
-            "default": 21
+            "default": 21,
+            "description": "k size for meryl (merqury)"
+        },
+        "merqury_skip": {
+            "type": "boolean",
+            "default": true,
+            "description": "Skip meryl/merqury step?"
         }
     }
 }
