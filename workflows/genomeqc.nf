@@ -18,6 +18,7 @@ include { softwareVersionsToYAML              } from '../subworkflows/nf-core/ut
 include { methodsDescriptionText              } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
 include { validateInputSamplesheet            } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
 include { FASTA_EXPLORE_SEARCH_PLOT_TIDK      } from '../subworkflows/nf-core/fasta_explore_search_plot_tidk/main'
+inclcude {decontamination                     } from '../../subworkflows/local/decontamination'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -132,6 +133,10 @@ workflow GENOMEQC {
             sort: true,
             newLine: true
         ).set { ch_collated_versions }
+
+
+
+
 
     //
     // MODULE: MultiQC
