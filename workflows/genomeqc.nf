@@ -50,6 +50,8 @@ workflow GENOMEQC {
     // MODULE: Run create_path
     //
 
+    //ch_input.view()
+
     CREATE_PATH (
         ch_input.ncbi
     )
@@ -72,7 +74,10 @@ workflow GENOMEQC {
 
     fasta = NCBIGENOMEDOWNLOAD.out.fna.mix( ch_input.local.map { [it[0],file(it[1])] } )
     gff   = NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { [it[0],file(it[2])] } )
-    
+
+//    fasta.view()
+//    gff.view()
+
     // Uncompress files if necessary | Consider using brances as an alternative
 
     if (fasta.map { it[1].endsWith(".gz") } ) {
