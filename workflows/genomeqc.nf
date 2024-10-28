@@ -99,6 +99,16 @@ workflow GENOMEQC {
         []
     )
 
+    // FIXME: Meryl+Merqury -- this should probably go into one of the subworkflows?
+    MERYL_COUNT(
+        ch_fasta,
+        params.kvalue 
+    )
+    ch_reads_meryl                          = MERYL_COUNT.out.meryl_db
+    ch_versions                             = ch_versions.mix(MERYL_COUNT.out.versions.first())
+
+
+
     // Run genome only or genome + gff
 
 
