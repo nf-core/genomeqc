@@ -3,6 +3,7 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+include { MERYL_UNIONSUM                         } from '../modules/nf-core/meryl/unionsum/main'
 include { MERYL_COUNT                         } from '../modules/nf-core/meryl/count/main'
 include { MERQURY_MERQURY                     } from '../modules/nf-core/merqury/merqury/main'
 include { CREATE_PATH                         } from '../modules/local/create_path'
@@ -100,12 +101,19 @@ workflow GENOMEQC {
     )
 
     // FIXME: Meryl+Merqury -- this should probably go into one of the subworkflows?
+    // meryl count
     MERYL_COUNT(
         ch_fasta,
         params.kvalue 
     )
-    ch_reads_meryl                          = MERYL_COUNT.out.meryl_db
-    ch_versions                             = ch_versions.mix(MERYL_COUNT.out.versions.first())
+    ch_meryl_db = MERYL_COUNT.out.meryl_db
+    ch_versions = ch_versions.mix(MERYL_COUNT.out.versions.first())
+    // meryl union sum
+    MERYL_UNIONSUM(
+        ch_meryl_db,
+        params.kvalue
+    )
+    ch_meryl_union = MERYL_UNIONSUM.out.meryl_db
 
 
 
