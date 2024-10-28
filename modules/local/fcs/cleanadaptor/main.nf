@@ -1,4 +1,4 @@
-process CLEANADAPTOR {
+process FCS_CLEANADAPTOR {
     tag "$meta.id"
     label 'process_low'
 
