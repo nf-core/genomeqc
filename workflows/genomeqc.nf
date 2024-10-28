@@ -125,7 +125,6 @@ workflow GENOMEQC {
                 ch_fasta
                 // | map { meta, fq, fastas -> [ meta, fastas ] } // fixme add this back in once actually get fqs
             )
-            | view
             | set {ch_merqury_inputs}
         MERQURY_MERQURY ( ch_merqury_inputs )
         ch_merqury_qv                           = MERQURY_MERQURY.out.assembly_qv
