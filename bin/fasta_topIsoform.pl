@@ -1,4 +1,8 @@
 #!/usr/bin/perl
+
+# Written by Chris Wyatt and released under the MIT license. 
+# Extract isoform from a list of isoforms you want to get
+
 use warnings;
 use strict;
 use Getopt::Std;
@@ -11,10 +15,7 @@ my $hitlist = $ARGV[1];
 my $outfile="$fastafile\.nucl.longest.fa";
 
 open(my $outhandle, ">", $outfile)   or die "Could not open $outfile \n";
-
 open(my $inhandle,  "<", $hitlist)   or die "Could not open $hitlist \n";
-
-
 
 use Bio::SeqIO;
 my $seqio = Bio::SeqIO->new(-file => "$fastafile", '-format' => 'Fasta');
@@ -22,8 +23,9 @@ my %fastadictionary=();
 my @headersplit=();
 
 
-while (my $seq = $seqio->next_seq){ ## selects one sequence at a time
-   	## set variables for THIS sequence
+while (my $seq = $seqio->next_seq){ 
+## selects one sequence at a time
+## set variables for THIS sequence
     my $id = $seq->display_id;
 	my $string = $seq->seq;
 	$id=~ s/rna-//g;
@@ -49,7 +51,3 @@ while ( my $line = <$inhandle> ){
 	$HIT{$sp[1]}="y";
 	$len_prots++;
 }
-
-
-
-

@@ -1,3 +1,6 @@
+# Written by Chris Wyatt and released under the MIT license. 
+# Prints a tree with QUAST N50 results on tips of branches
+
 # Load necessary libraries
 if (!requireNamespace("argparse", quietly = TRUE)) {
   install.packages("argparse")
