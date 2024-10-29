@@ -86,6 +86,10 @@ nextflow run main.nf -resume -profile docker,test --outdir results
 
 If you supply sequencing reads in your samplesheet, you can still disable merqury by using the parameter `--merqury_skip true`. Alternatively, use a different test profile that does _not_ contain sequencing reads:
 
+```
+nextflow run main.nf -resume -profile docker,test_nofastq --outdir results
+```
+
 To run this pipeline on an example samplesheet included in the repo assets:
 
 ```
