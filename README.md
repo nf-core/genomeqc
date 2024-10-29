@@ -14,8 +14,7 @@
 
 The pipeline takes a list of genomes and annotations (from raw files or Refseq IDs), and runs commonly used tools to assess their quality.
 
-There will be three different ways you can run this pipeline. 1. Genome only, 2. Annotation only, or 3. Genome and Annotation. 
-**Only Genome plus Annotation is functional**
+There are three different ways you can run this pipeline. 1. Genome only, 2. Annotation only, or 3. Genome and Annotation. **Only Genome plus Annotation is functional**
 
 <!-- TODO nf-core:
 For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#introduction
@@ -49,6 +48,10 @@ For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#intr
 2. Describes your annotation : `[AGAT]`: Gene, feature, length, averages, counts.
 3. Summary with MulitQC.
 
+In addition to the three different modes described above, it is also possible to run the pipeline with or without sequencing reads. When supplying sequencing reads, Merqury can also be run. [Merqury](https://github.com/marbl/merqury) is a tool for genome quality assessment that uses k-mer counts from raw sequencing data to evaluate the accuracy and completeness of a genome assembly. Meryl is the companion tool that efficiently counts and stores k-mers from sequencing reads, enabling Merqury to estimate metrics like assembly completeness and base accuracy. These tools provide a k-mer-based approach to assess assembly quality, helping to identify potential errors or gaps.​
+
+To run the pipeline with reads, you must supply a single FASTQ file for each genome in the samplesheet. It is assumed that reads used to create the assembly are from long read technology such as PacBio or ONT, and are therefore single end. If reads are in a .bam file, they must be converted to FASTQ format first. If you have paired end reads, these must be interleaved first.
+
 ## Usage
 
 > [!NOTE]
@@ -57,31 +60,33 @@ For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#intr
 First, prepare a `samplesheet.csv`, where your input data points to genomes + or annotations:
 
 ```csv
-species,refseq,fasta,gff
-Homo_sapiens,,/path/to/genome.fasta,/path/to/annotation.gff3
-Gorilla_gorilla,,/path/to/genome.fasta,
-Pan_paniscus,,/path/to/genome.fasta,/path/to/annotation.gff3
+species,refseq,fasta,gff,fastq
+Homo_sapiens,,/path/to/genome.fasta,/path/to/annotation.gff3,/path/to/reads.fq.gz
+Gorilla_gorilla,,/path/to/genome.fasta,,/path/to/reads.fq.gz
+Pan_paniscus,,/path/to/genome.fasta,/path/to/annotation.gff3,/path/to/reads.fq.gz
 ```
 
 Or to Refseq IDs of your species:
 
 ```csv
-species,refseq,fasta,gff
-Pongo_abelii,GCF_028885655.2,,
-Macaca_mulatta,GCF_003339765.1,,
+species,refseq,fasta,gff,fastq
+Pongo_abelii,GCF_028885655.2,,,/path/to/reads.fq.gz
+Macaca_mulatta,GCF_003339765.1,,,/path/to/reads.fq.gz
 ```
 
 You can mix the two input types **(in development)**.
 
 Each row represents a species, with its associated genome, gff or Refseq ID (to autodownload the genome + gff).
 
-You can run the pipeline using test profiles or example input samplesheets:
+You can run the pipeline using test profiles or example input samplesheets. To run a test set with a samplesheet containing reads:
 
 ```
 nextflow run main.nf -resume -profile docker,test --outdir results
 ```
 
-or
+If you supply sequencing reads in your samplesheet, you can still disable merqury by using the parameter `--merqury_skip true`. Alternatively, use a different test profile that does _not_ contain sequencing reads:
+
+To run this pipeline on an example samplesheet included in the repo assets:
 
 ```
 nextflow run main.nf -resume -profile docker --input assets/samplesheet.csv --outdir results
@@ -105,6 +110,8 @@ nextflow run ecoflow/genomeqc \
 ecoflow/genomeqc was originally written by Chris Wyatt, Fernando Duarte.
 
 We thank the following people for their extensive assistance in the development of this pipeline:
+
+- [Stephen Turner](https://github.com/stephenturner/) ([Colossal Biosciences](https://colossal.com/))
 
 <!-- TODO nf-core: If applicable, make list of people who have also contributed -->
 
