@@ -1,4 +1,5 @@
 
+include { AGAT_CONVERTSPGXF2GXF               } from '../../modules/nf-core/agat/convertspgxf2gxf'
 include { LONGEST                             } from '../../modules/local/longest'
 include { BUSCO_BUSCO                         } from '../../modules/nf-core/busco/busco/main'
 include { QUAST                               } from '../../modules/nf-core/quast/main'
@@ -21,6 +22,9 @@ workflow GENOME_AND_ANNOTATION {
 
     // TODO nf-core: substitute modules here for the modules of your subworkflow
 
+    // Check GFF integrity
+    ch_agat_gff = AGAT_CONVERTSPGXF2GXF(ch_gff).output_gff
+
     //
     // Run Quast
     //
@@ -28,7 +32,7 @@ workflow GENOME_AND_ANNOTATION {
     QUAST (
         ch_fasta,
         [[],[]],
-        ch_gff
+        ch_agat_gff
     )
     ch_versions = ch_versions.mix(QUAST.out.versions.first())
 
@@ -41,7 +45,7 @@ workflow GENOME_AND_ANNOTATION {
     //
 
     AGAT_SPSTATISTICS (
-        ch_gff
+        ch_agat_gff
     )
     ch_versions = ch_versions.mix(AGAT_SPSTATISTICS.out.versions.first())
 
@@ -50,7 +54,7 @@ workflow GENOME_AND_ANNOTATION {
     //
 
 //    LONGEST (
-//        ch_gff
+//        ch_ch_agat_gff
 //    )
 //    ch_versions = ch_versions.mix(LONGEST.out.versions.first())
 //
@@ -60,7 +64,7 @@ workflow GENOME_AND_ANNOTATION {
 //
 //    ch_long_gff = LONGEST.out.longest_proteins
 //    
-    inputChannel = ch_gff.combine(ch_fasta, by: 0)
+    inputChannel = ch_agat_gff.combine(ch_fasta, by: 0)
 
     // Split the input channel into two channels
     gffChannel = inputChannel.map { tuple ->
