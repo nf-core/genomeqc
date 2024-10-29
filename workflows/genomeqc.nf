@@ -8,6 +8,7 @@ include { CREATE_PATH                         } from '../modules/local/create_pa
 include { NCBIGENOMEDOWNLOAD                  } from '../modules/nf-core/ncbigenomedownload/main'
 include { PIGZ_UNCOMPRESS as UNCOMPRESS_FASTA } from '../modules/nf-core/pigz/uncompress/main'
 include { PIGZ_UNCOMPRESS as UNCOMPRESS_GFF   } from '../modules/nf-core/pigz/uncompress/main'
+include { AGAT_CONVERTSPGXF2GXF               } from '../modules/nf-core/agat/convertspgxf2gxf'
 include { GENOME                              } from '../subworkflows/local/genome'
 include { GENOME_AND_ANNOTATION               } from '../subworkflows/local/genome_and_annotation'
 include { MULTIQC                             } from '../modules/nf-core/multiqc/main'
@@ -89,6 +90,9 @@ workflow GENOMEQC {
         ch_gff = gff
     }
 
+    // Check gff integrity
+    ch_agat_gff = AGAT_CONVERTSPGXF2GXF(ch_gff)
+
     //
     // Run TIDK
     //
@@ -108,7 +112,7 @@ workflow GENOMEQC {
     } else {
         GENOME_AND_ANNOTATION (
             ch_fasta,
-            ch_gff
+            ch_agat_gff.output_gff
         )
     }
 
