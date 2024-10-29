@@ -63,9 +63,9 @@ process GFFREAD {
 
     fi
 
-    ${projectDir}/bin/gff_to_genetranshash.2.pl
-    ${projectDir}/bin/prot_fasta_to_longest.pl ${prefix}.prot.fa ${prefix}_longestisoform.txt
-    ${projectDir}/bin/fasta_topIsoform.pl ${prefix}.splicedcds.fa ${prefix}_longestisoform.txt
+    gff_to_genetranshash.2.pl
+    prot_fasta_to_longest.pl ${prefix}.prot.fa ${prefix}_longestisoform.txt
+    fasta_topIsoform.pl ${prefix}.splicedcds.fa ${prefix}_longestisoform.txt
 
 
     #This part checks if longest isoform worked, if not we will continue with all proteins into Orthofinder. Warning sent to screen.
