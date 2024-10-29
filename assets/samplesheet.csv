@@ -1,5 +1,2 @@
 species,refseq,fasta,gff
-Vespula_vulgaris,GCF_905475345.1,,
-Vespa_velutina,GCF_912470025.1,,
-Apis_mellifera,GCF_003254395.2,,
-Osmia_bicornis,GCF_907164935.1,,
+Saccharomyces_cerevisiae,,/workspace/FCS_combo_test.fa,/workspace/GCF_000146045.2_R64_genomic.gff.gz

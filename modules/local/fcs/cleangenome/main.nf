@@ -25,11 +25,11 @@ process FCS_CLEANGENOME {
         'biocontainers/ncbi-fcs-gx:0.5.4--h4ac6f70_1' }"
 
     input:
-    tuple path(assembly), path(action_report) //fcs-gx_find.out.fcs_gx_report
+    tuple val(meta), path(assembly), path(fcs_gx_report) //fcs-gx_find.out.fcs_gx_report
 
     output:
-    path("NCBI/*.cleaned.fasta"), emit: cleaned // genome with contamination removed 
-    path("NCBI/*.contam.fasta"), emit: contam // contaminated sequences in fasta format
+    tuple val(meta), path("NCBI/*.cleaned.fasta"), emit: cleaned // genome with contamination removed 
+    tuple val(meta), path("NCBI/*.contam.fasta"), emit: contam // contaminated sequences in fasta format
     path "versions.yml"         , emit: versions
 
     when:
@@ -45,12 +45,11 @@ process FCS_CLEANGENOME {
 
     """
     mkdir -p NCBI
-    gunzip ${assembly}
     gx clean-genome \\
     --input "${assembly}" \\
-    --action-report "${action_report}" \\
-    --output "NCBI/${meta}.cleaned.fasta" \\
-    --contam-fasta-out "NCBI/${meta}.contam.fasta"
+    --action-report "${fcs_gx_report}" \\
+    --output "NCBI/${meta.id}.cleaned.fasta" \\
+    --contam-fasta-out "NCBI/${meta.id}.contam.fasta"
     $args
         
     cat <<-END_VERSIONS > versions.yml
@@ -61,8 +60,6 @@ process FCS_CLEANGENOME {
     """
 
     stub:
-    def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}"
 
     if (workflow.profile.tokenize(',').intersect(['conda', 'mamba']).size() >= 1) {
         error "FCS_FCSGX module does not support Conda. Please use Docker / Singularity / Podman instead."

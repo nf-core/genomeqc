@@ -18,7 +18,7 @@ include { softwareVersionsToYAML              } from '../subworkflows/nf-core/ut
 include { methodsDescriptionText              } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
 include { validateInputSamplesheet            } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
 include { FASTA_EXPLORE_SEARCH_PLOT_TIDK      } from '../subworkflows/nf-core/fasta_explore_search_plot_tidk/main'
-inclcude {decontamination                     } from '../../subworkflows/local/decontamination'
+include { DECONTAMINATION                     } from '../subworkflows/local/decontamination'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -47,6 +47,7 @@ workflow GENOMEQC {
         }
         .set { ch_input }
 
+
     //
     // MODULE: Run create_path
     //
@@ -71,25 +72,46 @@ workflow GENOMEQC {
     // Define gff and fasta varliables
     //
 
-    fasta = NCBIGENOMEDOWNLOAD.out.fna.mix( ch_input.local.map { [it[0],file(it[2])] } )
-    gff   = NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { [it[0],file(it[1])] } )
+    fasta = NCBIGENOMEDOWNLOAD.out.fna.mix( ch_input.local.map { [it[0],file(it[1])] } )
+    gff   = NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { [it[0],file(it[2])] } )
     
-    // Uncompress files if necessary | Consider using brances as an alternative
 
-    if (fasta.map { it[1].endsWith(".gz") } ) {
-        ch_fasta = UNCOMPRESS_FASTA ( fasta ).file
-    } else {
-        ch_fasta = fasta
-    }
+// Define channels for fasta and gff, uncompressing if necessary
+
+// Filter fasta files by extension and create channels for each file type
+    gz_fasta = fasta.filter { it[1].name.endsWith(".gz") }
+    non_gz_fasta = fasta.filter { !it[1].name.endsWith(".gz") }
+
+// Run module uncompress_fasta
+
+    UNCOMPRESS_FASTA (gz_fasta )
+    ch_versions = ch_versions.mix(UNCOMPRESS_FASTA.out.versions.first())
+
+// Filter gff files by extension and create channels for each file type
+
+gz_gff = gff.filter { it[1].name.endsWith(".gz") }
+non_gz_gff = gff.filter { !it[1].name.endsWith(".gz") }
+
+    // Run module uncompress_GFF
+
+    UNCOMPRESS_GFF(gz_gff)
+    ch_versions = ch_versions.mix(UNCOMPRESS_GFF.out.versions.first())
+
+    // combine the channels back together so that all the uncompressed files are in channels 
+
+
+    ch_gff = UNCOMPRESS_GFF.out.file.mix(non_gz_gff).view()
+    ch_fasta  = UNCOMPRESS_FASTA.out.file.mix(non_gz_fasta).view()
+
+
+    //
+    // Run subworkflow DECONTAMINATION 
+    //
     
-    // Uncompress gff if necessary
-
-    if (gff.map { it[1].endsWith(".gz") } ) {
-        ch_gff = UNCOMPRESS_GFF ( gff ).file
-    } else {
-        ch_gff = gff
-    }
-
+    DECONTAMINATION (ch_fasta)
+    ch_versions = ch_versions.mix(DECONTAMINATION.out.versions.first())
+    
+    
     //
     // Run TIDK
     //

@@ -9,6 +9,7 @@ process FCS_FCSGX {
     input:
     tuple val(meta), path(assembly)
     path gxdb
+    val taxid
 
     output:
     tuple val(meta), path("out/*.fcs_gx_report.txt"), emit: fcs_gx_report
@@ -32,8 +33,8 @@ process FCS_FCSGX {
         --fasta $assembly \\
         --out-dir ./out \\
         --gx-db $gxdb \\
-        --tax-id ${meta.taxid} \\
-        --out-basename ${prefix}_${haplotype}.${meta.taxid} \\
+        --tax-id $taxid \\
+        --out-basename ${prefix}_.$taxid \\
         $args
 
     cat <<-END_VERSIONS > versions.yml
