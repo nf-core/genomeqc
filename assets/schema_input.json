@@ -14,17 +14,22 @@
             },
             "refseq": {
                 "type": "string",
-                "errorMessage": "FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+                "errorMessage": "RefSeq accession number"
             },
             "fasta": {
                 "type": "string",
                 "format": "file-path",
-                "errorMessage": "FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+                "errorMessage": "FASTA file with genome assembly"
             },
             "gff": {
                 "type": "string",
                 "format": "file-path",
-                "errorMessage": "FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+                "errorMessage": "GFF file with genome annotation"
+            },
+            "fastq": {
+                "type": "string",
+                "format": "file-path",
+                "errorMessage": "Single compressed FASTQ file, must have extension '.fq.gz' or '.fastq.gz'"
             }
         },
         "required": ["species"]
