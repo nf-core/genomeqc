@@ -68,7 +68,7 @@ workflow GENOMEQC {
     ch_versions = ch_versions.mix(NCBIGENOMEDOWNLOAD.out.versions.first())
     
     //
-    // Define gff and fasta varliables
+    // Define gff and fasta and fastq varliables
     //
     fasta = NCBIGENOMEDOWNLOAD.out.fna.mix( ch_input.local.map { [it[0],file(it[2])] } )
     gff   = NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { [it[0],file(it[1])] } )
@@ -88,6 +88,9 @@ workflow GENOMEQC {
         ch_gff = gff
     }
 
+    // Not necessary to uncompress fastq for meryl
+    ch_fastq = fastq
+
     
     //
     // Run TIDK
@@ -99,12 +102,11 @@ workflow GENOMEQC {
 
     // Merqury: Evaluate genome assemblies with k-mers and more
     // https://github.com/marbl/merqury
-    // MODULE: MERYL_COUNT
-    // FIXME: this is placeholder now because it's just running merqury on the assembly, not the reads!
-    // if (params.reads) { only run this if you supply reads }
-    if (!params.merqury_skip) {
+    // Only run if not skipping and fastqs are provided in the samplesheet
+    if (!params.merqury_skip && ch_fastq) {
+        // MODULE: MERYL_COUNT
         MERYL_COUNT(
-            ch_fasta, // very wrong!
+            ch_fastq,
             params.kvalue 
         )
         ch_meryl_db = MERYL_COUNT.out.meryl_db
@@ -118,10 +120,7 @@ workflow GENOMEQC {
         ch_versions = ch_versions.mix(MERYL_UNIONSUM.out.versions.first())
         // MODULE: MERQURY_MERQURY
         ch_meryl_union
-            | join(
-                ch_fasta
-                // | map { meta, fq, fastas -> [ meta, fastas ] } // fixme add this back in once actually get fqs
-            )
+            | join(ch_fastq)
             | set {ch_merqury_inputs}
         MERQURY_MERQURY ( ch_merqury_inputs )
         ch_merqury_qv                           = MERQURY_MERQURY.out.assembly_qv
