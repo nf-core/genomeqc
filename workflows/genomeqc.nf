@@ -58,7 +58,6 @@ workflow GENOMEQC {
     //
     // MODULE: Run ncbigenomedownlaod
     //
-
     NCBIGENOMEDOWNLOAD ( 
         CREATE_PATH.out.meta,
         CREATE_PATH.out.accession,
@@ -68,11 +67,10 @@ workflow GENOMEQC {
     ch_versions = ch_versions.mix(NCBIGENOMEDOWNLOAD.out.versions.first())
     
     //
-    // Define gff and fasta and fastq varliables
+    // Define gff and fasta varliables
     //
     fasta = NCBIGENOMEDOWNLOAD.out.fna.mix( ch_input.local.map { [it[0],file(it[2])] } )
     gff   = NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { [it[0],file(it[1])] } )
-    fastq = ch_input.local.map{ [it[0],file(it[2])] }.mix(ch_input.ncbi.map{ [it[0],file(it[2])] })
 
     // Uncompress files if necessary | Consider using brances as an alternative
     if (fasta.map { it[1].endsWith(".gz") } ) {
@@ -88,9 +86,18 @@ workflow GENOMEQC {
         ch_gff = gff
     }
 
-    // Not necessary to uncompress fastq for meryl
-    ch_fastq = fastq
-
+    ch_input.local.view()
+    ch_input.ncbi.view()
+    // FASTQ file is optional in the samplesheet. 
+    // First, get it like you do for gff and fasta
+    ch_fastq = ch_input.local.map{ [it[0], it[2]] }.mix(ch_input.ncbi.map{ [it[0],it[2]] })
+    // Then, check to see that element 1 is not empty, and if not, make it file()
+    // You have to do this because if you pass in file() in the initial map, 
+    // it'll fail if you don't supply a fastq, because you can't pass an empty to file()
+    ch_fastq
+        | map{meta, fq -> fq ? [meta, file(fq)] : [meta, fq]}
+        | filter { meta, fq -> fq && fq.name =~ /(\.fastq|\.fq|\.fastq\.gz|\.fq\.gz)$/ }
+        | set {ch_fastq}
     
     //
     // Run TIDK
@@ -102,7 +109,7 @@ workflow GENOMEQC {
 
     // Merqury: Evaluate genome assemblies with k-mers and more
     // https://github.com/marbl/merqury
-    // Only run if not skipping and fastqs are provided in the samplesheet
+    // Only run if not skipping and fastq is provided in the samplesheet
     if (!params.merqury_skip && ch_fastq) {
         // MODULE: MERYL_COUNT
         MERYL_COUNT(
@@ -138,11 +145,7 @@ workflow GENOMEQC {
     }
 
 
-
-
     // Run genome only or genome + gff
-
-
     if (params.genome_only) {
         GENOME (
             ch_fasta
@@ -157,7 +160,6 @@ workflow GENOMEQC {
     //
     // MODULE: Run TREE SUMMARY
     //  
-
     TREE_SUMMARY (
         GENOME_AND_ANNOTATION.out.orthofinder,
         GENOME_AND_ANNOTATION.out.tree_data
