@@ -86,8 +86,6 @@ workflow GENOMEQC {
         ch_gff = gff
     }
 
-    ch_input.local.view()
-    ch_input.ncbi.view()
     // FASTQ file is optional in the samplesheet. 
     // First, get it like you do for gff and fasta
     ch_fastq = ch_input.local.map{ [it[0], it[2]] }.mix(ch_input.ncbi.map{ [it[0],it[2]] })
