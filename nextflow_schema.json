@@ -302,6 +302,12 @@
         "busco_config": {
           "type": "string",
           "description": "A path to a BUSCO config file (optional)"
+        },
+        "skip_tidk": {
+          "type": "boolean",
+          "description": "Do not run TIDK.",
+          "hidden": true,
+          "help_text": "You may wish to turn off the tidk subworkflow"
         }
       }
     }

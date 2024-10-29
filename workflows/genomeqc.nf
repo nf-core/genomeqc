@@ -92,11 +92,12 @@ workflow GENOMEQC {
     //
     // Run TIDK
     //
-
-    FASTA_EXPLORE_SEARCH_PLOT_TIDK (
-        ch_fasta,
-        []
-    )
+    if (!params.skip_tidk) {
+        FASTA_EXPLORE_SEARCH_PLOT_TIDK (
+            ch_fasta,
+            []
+        )
+    }
 
     // Run genome only or genome + gff
 
