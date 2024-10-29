@@ -43,18 +43,17 @@ workflow GENOMEQC {
             validateInputSamplesheet(it) // Input validation (check local subworkflow)
         }
         .branch {
-            ncbi: it.size() == 2
-            local: it.size() == 3
+            ncbi: it.size() == 3
+            local: it.size() == 4
         }
         .set { ch_input }
 
-    //
     // MODULE: Run create_path
-    //
+    // ch_input.ncbi is now a 3-element tuple, last element is the fastq. We need to remove it before CREATE_PATH
+    ch_input.ncbi
+        | map { [it[0], it[1]] }
+        | CREATE_PATH
 
-    CREATE_PATH (
-        ch_input.ncbi
-    )
 
     //
     // MODULE: Run ncbigenomedownlaod
@@ -71,12 +70,11 @@ workflow GENOMEQC {
     //
     // Define gff and fasta varliables
     //
-
     fasta = NCBIGENOMEDOWNLOAD.out.fna.mix( ch_input.local.map { [it[0],file(it[2])] } )
     gff   = NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { [it[0],file(it[1])] } )
-    
-    // Uncompress files if necessary | Consider using brances as an alternative
+    fastq = ch_input.local.map{ [it[0],file(it[2])] }.mix(ch_input.ncbi.map{ [it[0],file(it[2])] })
 
+    // Uncompress files if necessary | Consider using brances as an alternative
     if (fasta.map { it[1].endsWith(".gz") } ) {
         ch_fasta = UNCOMPRESS_FASTA ( fasta ).file
     } else {
@@ -84,17 +82,16 @@ workflow GENOMEQC {
     }
     
     // Uncompress gff if necessary
-
     if (gff.map { it[1].endsWith(".gz") } ) {
         ch_gff = UNCOMPRESS_GFF ( gff ).file
     } else {
         ch_gff = gff
     }
 
+    
     //
     // Run TIDK
     //
-
     FASTA_EXPLORE_SEARCH_PLOT_TIDK (
         ch_fasta,
         []
