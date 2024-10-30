@@ -125,7 +125,7 @@ workflow GENOMEQC {
         ch_versions = ch_versions.mix(MERYL_UNIONSUM.out.versions.first())
         // MODULE: MERQURY_MERQURY
         ch_meryl_union
-            | join(ch_fastq)
+            | join(ch_fasta)
             | set {ch_merqury_inputs}
         MERQURY_MERQURY ( ch_merqury_inputs )
         ch_merqury_qv                           = MERQURY_MERQURY.out.assembly_qv
