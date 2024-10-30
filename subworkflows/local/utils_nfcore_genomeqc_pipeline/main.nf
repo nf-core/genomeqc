@@ -150,21 +150,14 @@ def validateInputSamplesheet(input) {
     def (meta, refseq, fasta, gff) = input
     // As for now, there are only two input options: RefSeq ID or local files. The pipeline will throw an error if the sample sheet does not contain the proper information
     // If --genome_only parameter
+    // Check for genome-only mode
     if (params.genome_only) {
-        // If RefSeq ID is given
-        if ( meta && refseq && !fasta && !gff ) {
-            return [ meta, refseq ]
-        // If path to fasta instead of RefSeq ID is given
-        } else if (meta && !refseq) {
-            // Print error if no fasta was found
-            if (!fasta) {
-                error("Your are running on --genome_only mode. No RefSeq ID or path to fasta found on samplesheet. Please check input samplesheet -> Incorrent samplesheet format")
-            } else {
-                return [ meta, fasta, gff ]
-            }
+        if (meta && refseq && !fasta && !gff) {
+            return [meta, refseq]
+        } else if (meta && !refseq && fasta) {
+            return [meta, fasta, gff] // Empty or not gff, either way won't be used
         } else {
-            // Print error if format is not correct
-            error("Your are running on --genome_only mode. Please check input samplesheet -> Incorrent samplesheet format")
+            error("You are running in --genome_only mode. Please check input samplesheet -> Incorrect samplesheet format")
         }
     } else {
         if (meta && refseq && !fasta && !gff) {

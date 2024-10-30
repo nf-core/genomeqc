@@ -48,21 +48,28 @@ workflow GENOMEQC {
 
     //
     // MODULE: Run create_path
-    //
-
-    //ch_input.view()
+    // 
 
     CREATE_PATH (
         ch_input.ncbi
     )
+
+    // For NCBIGENOMEDOWNLOAD
+
+    ch_ncbi_input = CREATE_PATH.out.accession
+        .multiMap {
+            meta, accession ->
+                meta: meta
+                accession: accession
+        }
 
     //
     // MODULE: Run ncbigenomedownlaod
     //
 
     NCBIGENOMEDOWNLOAD ( 
-        CREATE_PATH.out.meta,
-        CREATE_PATH.out.accession,
+        ch_ncbi_input.meta,
+        ch_ncbi_input.accession,
         [],
         params.groups
     )
@@ -72,11 +79,8 @@ workflow GENOMEQC {
     // Define gff and fasta varliables
     //
 
-    fasta = NCBIGENOMEDOWNLOAD.out.fna.mix( ch_input.local.map { [it[0],file(it[1])] } )
-    gff   = NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { [it[0],file(it[2])] } )
-
-//    fasta.view()
-//    gff.view()
+    fasta = NCBIGENOMEDOWNLOAD.out.fna.mix( ch_input.local.map { meta, fasta, gff -> tuple( meta, file(fasta) ) } )
+    gff   = NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { meta, fasta, gff -> tuple( meta, file(gff) ) } )
 
     // Uncompress files if necessary | Consider using brances as an alternative
 
@@ -94,6 +98,10 @@ workflow GENOMEQC {
         ch_gff = gff
     }
 
+    ch_combined = ch_fasta.combine(ch_gff, by:0)
+
+    //ch_combined.view()
+
     //
     // Run TIDK
     //
@@ -108,12 +116,15 @@ workflow GENOMEQC {
 
     if (params.genome_only) {
         GENOME (
-            ch_fasta
+            //ch_fasta
+            ch_combined.map { [it[0], it[1]] }
         )
     } else {
         GENOME_AND_ANNOTATION (
-            ch_fasta,
-            ch_gff
+            //ch_fasta,
+            //ch_gff
+            ch_combined.map { [it[0], it[1]] },
+            ch_combined.map { [it[0], it[2]] }
         )
         
         //
