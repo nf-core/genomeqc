@@ -148,16 +148,18 @@ workflow GENOMEQC {
         GENOME (
             ch_fasta
         )
-        ch_multiqc_files = ch_multiqc_files.mix(GENOME.out.quast.collect{it[1]})
-        ch_multiqc_files = ch_multiqc_files.mix(GENOME.out.busco.collect{it[1]})
+        ch_multiqc_files = ch_multiqc_files.mix(GENOME.out.quast.collect())
+        ch_multiqc_files = ch_multiqc_files.mix(GENOME.out.busco.collect())
     } else {
         GENOME_AND_ANNOTATION (
             ch_fasta,
             ch_gff
         )
-        ch_multiqc_files = ch_multiqc_files.mix(GENOME_AND_ANNOTATION.out.quast.collect{it[1]})
-        ch_multiqc_files = ch_multiqc_files.mix(GENOME_AND_ANNOTATION.out.busco.collect{it[1]})
+        ch_multiqc_files = ch_multiqc_files.mix(GENOME_AND_ANNOTATION.out.quast.collect())
+        ch_multiqc_files = ch_multiqc_files.mix(GENOME_AND_ANNOTATION.out.busco.collect())
     }
+
+    ch_multiqc_files.view()
 
     //
     // MODULE: Run TREE SUMMARY

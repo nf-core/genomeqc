@@ -112,7 +112,7 @@ workflow GENOME_AND_ANNOTATION {
     emit:
     orthofinder = ORTHOFINDER.out.orthofinder // channel: [ val(meta), [folder] ]
     busco = BUSCO_BUSCO.out.short_summaries_txt.collect { meta, file -> file }
-    quast = QUAST.out.report.collect()
+    quast = QUAST.out.report.collect { meta, file -> file }
     tree_data = ch_tree_data.flatten().collect()
 
     versions = ch_versions                     // channel: [ versions.yml ]

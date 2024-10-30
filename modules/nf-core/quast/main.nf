@@ -18,7 +18,7 @@ process QUAST {
     tuple val(meta), path("${prefix}_transcriptome.tsv") , optional: true , emit: transcriptome
     tuple val(meta), path("${prefix}_misassemblies.tsv") , optional: true , emit: misassemblies
     tuple val(meta), path("${prefix}_unaligned.tsv")     , optional: true , emit: unaligned
-    tuple val(meta), path("${prefix}/report.tsv")        , emit: report
+    tuple val(meta), path("${prefix}/report.tsv")       , emit: report
     path "versions.yml"                                  , emit: versions
 
     when:
@@ -42,6 +42,7 @@ process QUAST {
     [ -f  ${prefix}/contigs_reports/all_alignments_transcriptome.tsv ] && ln -s ${prefix}/contigs_reports/all_alignments_transcriptome.tsv ${prefix}_transcriptome.tsv
     [ -f  ${prefix}/contigs_reports/misassemblies_report.tsv         ] && ln -s ${prefix}/contigs_reports/misassemblies_report.tsv ${prefix}_misassemblies.tsv
     [ -f  ${prefix}/contigs_reports/unaligned_report.tsv             ] && ln -s ${prefix}/contigs_reports/unaligned_report.tsv ${prefix}_unaligned.tsv
+
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
