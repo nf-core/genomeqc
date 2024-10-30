@@ -18,6 +18,7 @@ process QUAST {
     tuple val(meta), path("${prefix}_transcriptome.tsv") , optional: true , emit: transcriptome
     tuple val(meta), path("${prefix}_misassemblies.tsv") , optional: true , emit: misassemblies
     tuple val(meta), path("${prefix}_unaligned.tsv")     , optional: true , emit: unaligned
+    tuple val(meta), path("${prefix}/report.tsv")        , emit: report
     path "versions.yml"                                  , emit: versions
 
     when:
