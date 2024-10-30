@@ -14,18 +14,25 @@
             },
             "refseq": {
                 "type": "string",
-                "errorMessage": "FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+                "errorMessage": "FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'",
+                "meta": ["refseq"]
             },
             "fasta": {
                 "type": "string",
                 "format": "file-path",
-                "errorMessage": "FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+                "errorMessage": "FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'",
+                "meta": ["fasta"]
             },
             "gff": {
                 "type": "string",
                 "format": "file-path",
-                "errorMessage": "FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
-            }
+                "errorMessage": "FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'",
+                "meta": ["gff"]
+            },
+            "taxid": {
+            "type": "string",
+            "meta": ["taxid"]
+        }
         },
         "required": ["species"]
     }

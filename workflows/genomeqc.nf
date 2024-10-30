@@ -42,8 +42,8 @@ workflow GENOMEQC {
             validateInputSamplesheet(it) // Input validation (check local subworkflow)
         }
         .branch {
-            ncbi: it.size() == 2
-            local: it.size() == 3
+            ncbi: it.size() == 3
+            local: it.size() == 4
         }
         .set { ch_input }
 
@@ -111,7 +111,6 @@ non_gz_gff = gff.filter { !it[1].name.endsWith(".gz") }
     DECONTAMINATION (ch_fasta)
     ch_versions = ch_versions.mix(DECONTAMINATION.out.versions.first())
     
-    
     //
     // Run TIDK
     //
@@ -139,10 +138,10 @@ non_gz_gff = gff.filter { !it[1].name.endsWith(".gz") }
     // MODULE: Run TREE SUMMARY
     //  
 
-    TREE_SUMMARY (
-        GENOME_AND_ANNOTATION.out.orthofinder,
-        GENOME_AND_ANNOTATION.out.tree_data
-    )
+    //TREE_SUMMARY (
+    //    GENOME_AND_ANNOTATION.out.orthofinder,
+    //    GENOME_AND_ANNOTATION.out.tree_data
+    //)
 
 
     //

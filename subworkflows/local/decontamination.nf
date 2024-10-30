@@ -36,8 +36,7 @@ workflow DECONTAMINATION {
 
 
     FCS_FCSGX ( FCS_CLEANADAPTOR.out.cleaned,
-    params.gxdb,
-    "4932")
+    params.gxdb)
     ch_versions = ch_versions.mix(FCS_FCSGX.out.versions.first())
 
 

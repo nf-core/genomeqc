@@ -1,2 +1,2 @@
-species,refseq,fasta,gff
-Saccharomyces_cerevisiae,,/workspace/FCS_combo_test.fa,/workspace/GCF_000146045.2_R64_genomic.gff.gz
+species,refseq,fasta,gff,taxid
+Saccharomyces_cerevisiae,,/workspace/FCS_combo_test.fa,/workspace/GCF_000146045.2_R64_genomic.gff.gz,4932
