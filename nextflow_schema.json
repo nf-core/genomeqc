@@ -303,6 +303,19 @@
           "type": "string",
           "description": "A path to a BUSCO config file (optional)"
         },
+        "genome_only": {
+            "type": "string"
+        },
+        "kvalue": {
+            "type": "integer",
+            "default": 21,
+            "description": "k size for meryl (merqury)"
+        },
+        "merqury_skip": {
+            "type": "boolean",
+            "default": true,
+            "description": "Skip meryl/merqury step?"
+        },
         "skip_tidk": {
           "type": "boolean",
           "description": "Do not run TIDK.",
