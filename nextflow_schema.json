@@ -321,6 +321,12 @@
           "description": "Do not run TIDK.",
           "hidden": true,
           "help_text": "You may wish to turn off the tidk subworkflow"
+        },
+        "karyotype": {
+          "type": "string",
+          "description": "Path to the karyotype file for ideogram plotting",
+          "help_text": "A tab-delimited file containing chromosome information for ideogram plotting",
+          "fa_icon": "fas fa-dna"
         }
       }
     }

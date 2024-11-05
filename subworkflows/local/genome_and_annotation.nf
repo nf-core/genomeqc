@@ -4,6 +4,7 @@ include { LONGEST                             } from '../../modules/local/longes
 include { BUSCO_BUSCO                         } from '../../modules/nf-core/busco/busco/main'
 include { QUAST                               } from '../../modules/nf-core/quast/main'
 include { AGAT_SPSTATISTICS                   } from '../../modules/nf-core/agat/spstatistics/main'
+include { PLOT_BUSCO_IDEOGRAM                 } from '../../modules/local/plot_busco_ideogram.nf'
 //include { GFFREAD                             } from '../../modules/nf-core/gffread/main'
 include { GFFREAD                             } from '../../modules/local/gffread'
 include { ORTHOFINDER                         } from '../../modules/nf-core/orthofinder/main'
@@ -106,6 +107,42 @@ workflow GENOME_AND_ANNOTATION {
         params.busco_config ?: []
     )
     ch_versions = ch_versions.mix(BUSCO_BUSCO.out.versions.first())
+
+// Prepare BUSCO output
+ch_busco_full_table = BUSCO_BUSCO.out.full_table
+    .flatMap { meta, full_tables -> 
+        full_tables.collect { full_table ->
+            def lineage = full_table.toString().split('/')[-2].replaceAll('run_', '').replaceAll('_odb\\d+', '')
+            def genus = meta.id.split('_')[0] // Extract species name
+            def speci = meta.id.split('_')[1] // Extract species name
+            def genusspeci = "${genus}_${speci}"
+            def new_meta = lineage + [id: "${lineage}_busco", lineage: lineage]
+            [genusspeci, lineage, full_table]
+        }
+    }
+    ch_busco_full_table.view()
+
+
+    // Prepare AGAT output
+    ch_agat_gff = ch_agat_gff
+        .map { meta, gff -> 
+            def genus = meta.id.split('_')[0] // Extract species name
+            def speci = meta.id.split('_')[1] // Extract species name
+            def genusspeci = "${genus}_${speci}"
+            [genusspeci, gff]
+        }
+    ch_agat_gff.view()
+
+    // Combine BUSCO and AGAT outputs
+ch_plot_input = ch_busco_full_table
+    .join(ch_agat_gff)
+    .map { genusspeci, busco_meta, lineage, full_table, agat_meta, gff ->
+        [busco_meta, lineage, full_table, gff]
+    }
+
+ch_plot_input.view()
+
+    //PLOT_BUSCO_IDEOGRAM ( ch_plot_input )//removed this temporarily:, ch_karyotype
 
     ch_tree_data = ch_tree_data.mix(BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file })
 
