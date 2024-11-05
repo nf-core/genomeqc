@@ -1,28 +1,26 @@
 process PLOT_BUSCO_IDEOGRAM {
-    tag "$meta.id"
+    tag "${genusspeci}_${lineage}"
     label 'process_low'
 
     conda "bioconda::r-rideogram=0.2.2 bioconda::r-svglite=2.1.1"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/mulled-v2-e11b2d0c9a6d8c1b9c1c9a6d8c1b9c1c:4' :
-        'biocontainers/mulled-v2-e11b2d0c9a6d8c1b9c1c9a6d8c1b9c1c:4' }"
+    container "community.wave.seqera.io/library/r-optparse_r-rideogram:14e26839d69da37f"
 
     input:
-    tuple val(meta), path(busco_full_table), path(gff_file)
+    tuple val(genusspeci), val(lineage), path(busco_full_table), path(gff_file)
 
     output:
-    tuple val(meta), path("*.svg"), emit: svg
-    tuple val(meta), path("*.png"), emit: png
+    tuple val(genusspeci), val(lineage), path("*.svg"), emit: svg
+    tuple val(genusspeci), val(lineage), path("*.png"), emit: png
     path "versions.yml"           , emit: versions
 
     script:
     def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    def prefix = "${genusspeci}_${lineage}"
     """
     plot_busco_ideogram.R \\
         --busco_full_table ${busco_full_table} \\
         --gff_file ${gff_file} \\
-        --lineage ${meta.lineage} \\
+        --lineage ${lineage} \\
         --prefix ${prefix} \\
         $args
 
