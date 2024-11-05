@@ -100,10 +100,12 @@ workflow GENOMEQC {
     //
     // Run TIDK
     //
-    FASTA_EXPLORE_SEARCH_PLOT_TIDK (
-        ch_fasta,
-        []
-    )
+    if (!params.skip_tidk) {
+        FASTA_EXPLORE_SEARCH_PLOT_TIDK (
+            ch_fasta,
+            []
+        )
+    }
 
     // Merqury: Evaluate genome assemblies with k-mers and more
     // https://github.com/marbl/merqury
