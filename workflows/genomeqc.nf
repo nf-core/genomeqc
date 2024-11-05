@@ -41,7 +41,7 @@ workflow GENOMEQC {
             validateInputSamplesheet(it) // Input validation (check local subworkflow)
         }
         .branch {
-            ncbi: it.size() == 2
+            ncbi:  it.size() == 2
             local: it.size() == 3
         }
         .set { ch_input }
@@ -59,7 +59,7 @@ workflow GENOMEQC {
     ch_ncbi_input = CREATE_PATH.out.accession
         .multiMap {
             meta, accession ->
-                meta: meta
+                meta:      meta
                 accession: accession
         }
 
@@ -106,17 +106,26 @@ workflow GENOMEQC {
     ch_fasta  = UNCOMPRESS_FASTA.out.file.mix(non_gz_fasta)
     ch_gff = UNCOMPRESS_GFF.out.file.mix(non_gz_gff)
 
-    // Combine both fasta and gff into a single channel so that they keep in sync
-    
-    ch_combined = ch_fasta.combine(ch_gff, by:0)
+    // Combine both fasta and gff into a single channel, and then emit them as channels using multiMap, so that they keep in sync
+
+    ch_input = ch_fasta
+        .combine(ch_gff, by:0) // by:0 | Only combine when both channels share the same id
+        .multiMap {
+            meta, fasta, gff ->
+                fasta: tuple( meta, fasta )
+                gff:   tuple( meta, gff )
+        }
 
     //
     // Run TIDK
     //
 
+    ch_input.fasta.view()
+    ch_input.gff.view()
+
     FASTA_EXPLORE_SEARCH_PLOT_TIDK (
         //ch_fasta,
-        ch_combined.map { meta, fasta, gff -> tuple( meta, fasta ) },
+        ch_input.fasta,
         []
     )
 
@@ -126,14 +135,14 @@ workflow GENOMEQC {
     if (params.genome_only) {
         GENOME (
             //ch_fasta
-            ch_combined.map { meta, fasta, gff -> tuple( meta, fasta ) }
+            ch_input.fasta
         )
     } else {
         GENOME_AND_ANNOTATION (
             //ch_fasta,
             //ch_gff
-            ch_combined.map { meta, fasta, gff -> tuple( meta, fasta ) },
-            ch_combined.map { meta, fasta, gff -> tuple( meta, gff ) }
+            ch_input.fasta,
+            ch_input.gff
         )
         
         //
