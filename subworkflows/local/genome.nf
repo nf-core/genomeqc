@@ -20,7 +20,7 @@ workflow GENOME {
 
     BUSCO_BUSCO (
         ch_fasta,
-        "genome", // hard coded, other options ('prteins', 'transcriptome') make no sense
+        "genome", // hardcoded, other options ('proteins', 'transcriptome') make no sense
         params.busco_lineage,
         params.busco_lineages_path ?: [],
         params.busco_config ?: []

@@ -76,38 +76,47 @@ workflow GENOMEQC {
     ch_versions = ch_versions.mix(NCBIGENOMEDOWNLOAD.out.versions.first())
     
     //
-    // Define gff and fasta varliables
+    // Define gff and fasta channels
     //
 
     fasta = NCBIGENOMEDOWNLOAD.out.fna.mix( ch_input.local.map { meta, fasta, gff -> tuple( meta, file(fasta) ) } )
     gff   = NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { meta, fasta, gff -> tuple( meta, file(gff) ) } )
 
-    // Uncompress files if necessary | Consider using brances as an alternative
+    // Filter fasta files by extension and create channels for each file type
+    gz_fasta = fasta.filter { it[1].name.endsWith(".gz") }
+    non_gz_fasta = fasta.filter { !it[1].name.endsWith(".gz") }
 
-    if (fasta.map { it[1].endsWith(".gz") } ) {
-        ch_fasta = UNCOMPRESS_FASTA ( fasta ).file
-    } else {
-        ch_fasta = fasta
-    }
+    // Run module uncompress_fasta
+
+    UNCOMPRESS_FASTA (gz_fasta )
+    ch_versions = ch_versions.mix(UNCOMPRESS_FASTA.out.versions.first())
+
+    // Filter gff files by extension and create channels for each file type
+
+    gz_gff = gff.filter { it[1].name.endsWith(".gz") }
+    non_gz_gff = gff.filter { !it[1].name.endsWith(".gz") }
+
+    // Run module uncompress_GFF
+
+    UNCOMPRESS_GFF(gz_gff)
+    ch_versions = ch_versions.mix(UNCOMPRESS_GFF.out.versions.first())
+
+    // Combine the channels back together so that all the uncompressed files are in channels 
+
+    ch_fasta  = UNCOMPRESS_FASTA.out.file.mix(non_gz_fasta)
+    ch_gff = UNCOMPRESS_GFF.out.file.mix(non_gz_gff)
+
+    // Combine both fasta and gff into a single channel so that they keep in sync
     
-    // Uncompress gff if necessary
-
-    if (gff.map { it[1].endsWith(".gz") } ) {
-        ch_gff = UNCOMPRESS_GFF ( gff ).file
-    } else {
-        ch_gff = gff
-    }
-
     ch_combined = ch_fasta.combine(ch_gff, by:0)
-
-    //ch_combined.view()
 
     //
     // Run TIDK
     //
 
     FASTA_EXPLORE_SEARCH_PLOT_TIDK (
-        ch_fasta,
+        //ch_fasta,
+        ch_combined.map { meta, fasta, gff -> tuple( meta, fasta ) },
         []
     )
 
@@ -117,14 +126,14 @@ workflow GENOMEQC {
     if (params.genome_only) {
         GENOME (
             //ch_fasta
-            ch_combined.map { [it[0], it[1]] }
+            ch_combined.map { meta, fasta, gff -> tuple( meta, fasta ) }
         )
     } else {
         GENOME_AND_ANNOTATION (
             //ch_fasta,
             //ch_gff
-            ch_combined.map { [it[0], it[1]] },
-            ch_combined.map { [it[0], it[2]] }
+            ch_combined.map { meta, fasta, gff -> tuple( meta, fasta ) },
+            ch_combined.map { meta, fasta, gff -> tuple( meta, gff ) }
         )
         
         //
