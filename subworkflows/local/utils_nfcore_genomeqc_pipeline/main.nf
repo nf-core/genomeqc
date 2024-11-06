@@ -147,14 +147,14 @@ def validateInputParameters() {
 // Validate channels from input samplesheet
 //
 def validateInputSamplesheet(input) {
-    def (meta, refseq, fasta, gff) = input
+    def (meta, refseq, fasta, gff, fastq) = input
     // As for now, there are only two input options: RefSeq ID or local files. The pipeline will throw an error if the sample sheet does not contain the proper information
     // For the RefSeq ID option
     if ( meta && refseq && !fasta && !gff ) {
-        return [ meta, refseq ]
+        return [ meta, refseq, fastq ]
     // For the local files option
     } else if ( meta && !refseq && fasta && gff) {
-        return [ meta, fasta, gff ]
+        return [ meta, fasta, gff, fastq ]
     } else {
         error("Please check input samplesheet -> Incorrent samplesheet format")
     }
