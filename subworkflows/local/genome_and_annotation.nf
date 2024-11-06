@@ -4,7 +4,6 @@ include { LONGEST                             } from '../../modules/local/longes
 include { BUSCO_BUSCO                         } from '../../modules/nf-core/busco/busco/main'
 include { QUAST                               } from '../../modules/nf-core/quast/main'
 include { AGAT_SPSTATISTICS                   } from '../../modules/nf-core/agat/spstatistics/main'
-//include { GFFREAD                             } from '../../modules/nf-core/gffread/main'
 include { GFFREAD                             } from '../../modules/local/gffread'
 include { ORTHOFINDER                         } from '../../modules/nf-core/orthofinder/main'
 
@@ -17,6 +16,7 @@ workflow GENOME_AND_ANNOTATION {
     main:
 
     ch_versions = Channel.empty()
+    
     // For tree plot
     ch_tree_data = Channel.empty()
 
@@ -41,44 +41,12 @@ workflow GENOME_AND_ANNOTATION {
     ch_tree_data = ch_tree_data.mix(QUAST.out.tsv.map { tuple -> tuple[1] })
 
     //
-    // Run AGAT Spstatistics
+    // Run GFFREAD
     //
-
-    AGAT_SPSTATISTICS (
-        ch_agat_gff
-    )
-    ch_versions = ch_versions.mix(AGAT_SPSTATISTICS.out.versions.first())
-
-    //
-    // Run AGAT longest isoform
-    //
-
-//    LONGEST (
-//        ch_ch_agat_gff
-//    )
-//    ch_versions = ch_versions.mix(LONGEST.out.versions.first())
-//
-//    //
-//    // Run GFFREAD
-//    //
-//
-//    ch_long_gff = LONGEST.out.longest_proteins
-//    
-    inputChannel = ch_agat_gff.combine(ch_fasta, by: 0)
-
-    // Split the input channel into two channels
-    gffChannel = inputChannel.map { tuple ->
-        // Extracting the GFF path and ID
-        [tuple[0], tuple[1]]
-    }
-    fnaChannel = inputChannel.map { tuple ->
-        // Extracting only the FNA path
-        [tuple[0], tuple[2]]
-    }
 
     GFFREAD ( 
-        fnaChannel,
-        gffChannel
+        ch_fasta,
+        ch_gff
     )
     ch_versions = ch_versions.mix(GFFREAD.out.versions.first())
 
@@ -87,7 +55,7 @@ workflow GENOME_AND_ANNOTATION {
     //
 
     ortho_ch = GFFREAD.out.longest.collect().map { it -> [[id:"orthofinder"], it] }
-
+    
     ORTHOFINDER (
         ortho_ch,
         [[],[]]
@@ -108,6 +76,16 @@ workflow GENOME_AND_ANNOTATION {
     ch_versions = ch_versions.mix(BUSCO_BUSCO.out.versions.first())
 
     ch_tree_data = ch_tree_data.mix(BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file })
+
+    //
+    // Run AGAT Spstatistics
+    //
+
+    AGAT_SPSTATISTICS (
+        ch_gff
+    )
+    ch_versions = ch_versions.mix(AGAT_SPSTATISTICS.out.versions.first())
+
 
     emit:
     orthofinder = ORTHOFINDER.out.orthofinder // channel: [ val(meta), [folder] ]

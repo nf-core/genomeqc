@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
+  "$schema": "https://json-schema.org/draft-07/schema",
   "$id": "https://raw.githubusercontent.com/ecoflow/genomeqc/master/nextflow_schema.json",
   "title": "ecoflow/genomeqc pipeline parameters",
   "description": "A pipeline to compare multiple genomes and annotations",
@@ -304,21 +304,21 @@
           "description": "A path to a BUSCO config file (optional)"
         },
         "genome_only": {
-            "type": "string"
+          "type": "boolean",
+          "description": "Run genomeqc on genomes only"
         },
         "kvalue": {
-            "type": "integer",
-            "default": 21,
-            "description": "k size for meryl (merqury)"
+          "type": "integer",
+          "default": 21,
+          "description": "k size for meryl (merqury)"
         },
-        "merqury_skip": {
-            "type": "boolean",
-            "default": true,
-            "description": "Skip meryl/merqury step?"
+        "skip_merqury": {
+          "type": "boolean",
+          "description": "Skip meryl/merqury step?"
         },
         "skip_tidk": {
           "type": "boolean",
-          "description": "Do not run TIDK.",
+          "description": "Do not run TIDK",
           "hidden": true,
           "help_text": "You may wish to turn off the tidk subworkflow"
         }
