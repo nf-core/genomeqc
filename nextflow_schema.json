@@ -304,7 +304,9 @@
           "description": "A path to a BUSCO config file (optional)"
         },
         "genome_only": {
-            "type": "string"
+            "type": "boolean",
+            "default": true,
+            "description": "Run on genome only"
         },
         "kvalue": {
             "type": "integer",
@@ -318,7 +320,7 @@
         },
         "skip_tidk": {
           "type": "boolean",
-          "description": "Do not run TIDK.",
+          "description": "Do not run TIDK",
           "hidden": true,
           "help_text": "You may wish to turn off the tidk subworkflow"
         }
