@@ -1,6 +1,6 @@
 process PLOT_BUSCO_IDEOGRAM {
     tag "${genusspeci}_${lineage}"
-    label 'process_low'
+    label 'process_single'
 
     conda "bioconda::r-rideogram=0.2.2 bioconda::r-svglite=2.1.1"
     container "community.wave.seqera.io/library/seqkit_r-dplyr_r-optparse_r-readr_pruned:92b750716d244919"
@@ -9,8 +9,7 @@ process PLOT_BUSCO_IDEOGRAM {
     tuple val(genusspeci), val(lineage), path(busco_full_table), path(genome), path(gff)
 
     output:
-    //tuple val(genusspeci), val(lineage), path("*.svg"), emit: svg
-    //tuple val(genusspeci), val(lineage), path("*.png"), emit: png
+    tuple val(genusspeci), val(lineage), path("*.svg"), emit: svg
     path "versions.yml"           , emit: versions
 
     script:
@@ -31,6 +30,8 @@ process PLOT_BUSCO_IDEOGRAM {
         --karyotype ${prefix}_karyotype.txt \\
         --prefix ${prefix} \\
         $args
+
+    
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
