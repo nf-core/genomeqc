@@ -1,4 +1,5 @@
 
+include { AGAT_CONVERTSPGXF2GXF               } from '../../modules/nf-core/agat/convertspgxf2gxf'
 include { LONGEST                             } from '../../modules/local/longest'
 include { BUSCO_BUSCO                         } from '../../modules/nf-core/busco/busco/main'
 include { QUAST                               } from '../../modules/nf-core/quast/main'
@@ -15,10 +16,14 @@ workflow GENOME_AND_ANNOTATION {
     main:
 
     ch_versions = Channel.empty()
+    
     // For tree plot
     ch_tree_data = Channel.empty()
 
     // TODO nf-core: substitute modules here for the modules of your subworkflow
+
+    // Check GFF integrity
+    ch_agat_gff = AGAT_CONVERTSPGXF2GXF(ch_gff).output_gff
 
     //
     // Run Quast
@@ -27,7 +32,7 @@ workflow GENOME_AND_ANNOTATION {
     QUAST (
         ch_fasta,
         [[],[]],
-        ch_gff
+        ch_agat_gff
     )
     ch_versions = ch_versions.mix(QUAST.out.versions.first())
 

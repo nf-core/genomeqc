@@ -3,7 +3,9 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-
+include { MERYL_UNIONSUM                         } from '../modules/nf-core/meryl/unionsum/main'
+include { MERYL_COUNT                         } from '../modules/nf-core/meryl/count/main'
+include { MERQURY_MERQURY                     } from '../modules/nf-core/merqury/merqury/main'
 include { CREATE_PATH                         } from '../modules/local/create_path'
 include { NCBIGENOMEDOWNLOAD                  } from '../modules/nf-core/ncbigenomedownload/main'
 include { PIGZ_UNCOMPRESS as UNCOMPRESS_FASTA } from '../modules/nf-core/pigz/uncompress/main'
@@ -41,18 +43,18 @@ workflow GENOMEQC {
             validateInputSamplesheet(it) // Input validation (check local subworkflow)
         }
         .branch {
-            ncbi:  it.size() == 2
-            local: it.size() == 3
+            ncbi: it.size() == 3
+            local: it.size() == 4
         }
         .set { ch_input }
 
-    //
     // MODULE: Run create_path
-    // 
 
-    CREATE_PATH (
-        ch_input.ncbi
-    )
+    // ch_input.ncbi is now a 3-element tuple, last element is the fastq. We need to remove it before CREATE_PATH
+    ch_input.ncbi
+        | map { [it[0], it[1]] }
+        | CREATE_PATH
+
 
     // For NCBIGENOMEDOWNLOAD
 
@@ -66,7 +68,6 @@ workflow GENOMEQC {
     //
     // MODULE: Run ncbigenomedownlaod
     //
-
     NCBIGENOMEDOWNLOAD ( 
         ch_ncbi_input.meta,
         ch_ncbi_input.accession,
@@ -79,8 +80,8 @@ workflow GENOMEQC {
     // Define gff and fasta channels
     //
 
-    fasta = NCBIGENOMEDOWNLOAD.out.fna.mix( ch_input.local.map { meta, fasta, gff -> tuple( meta, file(fasta) ) } )
-    gff   = NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { meta, fasta, gff -> tuple( meta, file(gff) ) } )
+    fasta = NCBIGENOMEDOWNLOAD.out.fna.mix( ch_input.local.map { meta, fasta, gff, fastq -> tuple( meta, file(fasta) ) } )
+    gff   = NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { meta, fasta, gff, fastq -> tuple( meta, file(gff) ) } )
 
     // Filter fasta files by extension and create channels for each file type
     gz_fasta = fasta.filter { it[1].name.endsWith(".gz") }
@@ -106,7 +107,7 @@ workflow GENOMEQC {
     ch_fasta  = UNCOMPRESS_FASTA.out.file.mix(non_gz_fasta)
     ch_gff = UNCOMPRESS_GFF.out.file.mix(non_gz_gff)
 
-    // Combine both fasta and gff into a single channel, and then emit them as channels using multiMap, so that they keep in sync
+    // Combine both fasta and gff into a single channel, and then emit them as channels using multiMap, so that they are in sync all the time
 
     ch_input = ch_fasta
         .combine(ch_gff, by:0) // by:0 | Only combine when both channels share the same id
@@ -116,22 +117,67 @@ workflow GENOMEQC {
                 gff:   tuple( meta, gff )
         }
 
+    // FASTQ file is optional in the samplesheet. 
+    // First, get it like you do for gff and fasta
+    ch_fastq = ch_input.local.map{ [it[0], it[2]] }.mix(ch_input.ncbi.map{ [it[0],it[2]] })
+    // Then, check to see that element 1 is not empty, and if not, make it file()
+    // You have to do this because if you pass in file() in the initial map, 
+    // it'll fail if you don't supply a fastq, because you can't pass an empty to file()
+    ch_fastq
+        | map{meta, fq -> fq ? [meta, file(fq)] : [meta, fq]}
+        | filter { meta, fq -> fq && fq.name =~ /(\.fastq|\.fq|\.fastq\.gz|\.fq\.gz)$/ }
+        | set {ch_fastq}
+    
     //
     // Run TIDK
     //
+    
+    if (!params.skip_tidk) {
+        FASTA_EXPLORE_SEARCH_PLOT_TIDK (
+            ch_input.fasta,
+            []
+        )
+    }
 
-    ch_input.fasta.view()
-    ch_input.gff.view()
+    // Merqury: Evaluate genome assemblies with k-mers and more
+    // https://github.com/marbl/merqury
+    // Only run if not skipping and fastq is provided in the samplesheet
+    if (!params.merqury_skip && ch_fastq) {
+        // MODULE: MERYL_COUNT
+        MERYL_COUNT(
+            ch_fastq,
+            params.kvalue 
+        )
+        ch_meryl_db = MERYL_COUNT.out.meryl_db
+        ch_versions = ch_versions.mix(MERYL_COUNT.out.versions.first())
+        // MODULE: MERYL_UNIONSUM
+        MERYL_UNIONSUM(
+            ch_meryl_db,
+            params.kvalue
+        )
+        ch_meryl_union = MERYL_UNIONSUM.out.meryl_db
+        ch_versions = ch_versions.mix(MERYL_UNIONSUM.out.versions.first())
+        // MODULE: MERQURY_MERQURY
+        ch_meryl_union
+            | join(ch_fastq)
+            | set {ch_merqury_inputs}
+        MERQURY_MERQURY ( ch_merqury_inputs )
+        ch_merqury_qv                           = MERQURY_MERQURY.out.assembly_qv
+        ch_merqury_stats                        = MERQURY_MERQURY.out.stats
+        ch_merqury_spectra_cn_fl_png            = MERQURY_MERQURY.out.spectra_cn_fl_png
+        ch_merqury_spectra_asm_fl_png           = MERQURY_MERQURY.out.spectra_asm_fl_png
+        ch_hapmers_blob_png                     = MERQURY_MERQURY.out.hapmers_blob_png
+        ch_merqury_outputs                      = ch_merqury_qv
+                                                | mix(ch_merqury_stats)
+                                                | mix(ch_merqury_spectra_cn_fl_png)
+                                                | mix(ch_merqury_spectra_asm_fl_png)
+                                                | mix(ch_hapmers_blob_png)
+                                                | flatMap { meta, data -> data }
+        ch_versions                             = ch_versions.mix(MERQURY_MERQURY.out.versions.first())
+    }
 
-    FASTA_EXPLORE_SEARCH_PLOT_TIDK (
-        //ch_fasta,
-        ch_input.fasta,
-        []
-    )
 
     // Run genome only or genome + gff
-
-
     if (params.genome_only) {
         GENOME (
             //ch_fasta
@@ -154,7 +200,6 @@ workflow GENOMEQC {
             GENOME_AND_ANNOTATION.out.tree_data
         )
     }
-
 
     //
     // Collate and save software versions

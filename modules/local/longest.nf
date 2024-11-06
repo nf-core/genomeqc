@@ -4,7 +4,6 @@ process LONGEST {
     label 'process_med_memory'
 
     container = 'biocontainers/agat:1.3.0--pl5321hdfd78af_0'
-    publishDir "$params.outdir/output_data/longest" , mode: "${params.publish_dir_mode}", pattern:"*.txt"
 
     input:
     tuple val (meta),  path(gff)

@@ -147,23 +147,23 @@ def validateInputParameters() {
 // Validate channels from input samplesheet
 //
 def validateInputSamplesheet(input) {
-    def (meta, refseq, fasta, gff) = input
+    def (meta, refseq, fasta, gff, fastq) = input
     // As for now, there are only two input options: RefSeq ID or local files. The pipeline will throw an error if the sample sheet does not contain the proper information
     // If --genome_only parameter
     // Check for genome-only mode
     if (params.genome_only) {
         if (meta && refseq && !fasta && !gff) {
-            return [meta, refseq]
+            return [meta, refseq, fastq]
         } else if (meta && !refseq && fasta) {
-            return [meta, fasta, gff] // Empty or not gff, either way won't be used
+            return [meta, fasta, gff, fastq] // Empty or not gff, either way won't be used
         } else {
             error("You are running in --genome_only mode. Please check input samplesheet -> Incorrect samplesheet format")
         }
     } else {
         if (meta && refseq && !fasta && !gff) {
-            return [ meta, refseq ]
+            return [ meta, refseq, fastq ]
         } else if ( meta && !refseq && fasta && gff ) {
-            return [ meta, fasta, gff ]
+            return [ meta, fasta, gff, fastq ]
         } else {
             error("You are running on default mode. Please check input samplesheet -> Incorrent samplesheet format")
         }

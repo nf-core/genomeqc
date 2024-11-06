@@ -1,3 +1,4 @@
+#!/usr/bin/Rscript
 # Load necessary libraries
 if (!requireNamespace("argparse", quietly = TRUE)) {
   install.packages("argparse")
