@@ -111,34 +111,31 @@ workflow GENOME_AND_ANNOTATION {
     // Prepare BUSCO output
     ch_busco_full_table = BUSCO_BUSCO.out.full_table
         .map { meta, full_tables -> 
-            def genus = meta.id.split('_')[0]
-            def speci = meta.id.split('_')[1]
-            def genusspeci = "${genus}_${speci}"
             def lineages = full_tables.collect { it.toString().split('/')[-2].replaceAll('run_', '').replaceAll('_odb\\d+', '') }
-            [genusspeci, lineages, full_tables]
+            [meta.id, lineages, full_tables]
         }
-        //.view()
+
+    // Add genome to channel
+    fnaChannel_busco = fnaChannel
+        .map { meta, fasta -> 
+            [meta.id, fasta]
+        }
 
     // Prepare AGAT output
-    ch_agat_gff = ch_agat_gff
+    ch_agat_gff_busco = ch_agat_gff
         .map { meta, gff -> 
-            def genus = meta.id.split('_')[0]
-            def speci = meta.id.split('_')[1]
-            def genusspeci = "${genus}_${speci}"
-            [genusspeci, gff]
+            [meta.id, gff]
         }
-        //.view()
 
-    // Combine BUSCO and AGAT outputs
+    // Combine BUSCO, AGAT, and genome outputs
     ch_plot_input = ch_busco_full_table
-        .join(ch_agat_gff)
-        .flatMap { genusspeci, lineages, full_tables, gff ->
+        .join(fnaChannel_busco)
+        .join(ch_agat_gff_busco)
+        .flatMap { genusspeci, lineages, full_tables, fasta, gff ->
             lineages.withIndex().collect { lineage, index ->
-                [genusspeci, lineage, full_tables[index], gff]
+                [genusspeci, lineage, full_tables[index], fasta, gff]
             }
         }
-
-    //ch_plot_input.view()
 
     PLOT_BUSCO_IDEOGRAM ( ch_plot_input )//removed this temporarily:, ch_karyotype
 
