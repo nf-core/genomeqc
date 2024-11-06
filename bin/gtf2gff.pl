@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-#
+# Script taken from : https://github.com/Gaius-Augustus/Augustus/blob/955ce1731e9bdd1c670216ed3c514f978c033891/scripts/gtf2gff.pl
 # format convert a gtf file
 #
 # This script is used by the braker.pl pipeline.

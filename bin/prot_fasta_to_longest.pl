@@ -1,4 +1,8 @@
 #!/usr/bin/perl
+
+# Written by Chris Wyatt and released under the MIT license. 
+# Prints out longest unique protein 
+
 use warnings;
 use strict;
 use lib '/opt/conda/lib/perl5/site_perl';
@@ -42,7 +46,7 @@ my @headersplit=();
 
 
 while (my $seq = $seqio->next_seq){ ## selects one sequence at a time
-   	## set variables for THIS sequence
+    ## set variables for THIS sequence
     my $id = $seq->id;
     chomp $id;
     print "here $id\n";
@@ -57,8 +61,6 @@ while (my $seq = $seqio->next_seq){ ## selects one sequence at a time
     if ($longest{$id}){
         print $outhandle ">$iso2gene{$id}\n$string\n";
     }
-	
-	
 }
 
 
