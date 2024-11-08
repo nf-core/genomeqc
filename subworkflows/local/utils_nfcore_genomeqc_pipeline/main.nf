@@ -148,23 +148,29 @@ def validateInputParameters() {
 //
 def validateInputSamplesheet(input) {
     def (meta, refseq, fasta, gff, fastq) = input
-    // As for now, there are only two input options: RefSeq ID or local files. The pipeline will throw an error if the sample sheet does not contain the proper information
-    // For the RefSeq ID option
-    if ( meta && refseq && !fasta && !gff ) {
-        return [ meta, refseq, fastq ]
-    // For the local files option
-    } else if ( meta && !refseq && fasta && gff) {
-        return [ meta, fasta, gff, fastq ]
-    } else {
-        error("Please check input samplesheet -> Incorrent samplesheet format")
+    if (params.run_merqury && !fastq) { // Perhaps this should be on validateInputParameters()
+        error("You are runnning using --run_merqury flag but no fastq was found")
     }
-    // Check that multiple runs of the same sample are of the same datatype i.e. single-end / paired-end
-    //def endedness_ok = metas.collect{ it.single_end }.unique().size == 1
-    //if (!endedness_ok) {
-    //    error("Please check input samplesheet -> Multiple runs of a sample must be of the same datatype i.e. single-end or paired-end: ${metas[0].id}")
-    //}
-
-    //return [ metas[0], fastqs ]
+    // As for now, there are only two input options: RefSeq ID or local files. The pipeline will throw an error if the sample sheet does not contain the proper information
+    // If --genome_only parameter
+    // Check for genome-only mode
+    if (params.genome_only) {
+        if (meta && refseq && !fasta && !gff) {
+            return [meta, refseq, fastq]
+        } else if (meta && !refseq && fasta) {
+            return [meta, fasta, gff, fastq] // Empty or not gff, either way won't be used
+        } else {
+            error("You are running in --genome_only mode. Please check input samplesheet -> Incorrect samplesheet format")
+        }
+    } else {
+        if (meta && refseq && !fasta && !gff) {
+            return [ meta, refseq, fastq ]
+        } else if ( meta && !refseq && fasta && gff ) {
+            return [ meta, fasta, gff, fastq ]
+        } else {
+            error("You are running on default mode. Please check input samplesheet -> Incorrent samplesheet format")
+        }
+    }
 }
 //
 // Get attribute from genome config file e.g. fasta
