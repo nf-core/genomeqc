@@ -174,7 +174,7 @@ workflow GENOMEQC {
     // Merqury: Evaluate genome assemblies with k-mers and more
     // https://github.com/marbl/merqury
     // Only run if not skipping and fastq is provided in the samplesheet
-    if (!params.skip_merqury && ch_input.fq) {
+    if (params.run_merqury) {
         // MODULE: MERYL_COUNT
         MERYL_COUNT(
             ch_input.fq,
