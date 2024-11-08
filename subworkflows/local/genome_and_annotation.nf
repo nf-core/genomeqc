@@ -18,7 +18,7 @@ workflow GENOME_AND_ANNOTATION {
     main:
 
     ch_versions = Channel.empty()
- 
+
     // For tree plot
     ch_tree_data = Channel.empty()
 
@@ -55,7 +55,7 @@ workflow GENOME_AND_ANNOTATION {
     // Run GFFREAD
     //
 
-    GFFREAD ( 
+    GFFREAD (
         ch_input.fasta,
         ch_input.gff
     )
@@ -66,7 +66,7 @@ workflow GENOME_AND_ANNOTATION {
     //
 
     ortho_ch = GFFREAD.out.longest.collect().map { fastas -> [[id:"orthofinder"], fastas] }
-    
+
     ORTHOFINDER (
         ortho_ch,
         [[],[]]
@@ -77,8 +77,8 @@ workflow GENOME_AND_ANNOTATION {
     // MODULE: Run BUSCO
     //
 
-    BUSCO_BUSCO (  
-        GFFREAD.out.proteins_busco, 
+    BUSCO_BUSCO (
+        GFFREAD.out.proteins_busco,
         "proteins", // hard coded
         params.busco_lineage,
         params.busco_lineages_path ?: [],
@@ -88,20 +88,20 @@ workflow GENOME_AND_ANNOTATION {
 
     // Prepare BUSCO output
     ch_busco_full_table = BUSCO_BUSCO.out.full_table
-        .map { meta, full_tables -> 
+        .map { meta, full_tables ->
             def lineages = full_tables.collect { it.toString().split('/')[-2].replaceAll('run_', '').replaceAll('_odb\\d+', '') }
             [meta.id, lineages, full_tables]
         }
 
     // Add genome to channel
-    fnaChannel_busco = fnaChannel
-        .map { meta, fasta -> 
+    fnaChannel_busco = ch_input.fasta
+        .map { meta, fasta ->
             [meta.id, fasta]
         }
 
     // Prepare AGAT output
-    ch_agat_gff_busco = ch_agat_gff
-        .map { meta, gff -> 
+    ch_agat_gff_busco = ch_input.gff
+        .map { meta, gff ->
             [meta.id, gff]
         }
 
@@ -136,4 +136,3 @@ workflow GENOME_AND_ANNOTATION {
 
     versions = ch_versions                     // channel: [ versions.yml ]
 }
-
