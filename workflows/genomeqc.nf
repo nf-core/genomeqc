@@ -154,7 +154,7 @@ workflow GENOMEQC {
         | combine(ch_fastq, by:0)
         | multiMap {
             meta, fasta, gff, fq ->
-                fasta : fasta ? tuple( meta, file(fasta) ) : null
+                fasta : fasta ? tuple( meta, file(fasta) ) : null // Not sure if conditional is necessary anymore
                 gff   : gff   ? tuple( meta, file(gff) )   : null
                 fq    : fq    ? tuple( meta, file(fq) )    : null
         }
