@@ -3,7 +3,7 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { MERYL_UNIONSUM                         } from '../modules/nf-core/meryl/unionsum/main'
+include { MERYL_UNIONSUM                      } from '../modules/nf-core/meryl/unionsum/main'
 include { MERYL_COUNT                         } from '../modules/nf-core/meryl/count/main'
 include { MERQURY_MERQURY                     } from '../modules/nf-core/merqury/merqury/main'
 include { CREATE_PATH                         } from '../modules/local/create_path'
@@ -138,25 +138,25 @@ workflow GENOMEQC {
     // You have to do this because if you pass in file() in the initial map, 
     // it'll fail if you don't supply a fastq, because you can't pass an empty to file()
 
-    ch_fastq
-        | map{meta, fq -> fq ? [meta, file(fq)] : [meta, fq]}
-        | filter { meta, fq -> fq && fq.name =~ /(\.fastq|\.fq|\.fastq\.gz|\.fq\.gz)$/ }
-        | set {ch_fastq}
+    //ch_fastq
+    //    | map{meta, fq -> fq ? [meta, file(fq)] : [meta, fq]}
+    //    | filter { meta, fq -> fq && fq.name =~ /(\.fastq|\.fq|\.fastq\.gz|\.fq\.gz)$/ }
+    //    | set {ch_fastq}
     
     //
     // Define multi-channel object
     //
 
     // Combine both fasta, gff and fastq channels into a single multi-channel object using multiMap, so that they are in sync all the time
-
+    // If element (fasta, gff, fq) is empty, it will return an empty (null) channel
     ch_fasta
         | combine(ch_gff, by:0) // by:0 | Only combine when both channels share the same id
         | combine(ch_fastq, by:0)
         | multiMap {
-            meta, fasta, gff, fastq ->
-                fasta : tuple( meta, fasta )
-                gff   : tuple( meta, gff )
-                fq    : tuple( meta, fastq )
+            meta, fasta, gff, fq ->
+                fasta : fasta ? tuple( meta, file(fasta) ) : null // Not sure if conditional is necessary anymore
+                gff   : gff   ? tuple( meta, file(gff) )   : null
+                fq    : fq    ? tuple( meta, file(fq) )    : null
         }
         | set { ch_input }
 
@@ -174,7 +174,7 @@ workflow GENOMEQC {
     // Merqury: Evaluate genome assemblies with k-mers and more
     // https://github.com/marbl/merqury
     // Only run if not skipping and fastq is provided in the samplesheet
-    if (!params.merqury_skip && ch_input.fq) {
+    if (params.run_merqury) {
         // MODULE: MERYL_COUNT
         MERYL_COUNT(
             ch_input.fq,

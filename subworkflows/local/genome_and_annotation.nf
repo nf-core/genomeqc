@@ -16,23 +16,32 @@ workflow GENOME_AND_ANNOTATION {
     main:
 
     ch_versions = Channel.empty()
-    
+ 
     // For tree plot
     ch_tree_data = Channel.empty()
 
-    // TODO nf-core: substitute modules here for the modules of your subworkflow
+    // Fix and standarize GFF
+    ch_gff_agat = AGAT_CONVERTSPGXF2GXF(ch_gff).output_gff
 
-    // Check GFF integrity
-    ch_agat_gff = AGAT_CONVERTSPGXF2GXF(ch_gff).output_gff
+    // Combine inputs into a single multichannel
+    ch_fasta
+        | combine(ch_gff_agat, by:0) // by:0 | Only combine when both channels share the same id
+        | multiMap {
+            meta, fasta, gff ->
+                fasta : fasta ? tuple( meta, file(fasta) ) : null
+                gff   : gff   ? tuple( meta, file(gff) )   : null
+        }
+        | set { ch_input }
+
 
     //
     // Run Quast
     //
 
     QUAST (
-        ch_fasta,
+        ch_input.fasta,
         [[],[]],
-        ch_agat_gff
+        ch_input.gff
     )
     ch_versions = ch_versions.mix(QUAST.out.versions.first())
 
@@ -45,8 +54,8 @@ workflow GENOME_AND_ANNOTATION {
     //
 
     GFFREAD ( 
-        ch_fasta,
-        ch_gff
+        ch_input.fasta,
+        ch_input.gff
     )
     ch_versions = ch_versions.mix(GFFREAD.out.versions.first())
 
@@ -54,7 +63,7 @@ workflow GENOME_AND_ANNOTATION {
     // MODULE: Run Orthofinder
     //
 
-    ortho_ch = GFFREAD.out.longest.collect().map { it -> [[id:"orthofinder"], it] }
+    ortho_ch = GFFREAD.out.longest.collect().map { fastas -> [[id:"orthofinder"], fastas] }
     
     ORTHOFINDER (
         ortho_ch,
@@ -68,7 +77,7 @@ workflow GENOME_AND_ANNOTATION {
 
     BUSCO_BUSCO (  
         GFFREAD.out.proteins_busco, 
-        "proteins", // Hard coded, it's the only possible option
+        "proteins", // hard coded
         params.busco_lineage,
         params.busco_lineages_path ?: [],
         params.busco_config ?: []
@@ -82,7 +91,7 @@ workflow GENOME_AND_ANNOTATION {
     //
 
     AGAT_SPSTATISTICS (
-        ch_gff
+        ch_input.gff
     )
     ch_versions = ch_versions.mix(AGAT_SPSTATISTICS.out.versions.first())
 

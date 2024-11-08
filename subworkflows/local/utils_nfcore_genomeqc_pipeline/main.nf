@@ -148,6 +148,9 @@ def validateInputParameters() {
 //
 def validateInputSamplesheet(input) {
     def (meta, refseq, fasta, gff, fastq) = input
+    if (params.run_merqury && !fastq) { // Perhaps this should be on validateInputParameters()
+        error("You are runnning using --run_merqury flag but no fastq was found")
+    }
     // As for now, there are only two input options: RefSeq ID or local files. The pipeline will throw an error if the sample sheet does not contain the proper information
     // If --genome_only parameter
     // Check for genome-only mode

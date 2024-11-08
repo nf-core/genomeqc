@@ -312,9 +312,9 @@
           "default": 21,
           "description": "k size for meryl (merqury)"
         },
-        "skip_merqury": {
+        "run_merqury": {
           "type": "boolean",
-          "description": "Skip meryl/merqury step?"
+          "description": "Run meryl/merqury step?"
         },
         "skip_tidk": {
           "type": "boolean",
