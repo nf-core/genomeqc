@@ -48,18 +48,18 @@ process GFFREAD {
         #Remove lines of the GFF that have ? in the strand section, as this cannot be parsed by gffread
         awk '\$7 != "?" { print \$0 }' ${prefix}.gff_for_jvci.gff3  > ${prefix}.gff_for_jvci.noquest.gff3
         
-        gffread -w ${prefix}.splicedexons.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3
-        gffread -x ${prefix}.splicedcds.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3
-        gffread -y ${prefix}.prot.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3 -F -S
+        gffread -w ${prefix}.splicedexons.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3 --table @genename
+        gffread -x ${prefix}.splicedcds.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3 --table @genename
+        gffread -y ${prefix}.prot.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3 -F -S --table @genename
 
     else
         mv gff_temp ${prefix}.gff_for_jvci.gff3
         #Remove lines of the GFF that have ? in the strand section, as this cannot be parsed by gffread
         awk '\$7 != "?" { print \$0 }' ${prefix}.gff_for_jvci.gff3  > ${prefix}.gff_for_jvci.noquest.gff3
         
-        gffread -w ${prefix}.splicedexons.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3
-        gffread -x ${prefix}.splicedcds.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3
-        gffread -y ${prefix}.prot.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3 -F -S
+        gffread -w ${prefix}.splicedexons.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3 --table @genename
+        gffread -x ${prefix}.splicedcds.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3 --table @genename
+        gffread -y ${prefix}.prot.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3 -F -S --table @genename
 
     fi
 

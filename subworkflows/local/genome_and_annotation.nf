@@ -4,6 +4,8 @@ include { LONGEST                             } from '../../modules/local/longes
 include { BUSCO_BUSCO                         } from '../../modules/nf-core/busco/busco/main'
 include { QUAST                               } from '../../modules/nf-core/quast/main'
 include { AGAT_SPSTATISTICS                   } from '../../modules/nf-core/agat/spstatistics/main'
+include { PLOT_BUSCO_IDEOGRAM                 } from '../../modules/local/plot_busco_ideogram.nf'
+//include { GFFREAD                             } from '../../modules/nf-core/gffread/main'
 include { GFFREAD                             } from '../../modules/local/gffread'
 include { ORTHOFINDER                         } from '../../modules/nf-core/orthofinder/main'
 
@@ -16,14 +18,23 @@ workflow GENOME_AND_ANNOTATION {
     main:
 
     ch_versions = Channel.empty()
- 
+
     // For tree plot
     ch_tree_data = Channel.empty()
+
+    //
+    // MODULE: run AGAT convertspgxf2gxf
+    //
 
     // Fix and standarize GFF
     ch_gff_agat = AGAT_CONVERTSPGXF2GXF(ch_gff).output_gff
 
-    // Combine inputs into a single multichannel
+    //
+    // Prepare input multichannel
+    //
+
+    // Combine inputs (fasta and gff from AGAT) into a single multichannel so that they
+    // keep in sync
     ch_fasta
         | combine(ch_gff_agat, by:0) // by:0 | Only combine when both channels share the same id
         | multiMap {
@@ -33,9 +44,17 @@ workflow GENOME_AND_ANNOTATION {
         }
         | set { ch_input }
 
+    //
+    // Run AGAT Spstatistics
+    //
+
+    AGAT_SPSTATISTICS (
+        ch_input.gff
+    )
+    ch_versions = ch_versions.mix(AGAT_SPSTATISTICS.out.versions.first())
 
     //
-    // Run Quast
+    // MODULE: Run Quast
     //
 
     QUAST (
@@ -50,10 +69,10 @@ workflow GENOME_AND_ANNOTATION {
     ch_tree_data = ch_tree_data.mix(QUAST.out.tsv.map { tuple -> tuple[1] })
 
     //
-    // Run GFFREAD
+    // MODULE: Run GFFREAD
     //
 
-    GFFREAD ( 
+    GFFREAD (
         ch_input.fasta,
         ch_input.gff
     )
@@ -64,7 +83,7 @@ workflow GENOME_AND_ANNOTATION {
     //
 
     ortho_ch = GFFREAD.out.longest.collect().map { fastas -> [[id:"orthofinder"], fastas] }
-    
+
     ORTHOFINDER (
         ortho_ch,
         [[],[]]
@@ -75,8 +94,8 @@ workflow GENOME_AND_ANNOTATION {
     // MODULE: Run BUSCO
     //
 
-    BUSCO_BUSCO (  
-        GFFREAD.out.proteins_busco, 
+    BUSCO_BUSCO (
+        GFFREAD.out.proteins_busco,
         "proteins", // hard coded
         params.busco_lineage,
         params.busco_lineages_path ?: [],
@@ -84,17 +103,42 @@ workflow GENOME_AND_ANNOTATION {
     )
     ch_versions = ch_versions.mix(BUSCO_BUSCO.out.versions.first())
 
+    //
+    // Plot BUSCO ideogram
+    //
+
+    // Prepare BUSCO output
+    ch_busco_full_table = BUSCO_BUSCO.out.full_table
+        .map { meta, full_tables ->
+            def lineages = full_tables.collect { it.toString().split('/')[-2].replaceAll('run_', '').replaceAll('_odb\\d+', '') }
+            [meta.id, lineages, full_tables]
+        }
+
+    // Add genome to channel
+    fnaChannel_busco = ch_input.fasta
+        .map { meta, fasta ->
+            [meta.id, fasta]
+        }
+
+    // Prepare GFF channel of ideogram
+    ch_agat_gff_busco = ch_input.gff
+        .map { meta, gff ->
+            [meta.id, gff]
+        }
+
+    // Combine BUSCO, AGAT, and genome outputs
+    ch_plot_input = ch_busco_full_table
+        .join(fnaChannel_busco)
+        .join(ch_agat_gff_busco)
+        .flatMap { genusspeci, lineages, full_tables, fasta, gff ->
+            lineages.withIndex().collect { lineage, index ->
+                [genusspeci, lineage, full_tables[index], fasta, gff]
+            }
+        }
+
+    PLOT_BUSCO_IDEOGRAM ( ch_plot_input )//removed this temporarily:, ch_karyotype
+
     ch_tree_data = ch_tree_data.mix(BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file })
-
-    //
-    // Run AGAT Spstatistics
-    //
-
-    AGAT_SPSTATISTICS (
-        ch_input.gff
-    )
-    ch_versions = ch_versions.mix(AGAT_SPSTATISTICS.out.versions.first())
-
 
     emit:
     orthofinder = ORTHOFINDER.out.orthofinder // channel: [ val(meta), [folder] ]
@@ -103,4 +147,3 @@ workflow GENOME_AND_ANNOTATION {
 
     versions = ch_versions                     // channel: [ versions.yml ]
 }
-
