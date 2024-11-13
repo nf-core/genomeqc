@@ -1,7 +1,7 @@
 process LONGEST {
     tag "$meta.id"
-    label 'process_single'
-    label 'process_med_memory'
+    label 'process_medium'
+    //label 'process_med_memory'
 
     container = 'biocontainers/agat:1.3.0--pl5321hdfd78af_0'
 
