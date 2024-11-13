@@ -104,6 +104,13 @@ workflow GENOME_AND_ANNOTATION {
         .map { meta, gff ->
             [meta.id, gff]
         }
+    // The gffs used to plot the ideogram should not come from AGAT,
+    // but from the filtered longest gff from GFFREAD
+    //ch_agat_gff_busco = GFFREAD.out.gffs_agat
+    //    .map { meta, gff ->
+    //        [meta.id, gff]
+    //    }
+
 
     // Combine BUSCO, AGAT, and genome outputs
     ch_plot_input = ch_busco_full_table

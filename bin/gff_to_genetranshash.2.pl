@@ -80,10 +80,7 @@ while (my $line=<$filein>){
                     my @spbit=split("\=", $bits);
                     $temp_h{$spbit[0]}=$spbit[1];
                 }
-                my $fullgene=$temp_h{"Parent"};
-                my @fullsp=split("\:", $fullgene);
-                my @fullminusdash=split("\-",$fullsp[-1]);
-                $gene=$fullminusdash[-1];
+                $gene=$temp_h{"Parent"};
                 $tran=$temp_h{"transcript_id"};
             }
 
