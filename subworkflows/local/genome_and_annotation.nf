@@ -5,7 +5,6 @@ include { BUSCO_BUSCO                         } from '../../modules/nf-core/busc
 include { QUAST                               } from '../../modules/nf-core/quast/main'
 include { AGAT_SPSTATISTICS                   } from '../../modules/nf-core/agat/spstatistics/main'
 include { PLOT_BUSCO_IDEOGRAM                 } from '../../modules/local/plot_busco_ideogram.nf'
-//include { GFFREAD                             } from '../../modules/nf-core/gffread/main'
 include { GFFREAD                             } from '../../modules/local/gffread'
 include { ORTHOFINDER                         } from '../../modules/nf-core/orthofinder/main'
 
@@ -35,14 +34,13 @@ workflow GENOME_AND_ANNOTATION {
 
     // Combine inputs (fasta and gff from AGAT) into a single multichannel so that they
     // keep in sync
-    ch_fasta
-        | combine(ch_gff_agat, by:0) // by:0 | Only combine when both channels share the same id
-        | multiMap {
-            meta, fasta, gff ->
-                fasta : fasta ? tuple( meta, file(fasta) ) : null
-                gff   : gff   ? tuple( meta, file(gff) )   : null
-        }
-        | set { ch_input }
+    ch_input = ch_fasta
+                | combine(ch_gff_agat, by:0) // by:0 | Only combine when both channels share the same id
+                | multiMap {
+                    meta, fasta, gff ->
+                        fasta : fasta ? tuple( meta, file(fasta) ) : null // channel: [ val(meta), [ fasta ] ]
+                        gff   : gff   ? tuple( meta, file(gff) )   : null // channel: [ val(meta), [ gff ] ]
+                }
 
     //
     // Run AGAT Spstatistics
