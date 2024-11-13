@@ -22,10 +22,19 @@ workflow GENOME_AND_ANNOTATION {
     // For tree plot
     ch_tree_data = Channel.empty()
 
+    //
+    // MODULE: run AGAT convertspgxf2gxf
+    //
+
     // Fix and standarize GFF
     ch_gff_agat = AGAT_CONVERTSPGXF2GXF(ch_gff).output_gff
 
-    // Combine inputs into a single multichannel
+    //
+    // Prepare input multichannel
+    //
+
+    // Combine inputs (fasta and gff from AGAT) into a single multichannel so that they
+    // keep in sync
     ch_fasta
         | combine(ch_gff_agat, by:0) // by:0 | Only combine when both channels share the same id
         | multiMap {
@@ -35,9 +44,17 @@ workflow GENOME_AND_ANNOTATION {
         }
         | set { ch_input }
 
+    //
+    // Run AGAT Spstatistics
+    //
+
+    AGAT_SPSTATISTICS (
+        ch_input.gff
+    )
+    ch_versions = ch_versions.mix(AGAT_SPSTATISTICS.out.versions.first())
 
     //
-    // Run Quast
+    // MODULE: Run Quast
     //
 
     QUAST (
@@ -52,7 +69,7 @@ workflow GENOME_AND_ANNOTATION {
     ch_tree_data = ch_tree_data.mix(QUAST.out.tsv.map { tuple -> tuple[1] })
 
     //
-    // Run GFFREAD
+    // MODULE: Run GFFREAD
     //
 
     GFFREAD (
@@ -86,6 +103,10 @@ workflow GENOME_AND_ANNOTATION {
     )
     ch_versions = ch_versions.mix(BUSCO_BUSCO.out.versions.first())
 
+    //
+    // Plot BUSCO ideogram
+    //
+
     // Prepare BUSCO output
     ch_busco_full_table = BUSCO_BUSCO.out.full_table
         .map { meta, full_tables ->
@@ -99,18 +120,11 @@ workflow GENOME_AND_ANNOTATION {
             [meta.id, fasta]
         }
 
-    // Prepare AGAT output
+    // Prepare GFF channel of ideogram
     ch_agat_gff_busco = ch_input.gff
         .map { meta, gff ->
             [meta.id, gff]
         }
-    // The gffs used to plot the ideogram should not come from AGAT,
-    // but from the filtered longest gff from GFFREAD
-    //ch_agat_gff_busco = GFFREAD.out.gffs_agat
-    //    .map { meta, gff ->
-    //        [meta.id, gff]
-    //    }
-
 
     // Combine BUSCO, AGAT, and genome outputs
     ch_plot_input = ch_busco_full_table
@@ -125,16 +139,6 @@ workflow GENOME_AND_ANNOTATION {
     PLOT_BUSCO_IDEOGRAM ( ch_plot_input )//removed this temporarily:, ch_karyotype
 
     ch_tree_data = ch_tree_data.mix(BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file })
-
-    //
-    // Run AGAT Spstatistics
-    //
-
-    AGAT_SPSTATISTICS (
-        ch_input.gff
-    )
-    ch_versions = ch_versions.mix(AGAT_SPSTATISTICS.out.versions.first())
-
 
     emit:
     orthofinder = ORTHOFINDER.out.orthofinder // channel: [ val(meta), [folder] ]
