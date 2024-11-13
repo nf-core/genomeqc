@@ -50,7 +50,7 @@ For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#intr
 
 In addition to the three different modes described above, it is also possible to run the pipeline with or without sequencing reads. When supplying sequencing reads, Merqury can also be run. [Merqury](https://github.com/marbl/merqury) is a tool for genome quality assessment that uses k-mer counts from raw sequencing data to evaluate the accuracy and completeness of a genome assembly. Meryl is the companion tool that efficiently counts and stores k-mers from sequencing reads, enabling Merqury to estimate metrics like assembly completeness and base accuracy. These tools provide a k-mer-based approach to assess assembly quality, helping to identify potential errors or gaps.​
 
-To run the pipeline with reads, you must supply a single FASTQ file for each genome in the samplesheet. It is assumed that reads used to create the assembly are from long read technology such as PacBio or ONT, and are therefore single end. If reads are in a .bam file, they must be converted to FASTQ format first. If you have paired end reads, these must be interleaved first.
+To run the pipeline with reads, you must supply a single FASTQ file for each genome in the samplesheet, alongside the `--run_merqury` flag. It is assumed that reads used to create the assembly are from long read technology such as PacBio or ONT, and are therefore single end. If reads are in a .bam file, they must be converted to FASTQ format first. If you have paired end reads, these must be interleaved first.
 
 ## Usage
 
@@ -61,18 +61,22 @@ First, prepare a `samplesheet.csv`, where your input data points to genomes + or
 
 ```csv
 species,refseq,fasta,gff,fastq
-Homo_sapiens,,/path/to/genome.fasta,/path/to/annotation.gff3,/path/to/reads.fq.gz
-Gorilla_gorilla,,/path/to/genome.fasta,,/path/to/reads.fq.gz
-Pan_paniscus,,/path/to/genome.fasta,/path/to/annotation.gff3,/path/to/reads.fq.gz
+Homo_sapiens,,/path/to/genome.fasta,/path/to/annotation.gff3,[/path/to/reads.fq.gz]
+Gorilla_gorilla,,/path/to/genome.fasta,/path/to/annotation.gff3,[/path/to/reads.fq.gz]
+Pan_paniscus,,/path/to/genome.fasta,/path/to/annotation.gff3,[/path/to/reads.fq.gz]
 ```
 
-Or to Refseq IDs of your species:
+When running on ``--genome_only`` mode, you can leave the **gff** field empty. Otherwise, this field will be ignored.
+
+Additionally, you can run the pipeline using the Refseq IDs of your species:
 
 ```csv
 species,refseq,fasta,gff,fastq
-Pongo_abelii,GCF_028885655.2,,,/path/to/reads.fq.gz
-Macaca_mulatta,GCF_003339765.1,,,/path/to/reads.fq.gz
+Pongo_abelii,GCF_028885655.2,,,[/path/to/reads.fq.gz]
+Macaca_mulatta,GCF_003339765.1,,,[/path/to/reads.fq.gz]
 ```
+
+The **fastq** field is optional. Supply sequencing reads if you intend to run merqury using the `--run_merqury`. Otherwise, this filed will be ignored.
 
 You can mix the two input types **(in development)**.
 
@@ -81,16 +85,10 @@ Each row represents a species, with its associated genome, gff or Refseq ID (to 
 You can run the pipeline using test profiles or example input samplesheets. To run a test set with a samplesheet containing reads:
 
 ```
-nextflow run main.nf -resume -profile docker,test --outdir results
+nextflow run main.nf -resume -profile docker,test --outdir results --run_merqury
 ```
 
-If you supply sequencing reads in your samplesheet, you can still disable merqury by using the parameter `--merqury_skip true`. Alternatively, use a different test profile that does _not_ contain sequencing reads:
-
-```
-nextflow run main.nf -resume -profile docker,test_nofastq --outdir results
-```
-
-To run this pipeline on an example samplesheet included in the repo assets:
+To run this pipeline on an example samplesheet included in the repo assets (_does not include reads_):
 
 ```
 nextflow run main.nf -resume -profile docker --input assets/samplesheet.csv --outdir results

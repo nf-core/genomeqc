@@ -36,17 +36,15 @@ workflow GENOMEQC {
 
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
-    ch_tree_data = Channel.empty()
 
-    ch_samplesheet
-        | map {
-            validateInputSamplesheet(it) // Input validation (check local subworkflow)
-        }
-        | branch {
-            ncbi  : it.size() == 3
-            local : it.size() == 4
-        }
-        | set { ch_input }
+    ch_input = ch_samplesheet
+                | map {
+                    validateInputSamplesheet(it) // Input validation (check local subworkflow)
+                }
+                | branch {
+                    ncbi  : it.size() == 3
+                    local : it.size() == 4
+                }
 
     // MODULE: Run create_path
 
@@ -58,13 +56,12 @@ workflow GENOMEQC {
 
     // For NCBIGENOMEDOWNLOAD
 
-    CREATE_PATH.out.accession
-        | multiMap {
-            meta, accession ->
-                meta      : meta
-                accession : accession
-        }
-        | set { ch_ncbi_input }
+    ch_ncbi_input = CREATE_PATH.out.accession
+                    | multiMap {
+                        meta, accession ->
+                            meta      : meta
+                            accession : accession
+                    }
 
     //
     // MODULE: Run ncbigenomedownlaod for RefSeq IDs
@@ -79,27 +76,23 @@ workflow GENOMEQC {
     ch_versions = ch_versions.mix(NCBIGENOMEDOWNLOAD.out.versions.first())
     
     //
-    // Define gff and fasta channels
+    // Perpare input channels
     //
-
-    //fasta = NCBIGENOMEDOWNLOAD.out.fna.mix( ch_input.local.map { meta, fasta, gff, fq -> tuple( meta, file(fasta) ) } )
-    //gff   = NCBIGENOMEDOWNLOAD.out.gff.mix( ch_input.local.map { meta, fasta, gff, fq -> tuple( meta, file(gff) ) } )
     
     // gff. We use mix() here becuase when local files are present,
     // then RefSeq IDs should be missing, and viceversa
-    ch_input.local
-        | map { meta, fasta, gff, fq -> tuple( meta, file(fasta) ) }
-        | mix ( NCBIGENOMEDOWNLOAD.out.fna )
-        | set { fasta }
+    fasta = ch_input.local
+            | map { meta, fasta, gff, fq -> tuple( meta, file(fasta) ) }
+            | mix ( NCBIGENOMEDOWNLOAD.out.fna )
+ 
     // fasta. We use mix() here becuase when local files are present, then RefSeq IDs should be missing, and viceversa
-    ch_input.local
-        | map { meta, fasta, gff, fq -> tuple( meta, file(gff) ) }
-        | mix ( NCBIGENOMEDOWNLOAD.out.gff )
-        | set { gff }
+    gff   = ch_input.local
+            | map { meta, fasta, gff, fq -> tuple( meta, file(gff) ) }
+            | mix ( NCBIGENOMEDOWNLOAD.out.gff )
 
 
     // Filter fasta files by extension and create channels for each file type
-    gz_fasta = fasta.filter { it[1].name.endsWith(".gz") }
+    gz_fasta     = fasta.filter { it[1].name.endsWith(".gz") }
     non_gz_fasta = fasta.filter { !it[1].name.endsWith(".gz") }
 
     // Run module uncompress_fasta
@@ -109,7 +102,7 @@ workflow GENOMEQC {
 
     // Filter gff files by extension and create channels for each file type
 
-    gz_gff = gff.filter { it[1].name.endsWith(".gz") }
+    gz_gff     = gff.filter { it[1].name.endsWith(".gz") }
     non_gz_gff = gff.filter { !it[1].name.endsWith(".gz") }
 
     // Run module uncompress_GFF
@@ -120,7 +113,7 @@ workflow GENOMEQC {
     // Combine the channels back together so that all the uncompressed files are in channels 
 
     ch_fasta  = UNCOMPRESS_FASTA.out.file.mix(non_gz_fasta)
-    ch_gff = UNCOMPRESS_GFF.out.file.mix(non_gz_gff)
+    ch_gff    = UNCOMPRESS_GFF.out.file.mix(non_gz_gff)
 
     //
     // Define fastq input channel
@@ -129,10 +122,9 @@ workflow GENOMEQC {
     // FASTQ file is optional in the samplesheet. 
     // First, get it like you do for gff and fasta
 
-    ch_input.ncbi
-        | map{ meta, refseq, fq -> tuple( meta, fq ) }
-        | mix( ch_input.local.map{ meta, fasta, gff, fq -> tuple( meta, fq ) } )
-        | set { ch_fastq }
+    ch_fastq = ch_input.ncbi
+                | map{ meta, refseq, fq -> tuple( meta, fq ) }
+                | mix( ch_input.local.map{ meta, fasta, gff, fq -> tuple( meta, fq ) } )
 
     // Then, check to see that element 1 is not empty, and if not, make it file()
     // You have to do this because if you pass in file() in the initial map, 
@@ -149,16 +141,15 @@ workflow GENOMEQC {
 
     // Combine both fasta, gff and fastq channels into a single multi-channel object using multiMap, so that they are in sync all the time
     // If element (fasta, gff, fq) is empty, it will return an empty (null) channel
-    ch_fasta
-        | combine(ch_gff, by:0) // by:0 | Only combine when both channels share the same id
-        | combine(ch_fastq, by:0)
-        | multiMap {
-            meta, fasta, gff, fq ->
-                fasta : fasta ? tuple( meta, file(fasta) ) : null // Not sure if conditional is necessary anymore
-                gff   : gff   ? tuple( meta, file(gff) )   : null
-                fq    : fq    ? tuple( meta, file(fq) )    : null
-        }
-        | set { ch_input }
+    ch_input = ch_fasta
+                | combine(ch_gff, by:0) // by:0 | Only combine when both channels share the same id
+                | combine(ch_fastq, by:0)
+                | multiMap {
+                    meta, fasta, gff, fq ->
+                        fasta : fasta ? tuple( meta, file(fasta) ) : null // Not sure if conditional is necessary anymore
+                        gff   : gff   ? tuple( meta, file(gff) )   : null
+                        fq    : fq    ? tuple( meta, file(fq) )    : null
+                }
 
     //
     // Run TIDK
@@ -188,11 +179,10 @@ workflow GENOMEQC {
             params.kvalue
         )
         ch_meryl_union = MERYL_UNIONSUM.out.meryl_db
-        ch_versions = ch_versions.mix(MERYL_UNIONSUM.out.versions.first())
+        ch_versions    = ch_versions.mix(MERYL_UNIONSUM.out.versions.first())
         // MODULE: MERQURY_MERQURY
-        ch_meryl_union
-            | join(ch_input.fasta)
-            | set {ch_merqury_inputs}
+        ch_merqury_inputs = ch_meryl_union.join(ch_input.fasta)
+        
         MERQURY_MERQURY ( ch_merqury_inputs )
         ch_merqury_qv                           = MERQURY_MERQURY.out.assembly_qv
         ch_merqury_stats                        = MERQURY_MERQURY.out.stats
