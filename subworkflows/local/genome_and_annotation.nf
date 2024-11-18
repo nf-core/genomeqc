@@ -4,8 +4,9 @@ include { LONGEST                             } from '../../modules/local/longes
 include { BUSCO_BUSCO                         } from '../../modules/nf-core/busco/busco/main'
 include { QUAST                               } from '../../modules/nf-core/quast/main'
 include { AGAT_SPSTATISTICS                   } from '../../modules/nf-core/agat/spstatistics/main'
-include { PLOT_BUSCO_IDEOGRAM                 } from '../../modules/local/plot_busco_ideogram.nf'
-include { GFFREAD                             } from '../../modules/nf-core/gffread/main'
+include { PLOT_BUSCO_IDEOGRAM                 } from '../../modules/local/plot_busco_ideogram'
+//include { GFFREAD                             } from '../../modules/nf-core/gffread/main'
+include { EXTRACT_SEQS                        } from '../../modules/local/extract_seqs'
 include { ORTHOFINDER                         } from '../../modules/nf-core/orthofinder/main'
 
 workflow GENOME_AND_ANNOTATION {
@@ -84,17 +85,28 @@ workflow GENOME_AND_ANNOTATION {
     // MODULE: Run GFFREAD
     //
 
-    GFFREAD (
-        ch_input.gff_filt,
-        ch_input.fasta.map { meta, fasta -> fasta}
+    // GFFREAD (
+    //    ch_input.gff_filt,
+    //    ch_input.fasta.map { meta, fasta -> fasta}
+    //)
+    //ch_versions = ch_versions.mix(GFFREAD.out.versions.first())
+
+    //
+    // MODULE: Run extract sequences
+    //
+
+    EXTRACT_SEQS (
+        ch_input.fasta,
+        ch_input.gff_filt
     )
-    ch_versions = ch_versions.mix(GFFREAD.out.versions.first())
+    ch_versions = ch_versions.mix(EXTRACT_SEQS.out.versions.first())
 
     //
     // MODULE: Run Orthofinder
     //
 
-    ortho_ch = GFFREAD.out.gffread_fasta
+    // Prepare orthofinder input channel
+    ortho_ch = EXTRACT_SEQS.out.prot_fasta
                 | map { meta, fasta ->
                     fasta // We only need the fastas
                 }
@@ -103,6 +115,7 @@ workflow GENOME_AND_ANNOTATION {
                     [[id:"orthofinder"], fastas] 
                 }
 
+    // Run orthofinder
     ORTHOFINDER (
         ortho_ch,
         [[],[]]
@@ -114,7 +127,7 @@ workflow GENOME_AND_ANNOTATION {
     //
 
     BUSCO_BUSCO (
-        GFFREAD.out.gffread_fasta,
+        EXTRACT_SEQS.out.prot_fasta,
         "proteins", // hardcoded
         params.busco_lineage,
         params.busco_lineages_path ?: [],

@@ -3,7 +3,7 @@ process LONGEST {
     label 'process_medium'
     //label 'process_med_memory'
 
-    container = 'biocontainers/agat:1.3.0--pl5321hdfd78af_0'
+    container = 'community.wave.seqera.io/library/agat:1.4.1--304a47c62ae478b4'
 
     input:
     tuple val (meta),  path(gff)
