@@ -8,6 +8,7 @@ include { PLOT_BUSCO_IDEOGRAM                 } from '../../modules/local/plot_b
 //include { GFFREAD                             } from '../../modules/nf-core/gffread/main'
 include { EXTRACT_SEQS                        } from '../../modules/local/extract_seqs'
 include { ORTHOFINDER                         } from '../../modules/nf-core/orthofinder/main'
+include { FASTAVALIDATOR                      } from '../../modules/nf-core/fastavalidator/main'
 
 workflow GENOME_AND_ANNOTATION {
 
@@ -100,6 +101,14 @@ workflow GENOME_AND_ANNOTATION {
         ch_input.gff_filt
     )
     ch_versions = ch_versions.mix(EXTRACT_SEQS.out.versions.first())
+
+    //
+    // MODULE: Run fasta validator
+    //
+
+    FASTAVALIDATOR(
+        EXTRACT_SEQS.out.prot_fasta
+    )
 
     //
     // MODULE: Run Orthofinder
