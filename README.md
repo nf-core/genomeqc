@@ -38,6 +38,7 @@ For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#intr
 
 > [!WARNING]
 > We strongly suggest users to specify the lineage using the `--busco_lineage` parameter, as setting the lineage to `auto` (value by default) might cause problems with `[BUSCO]` during the leneage determination step.
+
 > [!NOTE]
 > `BUSCO_IDEOGRAM` will plot only those chromosomes -or scaffolds- that contain single copy markers.
 
