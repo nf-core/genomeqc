@@ -6,7 +6,6 @@ include { QUAST                               } from '../../modules/nf-core/quas
 include { AGAT_SPSTATISTICS                   } from '../../modules/nf-core/agat/spstatistics/main'
 include { PLOT_BUSCO_IDEOGRAM                 } from '../../modules/local/plot_busco_ideogram'
 include { GFFREAD                             } from '../../modules/nf-core/gffread/main'
-//include { EXTRACT_SEQS                        } from '../../modules/local/extract_seqs'
 include { ORTHOFINDER                         } from '../../modules/nf-core/orthofinder/main'
 include { FASTAVALIDATOR                      } from '../../modules/nf-core/fastavalidator/main'
 
@@ -28,7 +27,7 @@ workflow GENOME_AND_ANNOTATION {
     //
 
     // Fix and standarize GFF
-    ch_gff_agat = AGAT_CONVERTSPGXF2GXF(ch_gff).output_gff
+    ch_gff_agat  = AGAT_CONVERTSPGXF2GXF(ch_gff).output_gff
 
     //
     // MODULE: Run AGAT longest isoform
@@ -37,10 +36,10 @@ workflow GENOME_AND_ANNOTATION {
     LONGEST (
         ch_gff_agat
     )
-    ch_versions = ch_versions.mix(LONGEST.out.versions.first())
+    ch_versions  = ch_versions.mix(LONGEST.out.versions.first())
 
     // Get longest isoform from gff
-    ch_gff_long = LONGEST.out.longest_proteins
+    ch_gff_long  = LONGEST.out.longest_proteins
 
     //
     // Prepare input multichannel
@@ -48,15 +47,15 @@ workflow GENOME_AND_ANNOTATION {
 
     // Combine inputs (fasta, gff from AGAT (unfiltered) and gff from LONGEST (fitlered)))
     // into a single multichannel so that they are in sync
-    ch_input = ch_fasta
-                | combine(ch_gff_agat, by:0) // by:0 | Only combine when both channels share the same id
-                | combine(ch_gff_long, by:0)
-                | multiMap {
-                    meta, fasta, gff_unfilt, gff_filt ->
-                        fasta      : fasta      ? tuple( meta, file(fasta)      ) : null // channel: [ val(meta), [ fasta ] ]
-                        gff_unfilt : gff_unfilt ? tuple( meta, file(gff_unfilt) ) : null // channel: [ val(meta), [ gff ] ], unfiltered
-                        gff_filt   : gff_filt   ? tuple( meta, file(gff_filt)   ) : null // channel: [ val(meta), [ gff ] ], filtered for longest isoform
-                }
+    ch_input     = ch_fasta
+                 | combine(ch_gff_agat, by:0) // by:0 | Only combine when both channels share the same id
+                 | combine(ch_gff_long, by:0)
+                 | multiMap {
+                     meta, fasta, gff_unfilt, gff_filt ->
+                         fasta      : fasta      ? tuple( meta, file(fasta)      ) : null // channel: [ val(meta), [ fasta ] ]
+                         gff_unfilt : gff_unfilt ? tuple( meta, file(gff_unfilt) ) : null // channel: [ val(meta), [ gff ] ], unfiltered
+                         gff_filt   : gff_filt   ? tuple( meta, file(gff_filt)   ) : null // channel: [ val(meta), [ gff ] ], filtered for longest isoform
+                 }
 
     //
     // Run AGAT Spstatistics
@@ -65,7 +64,7 @@ workflow GENOME_AND_ANNOTATION {
     AGAT_SPSTATISTICS (
         ch_input.gff_unfilt
     )
-    ch_versions = ch_versions.mix(AGAT_SPSTATISTICS.out.versions.first())
+    ch_versions  = ch_versions.mix(AGAT_SPSTATISTICS.out.versions.first())
 
     //
     // MODULE: Run Quast
@@ -76,7 +75,7 @@ workflow GENOME_AND_ANNOTATION {
         [[],[]],
         ch_input.gff_unfilt
     )
-    ch_versions = ch_versions.mix(QUAST.out.versions.first())
+    ch_versions  = ch_versions.mix(QUAST.out.versions.first())
 
     // For tree
 
@@ -90,46 +89,37 @@ workflow GENOME_AND_ANNOTATION {
         ch_input.gff_filt,
         ch_input.fasta.map { meta, fasta -> fasta}
     )
-    ch_versions = ch_versions.mix(GFFREAD.out.versions.first())
-
-    //
-    // MODULE: Run extract sequences
-    //
-
-    //EXTRACT_SEQS (
-    //    ch_input.fasta,
-    //    ch_input.gff_filt
-    //)
-    //ch_versions = ch_versions.mix(EXTRACT_SEQS.out.versions.first())
+    ch_versions  = ch_versions.mix(GFFREAD.out.versions.first())
 
     //
     // MODULE: Run fasta validator
     //
 
-    //FASTAVALIDATOR(
-    //    GFFREAD.out.gffread_fasta
-    //)
+    // Shoud we keep this?
+    FASTAVALIDATOR(
+        GFFREAD.out.gffread_fasta
+    )
 
     //
     // MODULE: Run Orthofinder
     //
 
     // Prepare orthofinder input channel
-    ortho_ch = GFFREAD.out.gffread_fasta
-                | map { meta, fasta ->
-                    fasta // We only need the fastas
-                }
-                | collect // Collect all fasta in a single tuple
-                | map { fastas ->
-                    [[id:"orthofinder"], fastas] 
-                }
+    ortho_ch     = GFFREAD.out.gffread_fasta
+                 | map { meta, fasta ->
+                     fasta // We only need the fastas
+                 }
+                 | collect // Collect all fasta in a single tuple
+                 | map { fastas ->
+                     [[id:"orthofinder"], fastas] 
+                 }
 
     // Run orthofinder
     ORTHOFINDER (
         ortho_ch,
         [[],[]]
     )
-    ch_versions = ch_versions.mix(ORTHOFINDER.out.versions)
+    ch_versions  = ch_versions.mix(ORTHOFINDER.out.versions)
 
     //
     // MODULE: Run BUSCO
@@ -144,7 +134,7 @@ workflow GENOME_AND_ANNOTATION {
         params.busco_lineages_path ?: [],
         params.busco_config ?: []
     )
-    ch_versions = ch_versions.mix(BUSCO_BUSCO.out.versions.first())
+    ch_versions  = ch_versions.mix(BUSCO_BUSCO.out.versions.first())
 
     //
     // Plot BUSCO ideogram
@@ -172,35 +162,35 @@ workflow GENOME_AND_ANNOTATION {
                             }
 
     // Add genome to channel
-    fnaChannel_busco = ch_input.fasta
+    fnaChannel_busco    = ch_input.fasta
                         | map { meta, fasta ->
                             [meta.id, fasta]
                         }
 
     // Prepare GFF channel of ideogram
-    ch_gff_busco = ch_input.gff_filt
+    ch_gff_busco        = ch_input.gff_filt
                         | map { meta, gff ->
                             [meta.id, gff]
                         }
 
     // Combine BUSCO, AGAT, and genome outputs
-    ch_plot_input = ch_busco_full_table
-                    | join(fnaChannel_busco)
-                    | join(ch_gff_busco)
-                    | flatMap { genusspeci, lineages, full_tables, fasta, gff ->
-                        lineages.withIndex().collect { lineage, index ->
-                            [genusspeci, lineage, full_tables[index], fasta, gff]
+    ch_plot_input       = ch_busco_full_table
+                        | join(fnaChannel_busco)
+                        | join(ch_gff_busco)
+                        | flatMap { genusspeci, lineages, full_tables, fasta, gff ->
+                            lineages.withIndex().collect { lineage, index ->
+                                [genusspeci, lineage, full_tables[index], fasta, gff]
+                            }
                         }
-                    }
 
     PLOT_BUSCO_IDEOGRAM ( ch_plot_input )//removed this temporarily:, ch_karyotype
 
-    ch_tree_data = ch_tree_data.mix(BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file })
+    ch_tree_data        = ch_tree_data.mix(BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file })
 
     emit:
-    orthofinder = ORTHOFINDER.out.orthofinder // channel: [ val(meta), [folder] ]
+    orthofinder         = ORTHOFINDER.out.orthofinder // channel: [ val(meta), [folder] ]
     //busco = BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file }
-    tree_data   = ch_tree_data.flatten().collect()
+    tree_data           = ch_tree_data.flatten().collect()
 
-    versions    = ch_versions // channel: [ versions.yml ]
+    versions            = ch_versions // channel: [ versions.yml ]
 }
