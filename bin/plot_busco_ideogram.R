@@ -5,6 +5,7 @@
 # Load required libraries
 library(optparse)
 library(RIdeogram)
+library(ggplot2)
 
 # Parse command line arguments
 option_list <- list(
@@ -24,7 +25,7 @@ colnames(busco_mappings) <- c("Status", "Chr", "Start", "End")
 karyotype <- read.table(opt$karyotype, header = TRUE, stringsAsFactors = FALSE)
 
 # Process BUSCO mappings
-busco_mappings$Type <- "BUSCO_marker"
+busco_mappings$Type <- busco_mappings$Status
 busco_mappings$Shape <- "circle" 
 
 # Change status to color
@@ -35,6 +36,8 @@ colnames(busco_mappings)[1] <- "color"
 
 busco_mappings <- busco_mappings[, c("Type", "Shape", "Chr", "Start", "End", "color")]
 
+head(busco_mappings)
+
 # Ensure karyotype has required columns
 required_columns <- c("Chr", "Start", "End")
 if (!all(required_columns %in% colnames(karyotype))) {
@@ -44,8 +47,14 @@ if (!all(required_columns %in% colnames(karyotype))) {
 # Use only required columns from karyotype
 karyotype <- karyotype[, required_columns]
 
+# Create a vector with all the chromosomes that contain markers
+chr_w_markers = unique(sort(busco_mappings$Chr))
+
+# Plot only those chromosomes in which markers where found
+filtered_karyotype = karyotype[karyotype$Chr %in% chr_w_markers, ]
+
 # Generate ideogram
-ideogram(karyotype = karyotype, label = busco_mappings, label_type = "marker", output = paste0(opt$prefix, ".svg"))
+ideogram(karyotype = filtered_karyotype, label = busco_mappings, label_type = "marker", output = paste0(opt$prefix, ".svg"))
 
 # Convert to png
 convertSVG(paste0(opt$prefix, ".svg"), file = opt$prefix, device = "png")
