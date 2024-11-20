@@ -28,16 +28,18 @@ For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#intr
 1. Downloads the genome and gene annotation files from NCBI `[NCBIGENOMEDOWNLOAD]` - Or you provide your own genomes/annotations
 2. Describes genome assembly:
 2a. `[BUSCO_BUSCO]`: Determines how complete is the genome compared to expected (protein mode).
-2b. `[BUSCO_IDEOGRAM]: Plots the location of BUSCO markers on the assembly.
+2b. `[BUSCO_IDEOGRAM]`: Plots the location of BUSCO markers on the assembly.
 2c. `[QUAST]`: Determines the N50, how contiguous the genome is.
 2d. More options
 3. Describes your annotation : `[AGAT]`: Gene, feature, length, averages, counts. 
 4. Extract longest protein fasta sequences `[GFFREAD]`.
 5. Finds orthologous genes `[ORTHOFINDER]`.
-6. Summary with MulitQC.q
+6. Summary with MulitQC.
 
-> [!WARNING] We strongly suggest users to specify the lineage using the `--busco_lineage` parameter, as setting the lineage to `auto` (value by default) might cause problems with `[BUSCO]` during the leneage determination step.
-> [!NOTE] `BUSCO_IDEOGRAM` will plot only those chromosomes -or scaffolds- that contain single copy markers.
+> [!WARNING]
+> We strongly suggest users to specify the lineage using the `--busco_lineage` parameter, as setting the lineage to `auto` (value by default) might cause problems with `[BUSCO]` during the leneage determination step.
+> [!NOTE]
+> `BUSCO_IDEOGRAM` will plot only those chromosomes -or scaffolds- that contain single copy markers.
 
 **Genome Only (in development):**
 1. Downloads the genome files from NCBI `[NCBIGENOMEDOWNLOAD]` - Or you provide your own genomes
