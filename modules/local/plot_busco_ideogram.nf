@@ -10,6 +10,7 @@ process PLOT_BUSCO_IDEOGRAM {
 
     output:
     tuple val(genusspeci), val(lineage), path("*.svg"), emit: svg
+    tuple val(genusspeci), val(lineage), path("*.png"), emit: png
     path "versions.yml"           , emit: versions
 
     script:

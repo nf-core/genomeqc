@@ -48,6 +48,6 @@ karyotype <- karyotype[, required_columns]
 ideogram(karyotype = karyotype, label = busco_mappings, label_type = "marker", output = paste0(opt$prefix, ".svg"))
 
 # Convert to png
-convertSVG(paste0(opt$prefix, ".svg"), device = "png")
+convertSVG(paste0(opt$prefix, ".svg"), file = opt$prefix, device = "png")
 
 cat("Ideogram has been generated and saved as", paste0(opt$prefix, ".svg"), "and", paste0(opt$prefix, ".png"), "\n")

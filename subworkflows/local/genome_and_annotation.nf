@@ -5,8 +5,8 @@ include { BUSCO_BUSCO                         } from '../../modules/nf-core/busc
 include { QUAST                               } from '../../modules/nf-core/quast/main'
 include { AGAT_SPSTATISTICS                   } from '../../modules/nf-core/agat/spstatistics/main'
 include { PLOT_BUSCO_IDEOGRAM                 } from '../../modules/local/plot_busco_ideogram'
-//include { GFFREAD                             } from '../../modules/nf-core/gffread/main'
-include { EXTRACT_SEQS                        } from '../../modules/local/extract_seqs'
+include { GFFREAD                             } from '../../modules/nf-core/gffread/main'
+//include { EXTRACT_SEQS                        } from '../../modules/local/extract_seqs'
 include { ORTHOFINDER                         } from '../../modules/nf-core/orthofinder/main'
 include { FASTAVALIDATOR                      } from '../../modules/nf-core/fastavalidator/main'
 
@@ -14,11 +14,11 @@ workflow GENOME_AND_ANNOTATION {
 
     take:
     ch_fasta // channel: [ val(meta), [ fasta ] ]
-    ch_gff // channel: [ val(meta), [ gff ] ]
+    ch_gff   // channel: [ val(meta), [ gff ] ]
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions  = Channel.empty()
 
     // For tree plot
     ch_tree_data = Channel.empty()
@@ -53,9 +53,9 @@ workflow GENOME_AND_ANNOTATION {
                 | combine(ch_gff_long, by:0)
                 | multiMap {
                     meta, fasta, gff_unfilt, gff_filt ->
-                        fasta      : fasta      ? tuple( meta, file(fasta) )      : null // channel: [ val(meta), [ fasta ] ]
+                        fasta      : fasta      ? tuple( meta, file(fasta)      ) : null // channel: [ val(meta), [ fasta ] ]
                         gff_unfilt : gff_unfilt ? tuple( meta, file(gff_unfilt) ) : null // channel: [ val(meta), [ gff ] ], unfiltered
-                        gff_filt   : gff_filt   ? tuple( meta, file(gff_filt) )   : null // channel: [ val(meta), [ gff ] ], filtered for longest isoform
+                        gff_filt   : gff_filt   ? tuple( meta, file(gff_filt)   ) : null // channel: [ val(meta), [ gff ] ], filtered for longest isoform
                 }
 
     //
@@ -86,36 +86,36 @@ workflow GENOME_AND_ANNOTATION {
     // MODULE: Run GFFREAD
     //
 
-    // GFFREAD (
-    //    ch_input.gff_filt,
-    //    ch_input.fasta.map { meta, fasta -> fasta}
-    //)
-    //ch_versions = ch_versions.mix(GFFREAD.out.versions.first())
+    GFFREAD (
+        ch_input.gff_filt,
+        ch_input.fasta.map { meta, fasta -> fasta}
+    )
+    ch_versions = ch_versions.mix(GFFREAD.out.versions.first())
 
     //
     // MODULE: Run extract sequences
     //
 
-    EXTRACT_SEQS (
-        ch_input.fasta,
-        ch_input.gff_filt
-    )
-    ch_versions = ch_versions.mix(EXTRACT_SEQS.out.versions.first())
+    //EXTRACT_SEQS (
+    //    ch_input.fasta,
+    //    ch_input.gff_filt
+    //)
+    //ch_versions = ch_versions.mix(EXTRACT_SEQS.out.versions.first())
 
     //
     // MODULE: Run fasta validator
     //
 
-    FASTAVALIDATOR(
-        EXTRACT_SEQS.out.prot_fasta
-    )
+    //FASTAVALIDATOR(
+    //    GFFREAD.out.gffread_fasta
+    //)
 
     //
     // MODULE: Run Orthofinder
     //
 
     // Prepare orthofinder input channel
-    ortho_ch = EXTRACT_SEQS.out.prot_fasta
+    ortho_ch = GFFREAD.out.gffread_fasta
                 | map { meta, fasta ->
                     fasta // We only need the fastas
                 }
@@ -135,8 +135,10 @@ workflow GENOME_AND_ANNOTATION {
     // MODULE: Run BUSCO
     //
 
+    //GFFREAD.out.gffread_fasta.collect().view()
+
     BUSCO_BUSCO (
-        EXTRACT_SEQS.out.prot_fasta,
+        GFFREAD.out.gffread_fasta,
         "proteins", // hardcoded
         params.busco_lineage,
         params.busco_lineages_path ?: [],
@@ -149,10 +151,24 @@ workflow GENOME_AND_ANNOTATION {
     //
 
     // Prepare BUSCO output
+    BUSCO_BUSCO.out.full_table.map { meta, full_tables -> full_tables }.view()
+    
+    //BUSCO_BUSCO.out.full_table.map { meta, full_tables -> full_tables.collect { it -> it.toString().split('/')[-2] } }.view()
+
+    //ch_busco_full_table = BUSCO_BUSCO.out.full_table
+    //                        | map { meta, full_tables ->
+    //                            def lineages = full_tables.collect { it -> it.toString().split('/')[-2].replaceAll('run_', '').replaceAll('_odb\\d+', '') }
+    //                            [meta.id, lineages, full_tables]
+    //                        }
+
     ch_busco_full_table = BUSCO_BUSCO.out.full_table
-                            | map { meta, full_tables ->
-                                def lineages = full_tables.collect { it.toString().split('/')[-2].replaceAll('run_', '').replaceAll('_odb\\d+', '') }
+                            .map { meta, full_tables ->
+                                def lineages = full_tables.toString().split('/')[-2].replaceAll('run_', '').replaceAll('_odb\\d+', '')
                                 [meta.id, lineages, full_tables]
+                            }
+                            .groupTuple(by: 0)
+                            .map { id, lineages, full_tables ->
+                                [id, lineages.flatten(), full_tables.flatten()]
                             }
 
     // Add genome to channel
