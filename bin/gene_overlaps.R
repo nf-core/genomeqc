@@ -1,7 +1,12 @@
 #!/usr/bin/env Rscript
 
 # Code written by Chris Wyatt with some editing by ChatGPT
-#!/usr/bin/env Rscript
+
+# Load required libraries
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+    install.packages("BiocManager", repos = "https://cloud.r-project.org/")
+}
+BiocManager::install(c("GenomicRanges", "IRanges", "GenomeInfoDb", "BiocGenerics"))
 
 library(GenomicRanges)
 
@@ -38,15 +43,23 @@ genes <- gr[gr$feature == "gene"]
 # Find overlaps
 overlap_results <- findOverlaps(genes, genes, ignore.strand = FALSE)
 
+# Initialize counts
+sense_count_within <- 0
+antisense_count_within <- 0
+
 # Initialize a results data frame
 results <- data.frame(
-    gene1_id = character(),
-    gene1_start = integer(),
-    gene1_end = integer(),
-    gene2_id = character(),
-    gene2_start = integer(),
-    gene2_end = integer(),
-    overlap_percent = numeric(),
+    query_gene = character(),
+    subject_gene = character(),
+    query_start = integer(),
+    query_end = integer(),
+    subject_start = integer(),
+    subject_end = integer(),
+    query_strand = character(),
+    subject_strand = character(),
+    overlap_type = character(),
+    query_overlap_pct = numeric(),
+    subject_overlap_pct = numeric(),
     stringsAsFactors = FALSE
 )
 
@@ -56,27 +69,47 @@ for (i in seq_len(length(overlap_results))) {
     subject_idx <- subjectHits(overlap_results)[i]
 
     if (query_idx != subject_idx) {
-        gene1 <- genes[query_idx]
-        gene2 <- genes[subject_idx]
+        query_gene <- genes[query_idx]
+        subject_gene <- genes[subject_idx]
 
-        overlap_range <- intersect(ranges(gene1), ranges(gene2))
+        overlap_range <- intersect(ranges(query_gene), ranges(subject_gene))
         overlap_length <- width(overlap_range)
 
-        gene1_length <- width(ranges(gene1))
-        gene2_length <- width(ranges(gene2))
+        query_length <- width(ranges(query_gene))
+        subject_length <- width(ranges(subject_gene))
 
-        overlap_percent <- (overlap_length / gene1_length) * 100
+        query_overlap_pct <- (overlap_length / query_length) * 100
+        subject_overlap_pct <- (overlap_length / subject_length) * 100
 
+        # Determine overlap type
+        if (strand(query_gene) == strand(subject_gene)) {
+            overlap_type <- "sense"
+        } else {
+            overlap_type <- "antisense"
+        }
+
+        # Increment counters for fully contained overlaps
+        if (query_overlap_pct == 100 && overlap_type == "sense") {
+            sense_count_within <- sense_count_within + 1
+        } else if (query_overlap_pct == 100 && overlap_type == "antisense") {
+            antisense_count_within <- antisense_count_within + 1
+        }
+
+        # Append to results
         results <- rbind(
             results,
             data.frame(
-                gene1_id = gene1$attribute,
-                gene1_start = start(gene1),
-                gene1_end = end(gene1),
-                gene2_id = gene2$attribute,
-                gene2_start = start(gene2),
-                gene2_end = end(gene2),
-                overlap_percent = overlap_percent,
+                query_gene = query_gene$attribute,
+                subject_gene = subject_gene$attribute,
+                query_start = start(query_gene),
+                query_end = end(query_gene),
+                subject_start = start(subject_gene),
+                subject_end = end(subject_gene),
+                query_strand = as.character(strand(query_gene)),
+                subject_strand = as.character(strand(subject_gene)),
+                overlap_type = overlap_type,
+                query_overlap_pct = query_overlap_pct,
+                subject_overlap_pct = subject_overlap_pct,
                 stringsAsFactors = FALSE
             )
         )
@@ -86,4 +119,7 @@ for (i in seq_len(length(overlap_results))) {
 # Write results to output file
 write.table(results, file = output_table, sep = "\t", row.names = FALSE, quote = FALSE)
 
+# Print the summary
+cat("Number of genes fully contained in sense direction:", sense_count_within, "\n")
+cat("Number of genes fully contained in antisense direction:", antisense_count_within, "\n")
 cat("Overlap analysis complete. Results saved to:", output_table, "\n")

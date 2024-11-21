@@ -1,7 +1,7 @@
 process GENE_OVERLAPS {
     tag "$meta.id"
     label 'process_single'
-    container = 'ecoflowucl/gene_overlap:v1'
+    container = 'ecoflowucl/gene_overlap:v1.0'
 
     input:
     tuple val(meta), path(gff)
@@ -17,7 +17,7 @@ process GENE_OVERLAPS {
     """
     #Run overlap R script
 
-    gene_overlaps.R $gff My_output
+    gene_overlaps.R $gff Summary.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
