@@ -76,11 +76,19 @@ for (i in seq_len(length(overlap_results))) {
         subject_overlap_pct <- (overlap_length / subject_length) * 100
 
         # Determine overlap type
-        if (strand(query_gene) == strand(subject_gene)) {
-            overlap_type <- "sense"
+        query_strand <- as.character(strand(query_gene))
+        subject_strand <- as.character(strand(subject_gene))
+
+        if (!is.na(query_strand) && !is.na(subject_strand)) {
+            if (query_strand == subject_strand) {
+                overlap_type <- "sense"
+            } else {
+                overlap_type <- "antisense"
+            }
         } else {
-            overlap_type <- "antisense"
+            overlap_type <- "unknown"
         }
+
 
         # Increment counters for fully contained overlaps
         if (query_overlap_pct == 100 && overlap_type == "sense") {
