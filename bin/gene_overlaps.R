@@ -2,12 +2,6 @@
 
 # Code written by Chris Wyatt with some editing by ChatGPT
 
-# Load required libraries
-if (!requireNamespace("BiocManager", quietly = TRUE)) {
-    install.packages("BiocManager", repos = "https://cloud.r-project.org/")
-}
-BiocManager::install(c("GenomicRanges", "IRanges", "GenomeInfoDb", "BiocGenerics"))
-
 library(GenomicRanges)
 
 # Parse command-line arguments
