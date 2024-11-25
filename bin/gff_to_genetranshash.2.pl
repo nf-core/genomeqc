@@ -2,9 +2,10 @@
 use warnings;
 use strict;
 
+# Written by Chris Wyatt and released under the MIT license. 
+# Converts gff file to a hash of genes
 
 print "Please be in folder with *noquest.gff3 file\n\n";
-
 
 my $in_gfffile=`ls *noquest.gff3`;
 chomp $in_gfffile;
@@ -39,7 +40,6 @@ while (my $line=<$filein>){
         #print "$line\n";
         if ($split[2] eq "mRNA"){
             my $length=$split[4]-$split[3];
-       
             #Do different split if AUGUSTUS or NCBI
             if ($split[1] eq "AUGUSTUS"){
                 #Its an AUGUSTUS GFF
@@ -80,10 +80,7 @@ while (my $line=<$filein>){
                     my @spbit=split("\=", $bits);
                     $temp_h{$spbit[0]}=$spbit[1];
                 }
-                my $fullgene=$temp_h{"Parent"};
-                my @fullsp=split("\:", $fullgene);
-                my @fullminusdash=split("\-",$fullsp[-1]);
-                $gene=$fullminusdash[-1];
+                $gene=$temp_h{"Parent"};
                 $tran=$temp_h{"transcript_id"};
             }
 
@@ -97,7 +94,6 @@ while (my $line=<$filein>){
                 $Gene_tran_hash{$gene}=$tran;
             }
 
-
             #Add to longest, if longest
             if ($longest{$gene}){
                 my @old=split("\t", $longest{$gene});
@@ -108,7 +104,6 @@ while (my $line=<$filein>){
             else{
                 $longest{$gene}="$tran\t$length";
             }
-
 
         }
     }

@@ -48,24 +48,24 @@ process GFFREAD {
         #Remove lines of the GFF that have ? in the strand section, as this cannot be parsed by gffread
         awk '\$7 != "?" { print \$0 }' ${prefix}.gff_for_jvci.gff3  > ${prefix}.gff_for_jvci.noquest.gff3
         
-        gffread -w ${prefix}.splicedexons.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3
-        gffread -x ${prefix}.splicedcds.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3
-        gffread -y ${prefix}.prot.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3 -F -S
+        gffread -w ${prefix}.splicedexons.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3 --table @genename
+        gffread -x ${prefix}.splicedcds.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3 --table @genename
+        gffread -y ${prefix}.prot.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3 -F -S --table @genename
 
     else
         mv gff_temp ${prefix}.gff_for_jvci.gff3
         #Remove lines of the GFF that have ? in the strand section, as this cannot be parsed by gffread
         awk '\$7 != "?" { print \$0 }' ${prefix}.gff_for_jvci.gff3  > ${prefix}.gff_for_jvci.noquest.gff3
         
-        gffread -w ${prefix}.splicedexons.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3
-        gffread -x ${prefix}.splicedcds.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3
-        gffread -y ${prefix}.prot.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3 -F -S
+        gffread -w ${prefix}.splicedexons.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3 --table @genename
+        gffread -x ${prefix}.splicedcds.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3 --table @genename
+        gffread -y ${prefix}.prot.fa -g genome_temp ${prefix}.gff_for_jvci.noquest.gff3 -F -S --table @genename
 
     fi
 
-    ${projectDir}/bin/gff_to_genetranshash.2.pl
-    ${projectDir}/bin/prot_fasta_to_longest.pl ${prefix}.prot.fa ${prefix}_longestisoform.txt
-    ${projectDir}/bin/fasta_topIsoform.pl ${prefix}.splicedcds.fa ${prefix}_longestisoform.txt
+    gff_to_genetranshash.2.pl
+    prot_fasta_to_longest.pl ${prefix}.prot.fa ${prefix}_longestisoform.txt
+    fasta_topIsoform.pl ${prefix}.splicedcds.fa ${prefix}_longestisoform.txt
 
 
     #This part checks if longest isoform worked, if not we will continue with all proteins into Orthofinder. Warning sent to screen.

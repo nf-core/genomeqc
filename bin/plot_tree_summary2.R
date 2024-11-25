@@ -1,3 +1,8 @@
+#!/usr/bin/Rscript
+
+# Written by Chris Wyatt and released under the MIT license. 
+# Plots the phylogenetic tree with BUSCO result in pie charts
+
 # Load necessary libraries
 if (!requireNamespace("argparse", quietly = TRUE)) {
   install.packages("argparse")

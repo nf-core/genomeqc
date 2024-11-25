@@ -11,8 +11,7 @@ process CREATE_PATH {
     tuple val(meta), val(accession)
 
     output:
-    val meta                 , emit: meta
-    path "${meta.id}.txt"    , emit: accession
+    tuple val (meta), path("${meta.id}.txt"), emit: accession
 
     when:
     task.ext.when == null || task.ext.when

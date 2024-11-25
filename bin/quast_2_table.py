@@ -1,3 +1,7 @@
+#!/usr/bin/python3
+
+# Written by Chris Wyatt and released under the MIT license. Converts a group of quast outputs to a table to plot on a tree
+
 import pandas as pd
 import argparse
 import os
