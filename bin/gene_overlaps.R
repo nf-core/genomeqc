@@ -12,6 +12,7 @@ if (length(args) < 2) {
 
 input_gff_file <- args[1]
 output_table <- args[2]
+output_count <- args[3]
 
 # Helper function to read a GFF file and convert it into a GRanges object
 read_gff_to_granges <- function(gff_file) {
@@ -33,6 +34,7 @@ gr <- read_gff_to_granges(input_gff_file)
 
 # Filter only "gene" features
 genes <- gr[gr$feature == "gene"]
+total_genes <- length(genes)
 
 # Find overlaps
 overlap_results <- findOverlaps(genes, genes, ignore.strand = FALSE)
@@ -125,3 +127,29 @@ write.table(results, file = output_table, sep = "\t", row.names = FALSE, quote =
 cat("Number of genes fully contained in sense direction:", sense_count_within, "\n")
 cat("Number of genes fully contained in antisense direction:", antisense_count_within, "\n")
 cat("Overlap analysis complete. Results saved to:", output_table, "\n")
+
+# Calculate total number of overlapping genes
+total_overlapping_genes <- length(unique(c(results$query_gene, results$subject_gene)))
+
+# Create summary statistics table
+summary_stats <- data.frame(
+    Statistic = c("Total number of genes",
+                  "Number of genes fully contained in sense direction",
+                  "Number of genes fully contained in antisense direction",
+                  "Total number of overlapping genes"),
+    Count = c(total_genes,
+              sense_count_within,
+              antisense_count_within,
+              total_overlapping_genes)
+)
+
+# Write summary statistics table
+write.table(summary_stats, file=output_count, sep="\t", quote=FALSE, row.names=FALSE)
+
+# Print the summary
+cat("Total number of genes:", total_genes, "\n")
+cat("Number of genes fully contained in sense direction:", sense_count_within, "\n")
+cat("Number of genes fully contained in antisense direction:", antisense_count_within, "\n")
+cat("Total number of overlapping genes:", total_overlapping_genes, "\n")
+cat("Overlap analysis complete. Results saved to:", output_table, "\n")
+cat("Summary statistics saved to:", output_count, "\n")
