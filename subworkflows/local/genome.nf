@@ -28,9 +28,9 @@ workflow GENOME {
     ch_versions = ch_versions.mix(BUSCO_BUSCO.out.versions.first())
 
     emit:
-    quast = QUAST.out.tsv
-    busco = BUSCO_BUSCO.out.batch_summary
+    quast_results         = QUAST.out.tsv                       // channel: [ val(meta), [tsv] ]
+    busco_short_summaries = BUSCO_BUSCO.out.short_summaries_txt // channel: [ val(meta), [txt] ]
 
-    versions = ch_versions                     // channel: [ versions.yml ]
+    versions = ch_versions                                      // channel: [ versions.yml ]
 }
 

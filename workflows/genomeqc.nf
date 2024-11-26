@@ -204,12 +204,18 @@ workflow GENOMEQC {
         GENOME (
             ch_input.fasta
         )
+        ch_multiqc_files = ch_multiqc_files
+                         | mix(GENOME.out.quast_results)
+                         | mix(GENOME.out.busco_short_summaries)
     } else {
         GENOME_AND_ANNOTATION (
             ch_input.fasta,
             ch_input.gff
         )
-        
+        ch_multiqc_files = ch_multiqc_files
+                         | mix(GENOME_AND_ANNOTATION.out.quast_results)
+                         | mix(GENOME_AND_ANNOTATION.out.busco_short_summaries)
+
         //
         // MODULE: Run TREE SUMMARY
         //  
@@ -269,9 +275,7 @@ workflow GENOMEQC {
             name: 'methods_description_mqc.yaml',
             sort: true
         )
-        // Add busco and quast plots to multiqc channel
-        // Plots are still not saved in multiqc_plots folder
-    ).mix(GENOME_AND_ANNOTATION.out.busco_mq, GENOME_AND_ANNOTATION.out.quast_mq) 
+    )
 
     MULTIQC (
         ch_multiqc_files.collect(),
