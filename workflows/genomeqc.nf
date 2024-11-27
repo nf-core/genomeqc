@@ -205,16 +205,18 @@ workflow GENOMEQC {
             ch_input.fasta
         )
         ch_multiqc_files = ch_multiqc_files
-                         | mix(GENOME.out.quast_results.map { meta, tsv -> tsv })
+                         | mix(GENOME.out.quast_results.map { meta, results -> results })
                          | mix(GENOME.out.busco_short_summaries.map { meta, txt -> txt })
+        ch_versions      = ch_versions.mix(GENOME.out.versions.first())
     } else {
         GENOME_AND_ANNOTATION (
             ch_input.fasta,
             ch_input.gff
         )
         ch_multiqc_files = ch_multiqc_files
-                         | mix(GENOME_AND_ANNOTATION.out.quast_results.map { meta, tsv -> tsv })
+                         | mix(GENOME_AND_ANNOTATION.out.quast_results.map { meta, results -> results })
                          | mix(GENOME_AND_ANNOTATION.out.busco_short_summaries.map { meta, txt -> txt })
+        ch_versions      = ch_versions.mix(GENOME_AND_ANNOTATION.out.versions.first())
 
         //
         // MODULE: Run TREE SUMMARY
