@@ -121,6 +121,7 @@ ecoflow/genomeqc was originally written by Chris Wyatt, Fernando Duarte.
 We thank the following people for their extensive assistance in the development of this pipeline:
 
 - [Stephen Turner](https://github.com/stephenturner/) ([Colossal Biosciences](https://colossal.com/))
+- [Usman Rashid](https://github.com/gallvp) ([The New Zealand Institute for Plant and Food Research](https://www.plantandfood.com/en-nz/))
 
 <!-- TODO nf-core: If applicable, make list of people who have also contributed -->
 
