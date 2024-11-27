@@ -1,13 +1,13 @@
 
 include { AGAT_CONVERTSPGXF2GXF               } from '../../modules/nf-core/agat/convertspgxf2gxf'
 include { LONGEST                             } from '../../modules/local/longest'
-include { BUSCO_BUSCO                         } from '../../modules/nf-core/busco/busco/main'
 include { QUAST                               } from '../../modules/nf-core/quast/main'
 include { AGAT_SPSTATISTICS                   } from '../../modules/nf-core/agat/spstatistics/main'
 include { PLOT_BUSCO_IDEOGRAM                 } from '../../modules/local/plot_busco_ideogram'
-include { GFFREAD                             } from '../../modules/nf-core/gffread/main'
 include { ORTHOFINDER                         } from '../../modules/nf-core/orthofinder/main'
 include { FASTAVALIDATOR                      } from '../../modules/nf-core/fastavalidator/main'
+
+include { FASTA_GXF_BUSCO_PLOT                } from '../../subworkflows/nf-core/fasta_gxf_busco_plot/main'
 
 workflow GENOME_AND_ANNOTATION {
 
@@ -82,14 +82,18 @@ workflow GENOME_AND_ANNOTATION {
     ch_tree_data = ch_tree_data.mix(QUAST.out.tsv.map { tuple -> tuple[1] })
 
     //
-    // MODULE: Run GFFREAD
+    // SUBWORKFLOW: FASTA_GXF_BUSCO_PLOT
     //
-
-    GFFREAD (
+    FASTA_GXF_BUSCO_PLOT (
+        ch_input.fasta,
         ch_input.gff_filt,
-        ch_input.fasta.map { meta, fasta -> fasta}
+        'genome', // mode
+        [ params.busco_lineage ], // List expected
+        params.busco_lineages_path,
+        params.busco_config
     )
-    ch_versions  = ch_versions.mix(GFFREAD.out.versions.first())
+
+    ch_versions  = ch_versions.mix(FASTA_GXF_BUSCO_PLOT.out.versions)
 
     //
     // MODULE: Run fasta validator
@@ -97,7 +101,7 @@ workflow GENOME_AND_ANNOTATION {
 
     // Shoud we keep this?
     FASTAVALIDATOR(
-        GFFREAD.out.gffread_fasta
+        FASTA_GXF_BUSCO_PLOT.out.proteins
     )
 
     //
@@ -105,7 +109,7 @@ workflow GENOME_AND_ANNOTATION {
     //
 
     // Prepare orthofinder input channel
-    ortho_ch     = GFFREAD.out.gffread_fasta
+    ortho_ch     = FASTA_GXF_BUSCO_PLOT.out.proteins
                  | map { meta, fasta ->
                      fasta // We only need the fastas
                  }
@@ -122,26 +126,11 @@ workflow GENOME_AND_ANNOTATION {
     ch_versions  = ch_versions.mix(ORTHOFINDER.out.versions)
 
     //
-    // MODULE: Run BUSCO
-    //
-
-    //GFFREAD.out.gffread_fasta.collect().view()
-
-    BUSCO_BUSCO (
-        GFFREAD.out.gffread_fasta,
-        "proteins", // hardcoded
-        params.busco_lineage,
-        params.busco_lineages_path ?: [],
-        params.busco_config ?: []
-    )
-    ch_versions  = ch_versions.mix(BUSCO_BUSCO.out.versions.first())
-
-    //
     // Plot BUSCO ideogram
     //
 
     // Prepare BUSCO output
-    BUSCO_BUSCO.out.full_table.map { meta, full_tables -> full_tables }.view()
+    FASTA_GXF_BUSCO_PLOT.out.annotation_full_table.map { meta, full_tables -> full_tables }.view()
     
     //BUSCO_BUSCO.out.full_table.map { meta, full_tables -> full_tables.collect { it -> it.toString().split('/')[-2] } }.view()
 
@@ -151,7 +140,7 @@ workflow GENOME_AND_ANNOTATION {
     //                            [meta.id, lineages, full_tables]
     //                        }
 
-    ch_busco_full_table = BUSCO_BUSCO.out.full_table
+    ch_busco_full_table = FASTA_GXF_BUSCO_PLOT.out.annotation_full_table
                             .map { meta, full_tables ->
                                 def lineages = full_tables.toString().split('/')[-2].replaceAll('run_', '').replaceAll('_odb\\d+', '')
                                 [meta.id, lineages, full_tables]
@@ -185,14 +174,14 @@ workflow GENOME_AND_ANNOTATION {
 
     PLOT_BUSCO_IDEOGRAM ( ch_plot_input )//removed this temporarily:, ch_karyotype
 
-    ch_tree_data        = ch_tree_data.mix(BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file })
+    ch_tree_data        = ch_tree_data.mix(FASTA_GXF_BUSCO_PLOT.out.annotation_batch_summary.collect { meta, file -> file })
 
     emit:
     orthofinder         = ORTHOFINDER.out.orthofinder // channel: [ val(meta), [folder] ]
     //busco = BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file }
 
     tree_data           = ch_tree_data.flatten().collect()
-    busco_mq            = BUSCO_BUSCO.out.short_summaries_txt.map { meta, file -> file } 
+    busco_mq            = FASTA_GXF_BUSCO_PLOT.out.annotation_short_summaries_txt.map { meta, file -> file } 
     quast_mq            = QUAST.out.results.map { meta, file -> file }
 
     versions            = ch_versions // channel: [ versions.yml ]

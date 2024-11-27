@@ -18,7 +18,12 @@
           "busco/busco": {
             "branch": "master",
             "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
-            "installed_by": ["modules"]
+            "installed_by": ["fasta_gxf_busco_plot", "modules"]
+          },
+          "busco/generateplot": {
+            "branch": "master",
+            "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
+            "installed_by": ["fasta_gxf_busco_plot"]
           },
           "fastavalidator": {
             "branch": "master",
@@ -33,7 +38,7 @@
           "gffread": {
             "branch": "master",
             "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
-            "installed_by": ["modules"]
+            "installed_by": ["fasta_gxf_busco_plot", "modules"]
           },
           "merqury/merqury": {
             "branch": "master",
@@ -107,6 +112,11 @@
           "fasta_explore_search_plot_tidk": {
             "branch": "master",
             "git_sha": "ab80a04707104a4baf39341581dfbced5da05479",
+            "installed_by": ["subworkflows"]
+          },
+          "fasta_gxf_busco_plot": {
+            "branch": "master",
+            "git_sha": "3628d826c68eea367143e403412133054f607650",
             "installed_by": ["subworkflows"]
           },
           "utils_nextflow_pipeline": {
