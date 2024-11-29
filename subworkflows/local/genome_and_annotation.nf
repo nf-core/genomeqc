@@ -141,15 +141,6 @@ workflow GENOME_AND_ANNOTATION {
     //
 
     // Prepare BUSCO output
-    BUSCO_BUSCO.out.full_table.map { meta, full_tables -> full_tables }.view()
-    
-    //BUSCO_BUSCO.out.full_table.map { meta, full_tables -> full_tables.collect { it -> it.toString().split('/')[-2] } }.view()
-
-    //ch_busco_full_table = BUSCO_BUSCO.out.full_table
-    //                        | map { meta, full_tables ->
-    //                            def lineages = full_tables.collect { it -> it.toString().split('/')[-2].replaceAll('run_', '').replaceAll('_odb\\d+', '') }
-    //                            [meta.id, lineages, full_tables]
-    //                        }
 
     ch_busco_full_table = BUSCO_BUSCO.out.full_table
                             .map { meta, full_tables ->
@@ -188,12 +179,10 @@ workflow GENOME_AND_ANNOTATION {
     ch_tree_data        = ch_tree_data.mix(BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file })
 
     emit:
-    orthofinder         = ORTHOFINDER.out.orthofinder // channel: [ val(meta), [folder] ]
-    //busco = BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file }
+    orthofinder           = ORTHOFINDER.out.orthofinder         // channel: [ val(meta), [folder] ]
+    tree_data             = ch_tree_data.flatten().collect()
+    quast_results         = QUAST.out.results                   // channel: [ val(meta), [tsv] ]
+    busco_short_summaries = BUSCO_BUSCO.out.short_summaries_txt // channel: [ val(meta), [txt] ]
 
-    tree_data           = ch_tree_data.flatten().collect()
-    busco_mq            = BUSCO_BUSCO.out.short_summaries_txt.map { meta, file -> file } 
-    quast_mq            = QUAST.out.results.map { meta, file -> file }
-
-    versions            = ch_versions // channel: [ versions.yml ]
+    versions              = ch_versions                         // channel: [ versions.yml ]
 }
