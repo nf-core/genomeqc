@@ -10,43 +10,96 @@
 
 ## Introduction
 
-**ecoflow/genomeqc** is a bioinformatics pipeline that ...
+**ecoflow/genomeqc** is a bioinformatics pipeline that compares the quality of multiple genomes, along with their annotations.
+
+The pipeline takes a list of genomes and annotations (from raw files or Refseq IDs), and runs commonly used tools to assess their quality.
+
+There are three different ways you can run this pipeline. 1. Genome only, 2. Annotation only, or 3. Genome and Annotation. **Only Genome plus Annotation is functional**
 
 <!-- TODO nf-core:
-   Complete this sentence with a 2-3 sentence summary of what types of data the pipeline ingests, a brief overview of the
-   major pipeline sections and the types of output it produces. You're giving an overview to someone new
-   to nf-core here, in 15-20 seconds. For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#introduction
+For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#introduction
 -->
 
 <!-- TODO nf-core: Include a figure that guides the user through the major workflow steps. Many nf-core
-     workflows use the "tube map" design for that. See https://nf-co.re/docs/contributing/design_guidelines#examples for examples.   -->
-<!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->
+     workflows use the "tube map" design for that. See https://nf-co.re/docs/contributing/design_guidelines#examples for examples.   
+-->
 
-1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
+**Genome and Annnotation:**
+1. Downloads the genome and gene annotation files from NCBI `[NCBIGENOMEDOWNLOAD]` - Or you provide your own genomes/annotations
+2. Describes genome assembly:
+2a. `[BUSCO_BUSCO]`: Determines how complete is the genome compared to expected (protein mode).
+2b. `[BUSCO_IDEOGRAM]`: Plots the location of BUSCO markers on the assembly.
+2c. `[QUAST]`: Determines the N50, how contiguous the genome is.
+2d. More options
+3. Describes your annotation : `[AGAT]`: Gene, feature, length, averages, counts. 
+4. Extract longest protein fasta sequences `[GFFREAD]`.
+5. Finds orthologous genes `[ORTHOFINDER]`.
+6. Summary with MulitQC.
+
+> [!WARNING]
+> We strongly suggest users to specify the lineage using the `--busco_lineage` parameter, as setting the lineage to `auto` (default value) might cause problems with `[BUSCO]` during the leneage determination step.
+
+> [!NOTE]
+> `BUSCO_IDEOGRAM` will only plot those chromosomes -or scaffolds- that contain single copy markers.
+
+**Genome Only (in development):**
+1. Downloads the genome files from NCBI `[NCBIGENOMEDOWNLOAD]` - Or you provide your own genomes
+2. Describes genome assembly:
+2a. `[BUSCO_BUSCO]`: Determines how complete is the genome compared to expected (genome mode).
+2b. `[QUAST]`: Determines the N50, how contiguous the genome is.
+2c. More options
+3. Summary with MulitQC.
+
+**Annnotation Only (in development):**
+1. Downloads the gene annotation files from NCBI `[NCBIGENOMEDOWNLOAD]` - Or you provide your own annotations.
+2. Describes your annotation : `[AGAT]`: Gene, feature, length, averages, counts.
+3. Summary with MulitQC.
+
+In addition to the three different modes described above, it is also possible to run the pipeline with or without sequencing reads. When supplying sequencing reads, Merqury can also be run. [Merqury](https://github.com/marbl/merqury) is a tool for genome quality assessment that uses k-mer counts from raw sequencing data to evaluate the accuracy and completeness of a genome assembly. Meryl is the companion tool that efficiently counts and stores k-mers from sequencing reads, enabling Merqury to estimate metrics like assembly completeness and base accuracy. These tools provide a k-mer-based approach to assess assembly quality, helping to identify potential errors or gaps.​
+
+To run the pipeline with reads, you must supply a single FASTQ file for each genome in the samplesheet, alongside the `--run_merqury` flag. It is assumed that reads used to create the assembly are from long read technology such as PacBio or ONT, and are therefore single end. If reads are in a .bam file, they must be converted to FASTQ format first. If you have paired end reads, these must be interleaved first.
 
 ## Usage
 
 > [!NOTE]
 > If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.
 
-<!-- TODO nf-core: Describe the minimum required steps to execute the pipeline, e.g. how to prepare samplesheets.
-     Explain what rows and columns represent. For instance (please edit as appropriate):
-
-First, prepare a samplesheet with your input data that looks as follows:
-
-`samplesheet.csv`:
+First, prepare a `samplesheet.csv`, where your input data points to genomes + or annotations:
 
 ```csv
-sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
+species,refseq,fasta,gff,fastq
+Homo_sapiens,,/path/to/genome.fasta,/path/to/annotation.gff3,[/path/to/reads.fq.gz]
+Gorilla_gorilla,,/path/to/genome.fasta,/path/to/annotation.gff3,[/path/to/reads.fq.gz]
+Pan_paniscus,,/path/to/genome.fasta,/path/to/annotation.gff3,[/path/to/reads.fq.gz]
 ```
 
-Each row represents a fastq file (single-end) or a pair of fastq files (paired end).
+When running on ``--genome_only`` mode, you can leave the **gff** field empty. Otherwise, this field will be ignored.
 
--->
+Additionally, you can run the pipeline using the Refseq IDs of your species:
 
-Now, you can run the pipeline using:
+```csv
+species,refseq,fasta,gff,fastq
+Pongo_abelii,GCF_028885655.2,,,[/path/to/reads.fq.gz]
+Macaca_mulatta,GCF_003339765.1,,,[/path/to/reads.fq.gz]
+```
+
+The **fastq** field is optional. Supply sequencing reads if you intend to run merqury using the `--run_merqury`. Otherwise, this filed will be ignored.
+
+You can mix the two input types **(in development)**.
+
+Each row represents a species, with its associated genome, gff or Refseq ID (to autodownload the genome + gff).
+
+You can run the pipeline using test profiles or example input samplesheets. To run a test set with a samplesheet containing reads:
+
+```
+nextflow run main.nf -resume -profile docker,test --outdir results --run_merqury
+```
+
+To run this pipeline on an example samplesheet included in the repo assets (_does not include reads_):
+
+```
+nextflow run main.nf -resume -profile docker --input assets/samplesheet.csv --outdir results
+```
 
 <!-- TODO nf-core: update the following command to include all required parameters for a minimal example -->
 
@@ -66,6 +119,8 @@ nextflow run ecoflow/genomeqc \
 ecoflow/genomeqc was originally written by Chris Wyatt, Fernando Duarte.
 
 We thank the following people for their extensive assistance in the development of this pipeline:
+
+- [Stephen Turner](https://github.com/stephenturner/) ([Colossal Biosciences](https://colossal.com/))
 
 <!-- TODO nf-core: If applicable, make list of people who have also contributed -->
 
