@@ -8,6 +8,7 @@ include { PLOT_BUSCO_IDEOGRAM                 } from '../../modules/local/plot_b
 include { GFFREAD                             } from '../../modules/nf-core/gffread/main'
 include { ORTHOFINDER                         } from '../../modules/nf-core/orthofinder/main'
 include { FASTAVALIDATOR                      } from '../../modules/nf-core/fastavalidator/main'
+include { GENE_OVERLAPS                       } from '../../modules/local/gene_overlaps'
 
 workflow GENOME_AND_ANNOTATION {
 
@@ -67,6 +68,14 @@ workflow GENOME_AND_ANNOTATION {
     ch_versions  = ch_versions.mix(AGAT_SPSTATISTICS.out.versions.first())
 
     //
+    // MODULE: Run gene overlap module
+    //
+
+    GENE_OVERLAPS {
+        ch_input.gff_filt
+    }
+
+    //
     // MODULE: Run Quast
     //
 
@@ -111,7 +120,7 @@ workflow GENOME_AND_ANNOTATION {
                  }
                  | collect // Collect all fasta in a single tuple
                  | map { fastas ->
-                     [[id:"orthofinder"], fastas] 
+                     [[id:"orthofinder"], fastas]
                  }
 
     // Run orthofinder
@@ -141,7 +150,6 @@ workflow GENOME_AND_ANNOTATION {
     //
 
     // Prepare BUSCO output
-
     ch_busco_full_table = BUSCO_BUSCO.out.full_table
                             .map { meta, full_tables ->
                                 def lineages = full_tables.toString().split('/')[-2].replaceAll('run_', '').replaceAll('_odb\\d+', '')
