@@ -204,12 +204,20 @@ workflow GENOMEQC {
         GENOME (
             ch_input.fasta
         )
+        ch_multiqc_files = ch_multiqc_files
+                         | mix(GENOME.out.quast_results.map { meta, results -> results })
+                         | mix(GENOME.out.busco_short_summaries.map { meta, txt -> txt })
+        ch_versions      = ch_versions.mix(GENOME.out.versions.first())
     } else {
         GENOME_AND_ANNOTATION (
             ch_input.fasta,
             ch_input.gff
         )
-        
+        ch_multiqc_files = ch_multiqc_files
+                         | mix(GENOME_AND_ANNOTATION.out.quast_results.map { meta, results -> results })
+                         | mix(GENOME_AND_ANNOTATION.out.busco_short_summaries.map { meta, txt -> txt })
+        ch_versions      = ch_versions.mix(GENOME_AND_ANNOTATION.out.versions.first())
+
         //
         // MODULE: Run TREE SUMMARY
         //  
@@ -231,31 +239,39 @@ workflow GENOMEQC {
             newLine: true
         ).set { ch_collated_versions }
 
+
     //
     // MODULE: MultiQC
     //
     ch_multiqc_config        = Channel.fromPath(
         "$projectDir/assets/multiqc_config.yml", checkIfExists: true)
+
     ch_multiqc_custom_config = params.multiqc_config ?
         Channel.fromPath(params.multiqc_config, checkIfExists: true) :
         Channel.empty()
+
     ch_multiqc_logo          = params.multiqc_logo ?
         Channel.fromPath(params.multiqc_logo, checkIfExists: true) :
         Channel.empty()
 
     summary_params      = paramsSummaryMap(
         workflow, parameters_schema: "nextflow_schema.json")
+        
     ch_workflow_summary = Channel.value(paramsSummaryMultiqc(summary_params))
 
     ch_multiqc_custom_methods_description = params.multiqc_methods_description ?
         file(params.multiqc_methods_description, checkIfExists: true) :
         file("$projectDir/assets/methods_description_template.yml", checkIfExists: true)
+
+
     ch_methods_description                = Channel.value(
         methodsDescriptionText(ch_multiqc_custom_methods_description))
-
+    
     ch_multiqc_files = ch_multiqc_files.mix(
         ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
+        
     ch_multiqc_files = ch_multiqc_files.mix(ch_collated_versions)
+
     ch_multiqc_files = ch_multiqc_files.mix(
         ch_methods_description.collectFile(
             name: 'methods_description_mqc.yaml',
