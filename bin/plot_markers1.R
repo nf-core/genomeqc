@@ -1,3 +1,5 @@
+#!/usr/bin/env Rscript
+
 # load libraries
 require(RIdeogram)
 

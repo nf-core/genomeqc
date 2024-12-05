@@ -24,10 +24,10 @@ process GENOME_BUSCO_IDEOGRAM {
     seqkit fx2tab -i -n -l ${genome} > ${prefix}_for_karyotype.txt
     
     # Call script for table wrangling
-    Rscript plot_markers1.R ${prefix}_for_karyotype.txt ${prefix}
+    Rscript /home/ucbtfrd/pipelines/genomeqc/bin/plot_markers1.R ${prefix}_for_karyotype.txt ${prefix}
 
     # Call script for plotting
-    Rscript plot_markers2.R ${prefix}_karyotype.txt ${prefix}_busco_coordinates.txt ${prefix}
+    Rscript /home/ucbtfrd/pipelines/genomeqc/bin/plot_markers2.R ${prefix}_karyotype.txt ${prefix}_busco_coordinates.txt ${prefix}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
