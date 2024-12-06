@@ -1,4 +1,4 @@
-process PLOT_BUSCO_IDEOGRAM {
+process GENOME_ANNOTATION_BUSCO_IDEOGRAM {
     tag "${genusspeci}_${lineage}"
     label 'process_single'
 

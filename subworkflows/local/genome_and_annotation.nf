@@ -4,7 +4,7 @@ include { LONGEST                             } from '../../modules/local/longes
 include { BUSCO_BUSCO                         } from '../../modules/nf-core/busco/busco/main'
 include { QUAST                               } from '../../modules/nf-core/quast/main'
 include { AGAT_SPSTATISTICS                   } from '../../modules/nf-core/agat/spstatistics/main'
-include { PLOT_BUSCO_IDEOGRAM                 } from '../../modules/local/plot_busco_ideogram'
+include { GENOME_ANNOTATION_BUSCO_IDEOGRAM    } from '../../modules/local/genome_annotation_busco_ideogram'
 include { GFFREAD                             } from '../../modules/nf-core/gffread/main'
 include { ORTHOFINDER                         } from '../../modules/nf-core/orthofinder/main'
 include { FASTAVALIDATOR                      } from '../../modules/nf-core/fastavalidator/main'
@@ -182,7 +182,7 @@ workflow GENOME_AND_ANNOTATION {
                             }
                         }
 
-    PLOT_BUSCO_IDEOGRAM ( ch_plot_input )//removed this temporarily:, ch_karyotype
+    GENOME_ANNOTATION_BUSCO_IDEOGRAM ( ch_plot_input )//removed this temporarily:, ch_karyotype
 
     ch_tree_data        = ch_tree_data.mix(BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file })
 

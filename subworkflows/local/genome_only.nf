@@ -1,9 +1,9 @@
 
 include { QUAST                               } from '../../modules/nf-core/quast/main'
 include { BUSCO_BUSCO                         } from '../../modules/nf-core/busco/busco/main'
-include { GENOME_BUSCO_IDEOGRAM               } from '../../modules/local/genome_ideogram'
+include { GENOME_ONLY_BUSCO_IDEOGRAM          } from '../../modules/local/genome_only_busco_ideogram'
 
-workflow GENOME {
+workflow GENOME_ONLY {
 
     take:
     ch_fasta // channel: [ val(meta), [ fasta ] ]
@@ -34,7 +34,7 @@ workflow GENOME {
                   | combine(ch_full_table, by:0)
 
 
-    GENOME_BUSCO_IDEOGRAM (
+    GENOME_ONLY_BUSCO_IDEOGRAM (
         ch_input_ideo
     )
 
