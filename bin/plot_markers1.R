@@ -19,7 +19,11 @@ colnames(karyotype1) <- c("Chr", "End", "Start", "species", "size", "color")
 # reorder columns
 karyotype <- karyotype1[, c(1,3,2,4,5,6)]
 
-write.table(karyotype, file = paste0("data/karyotype/", out_name, "_karyotype.txt"), quote = FALSE, row.names = FALSE, col.names = TRUE, sep = "\t")
+# debugging code
+print("Karyotype table\n")
+head(karyotype)
+
+write.table(karyotype, file = paste0(out_name, "_karyotype.txt"), quote = FALSE, row.names = FALSE, col.names = TRUE, sep = "\t")
 
 
 

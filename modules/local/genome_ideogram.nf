@@ -19,15 +19,22 @@ process GENOME_BUSCO_IDEOGRAM {
     """
     grep -v "#" ${busco_full_table} | cut -f 2,3,4,5  | grep -v "Missing" > ${prefix}_busco_coordinates.txt
 
+    #echo "Current directory: \$(pwd)"
+    #echo "Contents of current directory:"
+    #ls -l
+    #echo "Contents of projectDir:"
+    #ls -l $projectDir/bin
+    #echo "Contents of plot_markers1.R script"
+    #cat $projectDir/bin/plot_markers1.R
 
     # Get chromosome lengths:
     seqkit fx2tab -i -n -l ${genome} > ${prefix}_for_karyotype.txt
     
     # Call script for table wrangling
-    Rscript /home/ucbtfrd/pipelines/genomeqc/bin/plot_markers1.R ${prefix}_for_karyotype.txt ${prefix}
+    $projectDir/bin/plot_markers1.R ${prefix}_for_karyotype.txt ${prefix}
 
     # Call script for plotting
-    Rscript /home/ucbtfrd/pipelines/genomeqc/bin/plot_markers2.R ${prefix}_karyotype.txt ${prefix}_busco_coordinates.txt ${prefix}
+    $projectDir/bin/plot_busco_ideogram.R --busco_output ${prefix}_busco_coordinates.txt --karyotype ${prefix}_karyotype.txt --prefix ${prefix}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
