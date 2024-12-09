@@ -20,7 +20,7 @@ process TREE_SUMMARY {
 
     #Remove unwanted extensions in the tree file
     sed \'s/\\.prot\\.fa\\.largestIsoform//g\' ${tree}/Species_Tree/SpeciesTree_rooted_node_labels.txt > tree.nw
-    
+
     # Combine the BUSCO outputs and remove empty tabs
     head -qn 1 *.txt | head -n 1                               > Busco_combined
     tail -q -n 1 *.txt | sed -E 's/\t+/\t/g' | sed 's/\t\$//g' >> Busco_combined
@@ -29,7 +29,7 @@ process TREE_SUMMARY {
     quast_2_table.py *quast.tsv -o Quast_to_plot.tsv -col N50,N90 -plot_types bar,bar
 
     # Run summary plot
-    tree_summary.R tree.nw Busco_combined Quast_to_plot.tsv
+    plot_tree_summary.R tree.nw Busco_combined Quast_to_plot.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

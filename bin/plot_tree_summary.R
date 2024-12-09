@@ -1,7 +1,7 @@
 #!/usr/bin/Rscript
 
-# Written by Chris Wyatt and released under the MIT license. 
-# Prints a tree with QUAST N50 results on tips of branches
+# Written by Chris Wyatt and Fernando Duarte and released under the MIT license.
+# Plots a phylogenetic tree alongside BUSCO and Quast stats
 
 # Load necessary libraries
 if (!requireNamespace("argparse", quietly = TRUE)) {
@@ -19,6 +19,12 @@ if (!requireNamespace("cowplot", quietly = TRUE)) {
 if (!requireNamespace("tidyr", quietly = TRUE)) {
   install.packages("tidyr")
 }
+if (!requireNamespace("ggtreeExtra", quietly = TRUE)) {
+  BiocManager::install("ggtreeExtra")
+}
+if (!requireNamespace("ggimage", quietly = TRUE)) {
+  install.packages("ggimage")
+}
 
 library(ggtree)
 library(ggplot2)
@@ -26,21 +32,56 @@ library(cowplot)
 library(argparse)
 library(dplyr)
 library(tidyr)
-
-# Function to extract legend from a ggplot
-extract_legend <- function(plot) {
-  g <- ggplotGrob(plot)
-  legend <- g$grobs[which(sapply(g$grobs, function(x) x$name) == "guide-box")]
-  return(legend)
-}
+library(ggimage)
+library(ggtreeExtra)
 
 # Parse command-line arguments
 parser <- ArgumentParser(description = 'Plot phylogenetic tree with statistics and true/false data')
 parser$add_argument('tree_file', type = 'character', help = 'Path to the Newick formatted tree file')
-parser$add_argument('data_file', type = 'character', help = 'Path to the CSV file with statistic and true/false data')
-parser$add_argument('--text_size', type = 'double', default = 3, help = 'Text size for the plots')
-parser$add_argument('--tree_size', type = 'double', default = 0.3, help = 'Proportion of the plot width for the tree')
+parser$add_argument('busco_file', type = 'character', help = 'Path to processed BUSCO output file')
+parser$add_argument('quast_file', type = 'character', help = 'Path to processed Quast output file')
+parser$add_argument('--text_size', type = 'double', default = 2.5, help = 'Tree tip text size for the plots')
+parser$add_argument('--pie_size', type = 'double', default = 0, help = 'Increase pie size of each tip by this fold')
+parser$add_argument('--pie_hjust', type = 'double', default = 0.4, help = 'Horizontally adjust pie positions')
+#parser$add_argument('--tree_size', type = 'double', default = 0.3, help = 'Proportion of the plot width for the tree')
 args <- parser$parse_args()
+
+# Create a function so that, if the Quast data is off limits and warnings related
+# to this pop up , margins will be increased by the value "step" on each iteration
+increase_scale_until_no_warnings <- function(plot, initial_limit = 5, step = 0.1, max_iterations = 50) {
+  # Initialize limit and warning flag
+  current_limit <- initial_limit
+  warning_flag <- TRUE
+  iteration <- 0
+
+  while (warning_flag && iteration < max_iterations) {
+    iteration <- iteration + 1
+    # Update the plot with the current limit
+    updated_plot <- plot + scale_x_continuous(limits = c(0, current_limit))
+
+    # Capture warnings
+    warnings <- tryCatch({
+      print(updated_plot)  # Render the plot
+      NULL  # No warnings
+    }, warning = function(w) {
+      w$message  # Capture warning message
+    })
+
+    # Check if there are warnings
+    if (is.null(warnings)) {
+      warning_flag <- FALSE  # No warnings, exit loop
+    } else {
+      # Increase the limit for the next iteration
+      current_limit <- current_limit + step
+    }
+  }
+
+  # Return the final plot
+  if (iteration >= max_iterations) {
+    warning("Maximum iterations reached. Plot may still have issues.")
+  }
+  return(updated_plot)
+}
 
 # Read the Newick tree from the file
 tree <- read.tree(args$tree_file)
@@ -50,170 +91,188 @@ tree$tip.label <- trimws(tree$tip.label)
 tree$tip.label <- tolower(tree$tip.label)
 
 # Read the data table from the file, ensuring species column is read as character
-data <- read.csv(args$data_file, sep = "\t", colClasses = c("species" = "character"))
+# Load BUSCO
+data_busco <- read.csv(args$busco_file, sep = "\t", colClasses = c("Input_file" = "character"))
 
-# Clean data species names
-data$species <- trimws(data$species)
-data$species <- tolower(data$species)
+# Prepare BUSCO data
+data_busco <- data_busco %>%
+  # Remove extension from Input_file
+  mutate(Input_file = tools::file_path_sans_ext(Input_file)) %>%
+  # Rename 'Input_file' to 'species'
+  rename(species = Input_file) %>%
+  # Make everything lowercase
+  mutate(species = tolower(species))
 
-# Extract the column headers and the second row to determine plot types
-plot_types <- as.character(data[1, ])
-data <- data[-1, ]  # Remove the second row used for plot types
+# Load Quast data
+data_quast <- read.csv(args$quast_file, sep = "\t")
+
+#Tidy Quast data
+data_quast <- data_quast %>%
+  # Remove the row where species is NA
+  filter(!is.na(species)) %>%
+  # Make species lowercase
+  mutate(species = tolower(species)) %>%
+  # Convert wide to long format
+  pivot_longer(cols = c(N50, N90),
+               names_to = "metric",
+               values_to = "value") %>%
+  # Remove any remaining "bar" rows if necessary (check Chris script)
+  filter(value != "bar") %>%
+  # Convert value column to numeric if needed
+  mutate(value = as.numeric(value))
 
 # Debugging: Print species names from the tree and the data
 cat("Species names in the tree based on nw:\n")
-print(tree$tip.label)
-cat("\nSpecies names in the data table before processing:\n")
-print(data$species)
+cat(tree$tip.label)
+cat("\nSpecies names in data tables:\n")
+quast_sp <- unique(data_quast$species)
+cat("BUSCO:", data_busco$species, "\nQUAST:", quast_sp, "\n")
 
-# Debugging: Print the data frame to check its structure
-cat("\nData frame:\n")
-print(data)
-
-# Ensure species names match the tree tips
-missing_in_tree <- setdiff(data$species, tree$tip.label)
-missing_in_data <- setdiff(tree$tip.label, data$species)
-
-if (length(missing_in_tree) > 0) {
-  cat("Species in data but not in tree:\n")
-  print(missing_in_tree)
+# Debugging: Check if there are any mismatches in species names (might need to be
+# changed in the future to support optional stats)
+if (all(sort(tree$tip.label) != sort(data_busco$species))) {
+  stop("Species names in BUSCO and tree labels do not match")
+} else if (all(sort(quast_sp) != sort(data_busco$species))) {
+  stop("Species names in Quast and tree labels do not match")
 }
 
-if (length(missing_in_data) > 0) {
-  cat("Species in tree but not in data:\n")
-  print(missing_in_data)
-}
+# Arrange data according to tree labels, so that they are plotted correctly
+# For BUSCO
+data_busco <- data_busco %>%
+  arrange(match(species, tree$tip.label))
 
-if (length(missing_in_tree) > 0 || length(missing_in_data) > 0) {
-  stop("Species names in the data do not match the tree tips")
-}
+# For Quast
+data_quast <- data_quast %>%
+  arrange(match(species, tree$tip.label))
+
+# Node number needed in BUSCO dataframe for nodpie. This is a generic 1-n
+# numbering (n=number of species)
+data_busco <- data_busco %>%
+  mutate(node = seq_len(n()))
 
 # Plot the phylogenetic tree
-tree_plot <- ggtree(tree) + 
-  geom_tiplab() + 
-  coord_cartesian(clip="off") +
+tree_plot <- ggtree(tree, branch.length = "none") + # No branch length, only topology
+  geom_tiplab(size=args$text_size) + # Tip font size
+  ggplot2::xlim(0, 5) +
   ggtitle("Phylogenetic Tree") +
-  theme(plot.margin = margin(10, 150, 10, 10))  # Increase margins
+  theme(plot.margin = margin(10, 10, 10, 10))  # Increase margins
 
-pdf ("Tree_only.pdf")
-tree_plot
-dev.off()
+# Save tree only
+ggsave("tree_only.pdf", tree_plot)
 
+# Create list of pies from BUSCO data
+pies <- nodepie(data_busco,
+                cols = 4:7,
+                color = c(
+                  "Single" = "steelblue",
+                  "Duplicated" = "orange",
+                  "Fragmented" = "purple",
+                  "Missing" = "red"
+                )
+)
 
-# Extract the exact tree tip names:axis.text
-tree$tip.label <- get_taxa_name(tree_plot)
+print("Check 1")
 
-# Reorder the data based on the order of species in the tree
-data <- data %>% arrange(match(species, tree$tip.label))
+# Create a dummy pie as for the legend it seems impossible to extract it
+# from nodpie
+dummy_pie_data <- data.frame(
+  Type = factor(c("Single", "Duplicated", "Fragmented", "Missing")),
+  value = c(1, 1, 1, 1)  # Dummy values for equal slices
+)
 
-# Debugging: Print plot types
-cat("\nPlot types:\n")
-print(plot_types)
+dummy_pie <- ggplot(dummy_pie_data) +
+  geom_bar(
+    aes(x = "", y = value, fill = Type),
+    stat = "identity",
+    width = 1
+  ) +
+  coord_polar("y") +
+  scale_fill_manual(
+    values = c(
+      "Single" = "steelblue",
+      "Duplicated" = "orange",
+      "Fragmented" = "purple",
+      "Missing" = "red"
+    ),
+    name = "BUSCO"
+  ) +
+  theme_void() +
+  theme(legend.position = "right")  # Show the legend
 
-# Debugging: Print the reordered data frame to check its structure
-cat("\nReordered data frame:\n")
-print(data)
+print("Check 2")
 
-write.table(data, "Reordered_output_tree.tsv", sep="\t", quote=F)
+# Create variable for standarization of legends format
+legends_theme <- theme(legend.title = element_text(size = 10, face = "bold"),
+                       legend.text = element_text(size = 8),
+                       legend.key.size = unit(0.5, "cm"))
 
-# Check if the number of unique species matches the number of tree tips
-if (length(unique(data$species)) != length(tree$tip.label)) {
-  warning("The number of unique species in the data does not match the number of tree tips.")
-}
+# Extract legend of dummy BUSCO pie chart
+legend_busco <- cowplot::get_legend(dummy_pie + legends_theme)
 
-# Find column headers
-column_headers <- colnames(data)
+print("Check 2.5")
 
-# Create plots based on the plot types
-plots <- list()
-legend_plot <- NULL
-for (i in 2:length(column_headers)) {
-  column_name <- column_headers[i]
-  plot_type <- plot_types[i]
-  
-  if (plot_type == "bar") {
-    bar_plot <- ggplot(data, aes(x = as.numeric(!!sym(column_name)), y = factor(species, levels = rev(tree$tip.label)))) + 
-      geom_bar(stat = "identity", fill = "darkblue") + 
-      geom_text(aes(label = as.numeric(!!sym(column_name)), x = 0), hjust = -0.1, color = "white", size = args$text_size) +  # Place text at the base of the bar
-      theme_minimal() + 
-      theme(axis.title.y = element_blank(), 
-            axis.text.y = element_blank(),
-            axis.ticks.y = element_blank(),
-            axis.title.x = element_blank(), 
-            axis.text.x = element_blank(),
-            axis.ticks.x = element_blank(),
-            panel.grid.major = element_blank(),  # Remove vertical grid lines
-            panel.grid.minor = element_blank(),  # Remove minor grid lines
-            panel.background = element_blank(),  # Remove grey background
-            plot.background = element_blank(),   # Remove any outer plot background
-            plot.margin = margin(0, 0, 0, 0)) + 
-      labs(x = column_name) +
-      ggtitle(column_name)
-    plots[[length(plots) + 1]] <- bar_plot
-  } else if (plot_type == "text") {
-    text_plot <- ggplot(data, aes(y = factor(species, levels = rev(tree$tip.label)), x = 1, label = !!sym(column_name))) + 
-      geom_text(size = args$text_size, hjust = 0) + 
-      theme_void() + 
-      labs(x = NULL, y = NULL) +
-      theme(axis.title.x = element_blank(), 
-            axis.text.x = element_blank(),
-            axis.ticks.x = element_blank(),
-            plot.margin = margin(0, 0, 0, 0)) +
-      ggtitle(column_name)
-    plots[[length(plots) + 1]] <- text_plot
-  } else if (plot_type == "stacked") {
-    # Split the stacked values into separate columns
-    stacked_data <- data %>%
-      separate(column_name, into = paste0(column_name, "_", 1:4), sep = ",", convert = TRUE, extra = "drop") %>%
-      pivot_longer(cols = starts_with(column_name), names_to = "stack", values_to = "value") %>%
-      mutate(stack = factor(stack, levels = paste0(column_name, "_", 1:4)))
-    
-    stacked_plot <- ggplot(stacked_data, aes(x = value, y = factor(species, levels = rev(tree$tip.label)), fill = stack)) + 
-      geom_bar(stat = "identity", position = "fill") + 
-      theme_minimal() + 
-      theme(axis.title.y = element_blank(), 
-            axis.text.y = element_blank(),
-            axis.ticks.y = element_blank(),
-            axis.title.x = element_blank(), 
-            axis.text.x = element_blank(),
-            axis.ticks.x = element_blank(),
-            panel.grid.major.y = element_blank(),  # Remove horizontal grid lines
-            panel.grid.minor.y = element_blank(),
-            plot.margin = margin(0, 0, 0, 0)) + 
-      labs(x = column_name) +
-      ggtitle(column_name)
-    
-    # Extract the legend from the stacked plot
-    legend_plot <- extract_legend(stacked_plot)
-    
-    # Remove the legend from the stacked plot
-    stacked_plot <- stacked_plot + theme(legend.position = "none")
-    
-    plots[[length(plots) + 1]] <- stacked_plot
-  } else {
-    cat("Unknown plot type:", plot_type, "for column:", column_name, "\n")
-  }
-}
+# Plot BUSCO pies next to tree tips
+p <- ggtree::inset(tree_plot,
+                   pies,
+                   width=(args$pie_size * .16 + .16),
+                   height=(args$pie_size * .6 + .6),
+                   hjust=-1.2)
 
-# Debugging: Print the list of plots
-cat("List of plots:\n")
-print(plots)
+print("Check 3")
 
-# Combine the plots if there are any
-if (length(plots) > 0) {
-  combined_plot <- plot_grid(tree_plot, plot_grid(plotlist = plots, ncol = length(plots)), ncol = 2, rel_widths = c(args$tree_size, 1 - args$tree_size))  # Adjust widths based on tree_size
+# Plot Quast data
+p2 <- p + geom_fruit(data=data_quast,
+                     geom = geom_bar,
+                     mapping = aes(y=species, x=value, fill=metric),
+                     position=position_dodgex(),
+                     pwidth=0.38,
+                     orientation="y",
+                     stat="identity",
+                     axis.params = list(
+                                        axis = "x",
+                                        text.size  = 1.8,
+                                        hjust = 1,
+                                        vjust = 0.5,
+                                        nbreak = 3
+                                        ),
+                     grid.params = list(),
+                     offset = 1,
+                     width = 0.4) +
+                     labs(fill = "Quast") +
+                     scale_x_continuous(limits=c(0,5)) # limits=c(0,5) by default for p2
 
-  # Save the combined plot to a PDF file
-  ggsave("Phyloplot_quast.pdf", plot = combined_plot, width = 10, height = 8)
-  
-  # Save the legend to a separate PDF file
-  if (!is.null(legend_plot)) {
-    legend_plot <- cowplot::plot_grid(legend_plot)
-    ggsave("Legend.pdf", plot = legend_plot, width = 10, height = 2)
-  }
-} else {
-  cat("No plots to combine.\n")
-}
+print("Check 4")
 
-# Print warnings
-warnings()
+#
+p2 <- increase_scale_until_no_warnings(p2)
+
+# Save plot without legend
+ggsave("Phyloplot_no_legend.pdf", p2 + theme(legend.position="none"))
+
+# Extract Quast legend
+legend_quast <- cowplot::get_legend(p2 + legends_theme)
+
+# Wrap the legends in fixed-sized containers and adjust margins so that legends
+# are perfectly aligned
+legend_busco <- ggdraw(legend_busco) + theme(plot.margin = margin(0, 0, 0, 0))
+legend_quast <- ggdraw(legend_quast) + theme(plot.margin = margin(0, 29, 60, 0))
+
+# Combine both BUSCO and Quast legends
+combined_legends <- plot_grid(legend_busco,
+                              legend_quast,
+                              NULL, # Dummy rows for better positioning
+                              NULL,
+                              nrow = 4,
+                              rel_widths = c(1, 1))
+
+# Save legend
+ggsave("legend.pdf", plot = combined_legends)
+
+# Add combined legends to tree plot
+p3 <- plot_grid(p2 + theme(legend.position = "none"),
+                combined_legends,
+                ncol = 2,
+                rel_widths = c(4, 1))
+
+# Save full plot
+ggsave("Phyloplot_complete.pdf", plot = p3)
