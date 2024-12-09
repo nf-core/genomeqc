@@ -24,17 +24,12 @@ process TREE_SUMMARY {
     # Combine the BUSCO outputs and remove empty tabs
     head -qn 1 *.txt | head -n 1                               > Busco_combined
     tail -q -n 1 *.txt | sed -E 's/\t+/\t/g' | sed 's/\t\$//g' >> Busco_combined
-    # cut -f 1,3,4,5,6,7 Busco_combined >> Busco_combined_cut
-    # sed -i \'s/\\.fasta//g\' Busco_combined_cut
-
-    # busco_2_table.py Busco_combined_cut Busco_to_plot.tsv
 
     # Combine QUAST ouput
     quast_2_table.py *quast.tsv -o Quast_to_plot.tsv -col N50,N90 -plot_types bar,bar
 
     # Run summary plot
     tree_summary.R tree.nw Busco_combined Quast_to_plot.tsv
-    #plot_tree_summary.R  tree.nw Quast_to_plot_final.tsv --tree_size 0.6
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
