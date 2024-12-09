@@ -2,7 +2,7 @@ process TREE_SUMMARY {
     tag "$meta.id"
     label 'process_single'
 
-    container = 'ecoflowucl/genomeqc_tree:v1.3'
+    container = 'fduarte001/genomeqc_tree:0.1'
     publishDir "$params.outdir/tree_plots" , mode: "${params.publish_dir_mode}", pattern:"Phyloplot_*.pdf"
 
     input:
@@ -31,8 +31,6 @@ process TREE_SUMMARY {
 
     # Combine QUAST ouput
     quast_2_table.py *quast.tsv -o Quast_to_plot.tsv -col N50,N90 -plot_types bar,bar
-    
-    sudo apt-get install libmagick++-dev
 
     # Run summary plot
     tree_summary.R tree.nw Busco_combined Quast_to_plot.tsv

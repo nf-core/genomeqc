@@ -42,8 +42,46 @@ parser$add_argument('busco_file', type = 'character', help = 'Path to processed 
 parser$add_argument('quast_file', type = 'character', help = 'Path to processed Quast output file')
 parser$add_argument('--text_size', type = 'double', default = 2.5, help = 'Tree tip text size for the plots')
 parser$add_argument('--pie_size', type = 'double', default = 0, help = 'Increase pie size of each tip by this fold')
+parser$add_argument('--pie_hjust', type = 'double', default = 0.4, help = 'Horizontally adjust pie positions')
 #parser$add_argument('--tree_size', type = 'double', default = 0.3, help = 'Proportion of the plot width for the tree')
 args <- parser$parse_args()
+
+# Create a function so that, if the Quast data is off limits and warnings related
+# to this pop up , margins will be increased by the value "step" on each iteration
+increase_scale_until_no_warnings <- function(plot, initial_limit = 5, step = 0.1, max_iterations = 50) {
+  # Initialize limit and warning flag
+  current_limit <- initial_limit
+  warning_flag <- TRUE
+  iteration <- 0
+  
+  while (warning_flag && iteration < max_iterations) {
+    iteration <- iteration + 1
+    # Update the plot with the current limit
+    updated_plot <- plot + scale_x_continuous(limits = c(0, current_limit))
+    
+    # Capture warnings
+    warnings <- tryCatch({
+      print(updated_plot)  # Render the plot
+      NULL  # No warnings
+    }, warning = function(w) {
+      w$message  # Capture warning message
+    })
+    
+    # Check if there are warnings
+    if (is.null(warnings)) {
+      warning_flag <- FALSE  # No warnings, exit loop
+    } else {
+      # Increase the limit for the next iteration
+      current_limit <- current_limit + step
+    }
+  }
+  
+  # Return the final plot
+  if (iteration >= max_iterations) {
+    warning("Maximum iterations reached. Plot may still have issues.")
+  }
+  return(updated_plot)
+}
 
 # Read the Newick tree from the file
 tree <- read.tree(args$tree_file)
@@ -190,18 +228,29 @@ p2 <- p + geom_fruit(data=data_quast,
                      pwidth=0.38,
                      orientation="y",
                      stat="identity",
-                     axis.params = list(axis = "x", text.size  = 1.8, hjust = 1, vjust = 0.5, nbreak = 3),
+                     axis.params = list(
+                                        axis = "x",
+                                        text.size  = 1.8, 
+                                        hjust = 1,
+                                        vjust = 0.5,
+                                        nbreak = 3
+                                        ),
                      grid.params = list(),
                      offset = 1,
-                     width = 0.4) + labs(fill = "Quast")
+                     width = 0.4) +
+                     labs(fill = "Quast") +
+                     scale_x_continuous(limits=c(0,5)) # limits=c(0,5) by default for p2
 
 print("Check 4")
+
+#
+p2 <- increase_scale_until_no_warnings(p2)
 
 # Save plot without legend
 ggsave("Phyloplot_no_legend.pdf", p2 + theme(legend.position="none"))
 
 # Extract Quast legend
-legend_quast <- cowplot::get_legend(p2 + std_theme)
+legend_quast <- cowplot::get_legend(p2 + legends_theme)
 
 # Wrap the legends in fixed-sized containers and adjust margins so that legends
 # are perfectly aligned
