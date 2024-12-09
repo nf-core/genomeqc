@@ -292,7 +292,7 @@
         },
         "busco_lineage": {
           "type": "string",
-          "default": "auto",
+          "default": "hymenoptera_odb10",
           "description": "A flag to set the busco lineage. Default: auto"
         },
         "busco_lineages_path": {
@@ -347,5 +347,31 @@
     {
       "$ref": "#/definitions/generic_options"
     }
-  ]
+  ],
+  "properties": {
+    "save_sorted_seqs": {
+      "type": "boolean",
+      "description": "Publish sorted fasta genome files from TIDK Explore subworkflow"
+    },
+    "save_validated_annotation": {
+      "type": "boolean",
+      "description": "Publish gff files validated by AGAT"
+    },
+    "save_assembly": {
+      "type": "boolean",
+      "description": "Publish genomes and/or annotations of user-supplied RefSeq IDs"
+    },
+    "save_extracted_seqs": {
+      "type": "boolean",
+      "description": "Publish extracted protein fasta files by GFFREAD"
+    },
+    "save_orthofinder_results": {
+      "type": "boolean",
+      "description": "Publish orthofinder results"
+    },
+    "save_longest_isoform": {
+      "type": "boolean",
+      "description": "Publish longest protein isoform fasta files"
+    }
+  }
 }
