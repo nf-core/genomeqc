@@ -21,12 +21,12 @@ process GENOME_ONLY_BUSCO_IDEOGRAM {
 
     # Get chromosome lengths:
     seqkit fx2tab -i -n -l ${genome} > ${prefix}_for_karyotype.txt
-    
+
     # Call script for table wrangling
-    $projectDir/bin/plot_markers1.R ${prefix}_for_karyotype.txt ${prefix}
+    plot_markers1.R ${prefix}_for_karyotype.txt ${prefix}
 
     # Call script for plotting
-    $projectDir/bin/plot_busco_ideogram.R \\
+    plot_busco_ideogram.R \\
         --busco_output ${prefix}_busco_coordinates.txt \\
         --karyotype ${prefix}_karyotype.txt \\
         --prefix ${prefix} \\
