@@ -4,7 +4,7 @@ include { LONGEST                             } from '../../modules/local/longes
 include { BUSCO_BUSCO                         } from '../../modules/nf-core/busco/busco/main'
 include { QUAST                               } from '../../modules/nf-core/quast/main'
 include { AGAT_SPSTATISTICS                   } from '../../modules/nf-core/agat/spstatistics/main'
-include { PLOT_BUSCO_IDEOGRAM                 } from '../../modules/local/plot_busco_ideogram'
+include { GENOME_ANNOTATION_BUSCO_IDEOGRAM    } from '../../modules/local/genome_annotation_busco_ideogram'
 include { GFFREAD                             } from '../../modules/nf-core/gffread/main'
 include { ORTHOFINDER                         } from '../../modules/nf-core/orthofinder/main'
 include { FASTAVALIDATOR                      } from '../../modules/nf-core/fastavalidator/main'
@@ -52,7 +52,7 @@ workflow GENOME_AND_ANNOTATION {
                  | combine(ch_gff_agat, by:0) // by:0 | Only combine when both channels share the same id
                  | combine(ch_gff_long, by:0)
                  | multiMap {
-                     meta, fasta, gff_unfilt, gff_filt ->
+                     meta, fasta, gff_unfilt, gff_filt -> // null is is probably not necessary
                          fasta      : fasta      ? tuple( meta, file(fasta)      ) : null // channel: [ val(meta), [ fasta ] ]
                          gff_unfilt : gff_unfilt ? tuple( meta, file(gff_unfilt) ) : null // channel: [ val(meta), [ gff ] ], unfiltered
                          gff_filt   : gff_filt   ? tuple( meta, file(gff_filt)   ) : null // channel: [ val(meta), [ gff ] ], filtered for longest isoform
@@ -134,8 +134,6 @@ workflow GENOME_AND_ANNOTATION {
     // MODULE: Run BUSCO
     //
 
-    //GFFREAD.out.gffread_fasta.collect().view()
-
     BUSCO_BUSCO (
         GFFREAD.out.gffread_fasta,
         "proteins", // hardcoded
@@ -182,7 +180,7 @@ workflow GENOME_AND_ANNOTATION {
                             }
                         }
 
-    PLOT_BUSCO_IDEOGRAM ( ch_plot_input )//removed this temporarily:, ch_karyotype
+    GENOME_ANNOTATION_BUSCO_IDEOGRAM ( ch_plot_input )
 
     ch_tree_data        = ch_tree_data.mix(BUSCO_BUSCO.out.batch_summary.collect { meta, file -> file })
 

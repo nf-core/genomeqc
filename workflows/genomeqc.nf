@@ -10,7 +10,7 @@ include { CREATE_PATH                         } from '../modules/local/create_pa
 include { NCBIGENOMEDOWNLOAD                  } from '../modules/nf-core/ncbigenomedownload/main'
 include { PIGZ_UNCOMPRESS as UNCOMPRESS_FASTA } from '../modules/nf-core/pigz/uncompress/main'
 include { PIGZ_UNCOMPRESS as UNCOMPRESS_GFF   } from '../modules/nf-core/pigz/uncompress/main'
-include { GENOME                              } from '../subworkflows/local/genome'
+include { GENOME_ONLY                         } from '../subworkflows/local/genome_only'
 include { GENOME_AND_ANNOTATION               } from '../subworkflows/local/genome_and_annotation'
 include { MULTIQC                             } from '../modules/nf-core/multiqc/main'
 include { TREE_SUMMARY                        } from '../modules/local/tree_summary'
@@ -201,13 +201,13 @@ workflow GENOMEQC {
 
     // Run genome only or genome + gff
     if (params.genome_only) {
-        GENOME (
+        GENOME_ONLY (
             ch_input.fasta
         )
         ch_multiqc_files = ch_multiqc_files
-                         | mix(GENOME.out.quast_results.map { meta, results -> results })
-                         | mix(GENOME.out.busco_short_summaries.map { meta, txt -> txt })
-        ch_versions      = ch_versions.mix(GENOME.out.versions.first())
+                         | mix(GENOME_ONLY.out.quast_results.map { meta, results -> results })
+                         | mix(GENOME_ONLY.out.busco_short_summaries.map { meta, txt -> txt })
+        ch_versions      = ch_versions.mix(GENOME_ONLY.out.versions.first())
     } else {
         GENOME_AND_ANNOTATION (
             ch_input.fasta,
