@@ -1,13 +1,13 @@
 #!/usr/bin/env nextflow
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    ecoflow/genomeqc
+    nf-core/genomeqc
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Github : https://github.com/ecoflow/genomeqc
+    Github : https://github.com/nf-core/genomeqc
+    Website: https://nf-co.re/genomeqc
+    Slack  : https://nfcore.slack.com/channels/genomeqc
 ----------------------------------------------------------------------------------------
 */
-
-nextflow.enable.dsl = 2
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -18,7 +18,6 @@ nextflow.enable.dsl = 2
 include { GENOMEQC  } from './workflows/genomeqc'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_genomeqc_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_genomeqc_pipeline'
-
 include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_genomeqc_pipeline'
 
 /*
@@ -41,7 +40,7 @@ params.fasta = getGenomeAttribute('fasta')
 //
 // WORKFLOW: Run main analysis pipeline depending on type of input
 //
-workflow ECOFLOW_GENOMEQC {
+workflow NFCORE_GENOMEQC {
 
     take:
     samplesheet // channel: samplesheet read in from --input
@@ -54,10 +53,8 @@ workflow ECOFLOW_GENOMEQC {
     GENOMEQC (
         samplesheet
     )
-
     emit:
     multiqc_report = GENOMEQC.out.multiqc_report // channel: /path/to/multiqc_report.html
-
 }
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -68,13 +65,11 @@ workflow ECOFLOW_GENOMEQC {
 workflow {
 
     main:
-
     //
     // SUBWORKFLOW: Run initialisation tasks
     //
     PIPELINE_INITIALISATION (
         params.version,
-        params.help,
         params.validate_params,
         params.monochrome_logs,
         args,
@@ -85,10 +80,9 @@ workflow {
     //
     // WORKFLOW: Run main workflow
     //
-    ECOFLOW_GENOMEQC (
+    NFCORE_GENOMEQC (
         PIPELINE_INITIALISATION.out.samplesheet
     )
-
     //
     // SUBWORKFLOW: Run completion tasks
     //
@@ -99,7 +93,7 @@ workflow {
         params.outdir,
         params.monochrome_logs,
         params.hook_url,
-        ECOFLOW_GENOMEQC.out.multiqc_report
+        NFCORE_GENOMEQC.out.multiqc_report
     )
 }
 

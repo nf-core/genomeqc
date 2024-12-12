@@ -1,0 +1,11 @@
+nf_core_version: 3.1.0
+repository_type: pipeline
+template:
+  author: Chris Wyatt, Fernando Duarte
+  description: A pipeline to compare multiple genomes and annotations
+  force: false
+  is_nfcore: true
+  name: genomeqc
+  org: nf-core
+  outdir: .
+  version: 1.0dev
