@@ -31,7 +31,8 @@ for file in args.input_files:
         # Optional statistics
         sense_genes = df.loc[df['Statistic'] == 'Number of genes fully contained in sense direction', 'Count'].values[0] if args.include_sense else "NA"
         antisense_genes = df.loc[df['Statistic'] == 'Number of genes fully contained in antisense direction', 'Count'].values[0] if args.include_antisense else "NA"
-        
+        print(sense_genes)
+
         # Collect results in a dictionary
         entry = {
             'File': file,
@@ -39,9 +40,9 @@ for file in args.input_files:
             'Overlapping_genes': overlapping_genes,
         }
         if args.include_sense:
-            entry['Sense_genes'] = sense_genes
+            entry['Fully_contained_sense_genes'] = sense_genes
         if args.include_antisense:
-            entry['Antisense_genes'] = antisense_genes
+            entry['Fully_contained_antisense_genes'] = antisense_genes
         
         results.append(entry)
     except Exception as e:
