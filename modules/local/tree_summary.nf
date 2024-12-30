@@ -13,16 +13,23 @@ process TREE_SUMMARY {
     path( "P*.pdf"          ),                emit: figure
     path( "versions.yml"    ),                emit: versions
 
-
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
-    """
 
+    """
     #Remove unwanted extensions in the tree file
     sed \'s/\\.prot\\.fa\\.largestIsoform//g\' ${tree}/Species_Tree/SpeciesTree_rooted_node_labels.txt > tree.nw
 
+    # Combine GENE OVERLAPS outputs
+    gene_overlaps_table.py Count.*.tsv gene_stats.tsv --include-sense --include-antisense
+
+    # Combine NUMBER SEQS outputs
+    # Add header
+    echo -e "species\tchromosome_count\tsequence_count" > number_seqs.tsv
+    tail -n +2 -q *.n_seqs.tsv >> number_seqs.tsv
+
     # Combine the BUSCO outputs and remove empty tabs
-    head -qn 1 *.txt | head -n 1                               > Busco_combined
+    head -qn 1 *.txt | head -n 1                                > Busco_combined
     tail -q -n 1 *.txt | sed -E 's/\t+/\t/g' | sed 's/\t\$//g' >> Busco_combined
 
     # Combine QUAST ouput

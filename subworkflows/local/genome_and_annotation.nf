@@ -9,6 +9,7 @@ include { GFFREAD                             } from '../../modules/nf-core/gffr
 include { ORTHOFINDER                         } from '../../modules/nf-core/orthofinder/main'
 include { FASTAVALIDATOR                      } from '../../modules/nf-core/fastavalidator/main'
 include { GENE_OVERLAPS                       } from '../../modules/local/gene_overlaps'
+include { NUMBER_SEQS                         } from '../../modules/local/number_seqs'
 
 workflow GENOME_AND_ANNOTATION {
 
@@ -52,11 +53,20 @@ workflow GENOME_AND_ANNOTATION {
                  | combine(ch_gff_agat, by:0) // by:0 | Only combine when both channels share the same id
                  | combine(ch_gff_long, by:0)
                  | multiMap {
-                     meta, fasta, gff_unfilt, gff_filt -> // null is is probably not necessary
+                     meta, fasta, gff_unfilt, gff_filt -> // "null" probably not necessary
                          fasta      : fasta      ? tuple( meta, file(fasta)      ) : null // channel: [ val(meta), [ fasta ] ]
                          gff_unfilt : gff_unfilt ? tuple( meta, file(gff_unfilt) ) : null // channel: [ val(meta), [ gff ] ], unfiltered
                          gff_filt   : gff_filt   ? tuple( meta, file(gff_filt)   ) : null // channel: [ val(meta), [ gff ] ], filtered for longest isoform
                  }
+
+    //
+    // Check number of sequences
+    //
+
+    NUMBER_SEQS (
+        ch_input.fasta
+    )
+    ch_tree_data = ch_tree_data.mix(NUMBER_SEQS.out.n_seqs.collect { meta, file -> file })
 
     //
     // Run AGAT Spstatistics
@@ -74,6 +84,7 @@ workflow GENOME_AND_ANNOTATION {
     GENE_OVERLAPS {
         ch_input.gff_filt
     }
+    ch_tree_data = ch_tree_data.mix(GENE_OVERLAPS.out.overlap_counts.collect { meta, file -> file })
 
     //
     // MODULE: Run Quast
