@@ -33,7 +33,7 @@ process TREE_SUMMARY {
     tail -q -n 1 *.txt | sed -E 's/\t+/\t/g' | sed 's/\t\$//g' >> Busco_combined
 
     # Combine QUAST ouput
-    quast_2_table.py *quast.tsv -o Quast_to_plot.tsv -col N50,N90,"Total length","GC (%)" -plot_types bar,bar,bar,bar
+    quast_2_table.py *quast.tsv -o Quast_to_plot.tsv -col N50,N90,"Total length","GC (%)","# contigs" -plot_types bar,bar,bar,bar
 
     # Run summary plot
     plot_tree_summary.R tree.nw Busco_combined Quast_to_plot.tsv
