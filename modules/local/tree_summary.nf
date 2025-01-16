@@ -2,15 +2,15 @@ process TREE_SUMMARY {
     tag "$meta.id"
     label 'process_single'
 
-    container = 'fduarte001/genomeqc_tree:0.1'
-    publishDir "$params.outdir/tree_plots" , mode: "${params.publish_dir_mode}", pattern:"Phyloplot_*.pdf"
+    container = 'fduarte001/genomeqc_tree:0.3'
+    publishDir "$params.outdir/tree_plots" , mode: "${params.publish_dir_mode}", pattern:"*.pdf"
 
     input:
     tuple val(meta), path(tree)
     path  multiqc_files
 
     output:
-    path( "P*.pdf"          ),                emit: figure
+    path( "*.pdf"          ),                 emit: figure
     path( "versions.yml"    ),                emit: versions
 
     script:
@@ -33,10 +33,10 @@ process TREE_SUMMARY {
     tail -q -n 1 *.txt | sed -E 's/\t+/\t/g' | sed 's/\t\$//g' >> Busco_combined
 
     # Combine QUAST ouput
-    quast_2_table.py *quast.tsv -o Quast_to_plot.tsv -col N50,N90,"Total length","GC (%)","# contigs" -plot_types bar,bar,bar,bar
+    quast_2_table.py *quast.tsv -o Quast_to_plot.tsv -col N50,N90,"Total length","GC (%)","# contigs" -plot_types bar,bar,bar,bar,bar
 
     # Run summary plot
-    plot_tree_summary.R tree.nw Busco_combined Quast_to_plot.tsv
+    plot_tree_summary.R tree.nw Busco_combined Quast_to_plot.tsv gene_stats.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
