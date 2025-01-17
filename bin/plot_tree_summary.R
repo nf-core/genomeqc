@@ -5,7 +5,7 @@
 
 #--------FUNCTIONS-------#
 
-# Function to rotate legends
+# Function to rotate legends (not used)
 rotate_grob <- function(grob, angle) {
   gTree(children = gList(grob), vp = viewport(angle = angle))
 }
@@ -13,7 +13,7 @@ rotate_grob <- function(grob, angle) {
 # Function to plot tree and plots
 build_tree_plot <- function(tree, n, plots, legends, xlimit, rigth_margin, bottom_margin) { #xlim for legends, use same xlim as barplots (new_xlim)
   # Update xlim for the tree plot
-  tree <- tree + ggplot2::xlim(0, n * max(tree$data$branch.length))
+  tree <- tree + ggplot2::xlim(0, n)
   
   # Initialize combined plot with the tree
   combined_plots <- tree
@@ -72,10 +72,8 @@ parser$add_argument('busco_file', type = 'character', help = 'Path to processed 
 parser$add_argument('quast_file', type = 'character', help = 'Path to processed Quast output file')
 parser$add_argument('genes_file', type = 'character', help = 'Path to gene stats output file')
 parser$add_argument('--text_size', type = 'double', default = 3, help = 'Text size for the plots')
-parser$add_argument('--tree_size', type = 'double', default = 4.5, help = 'x axis width for tree plot')
+parser$add_argument('--tree_size', type = 'double', default = 0.0005, help = 'Change x axis limits for tree plot (useful when tree labels appear truncated)')
 args <- parser$parse_args()
-
-#setwd("/Users/fernando/work/repositories/pipelines/make_better_tree_plot")
 
 # Avoid scientific notation in all plots
 options(scipen = 999)
@@ -116,6 +114,8 @@ data_quast <- data_quast %>%
   filter(N50 != "bar") %>%
   # Total length values to Mb
   mutate(Total.length = (as.numeric(Total.length)/1000000)) %>%
+  #Change Sequence values to integers
+  mutate(Sequences = as.integer(Sequences)) %>%
   # Create new col with numbers of GC bp
   mutate(GC = as.numeric(Total.length)*as.numeric(GC)/100) %>%
   # Rename column to make it shorter
@@ -225,8 +225,8 @@ len_plot <- ggplot(
     position = position_stack(reverse = TRUE),
     width = 0.7
   ) + 
-  scale_fill_manual(values = c("brown1", "cornflowerblue")) +
-  ggtitle("Genome\nsize") +
+  scale_fill_manual(labels = c("GC %", "Length"), values = c("brown1", "cornflowerblue")) +
+  ggtitle("Genome\nsize (Mb)") +
   barplots_theme +
   theme(plot.title = element_text(size = 9, hjust = 0.5, vjust = -5)) +
   coord_flip() + #Flip plot
@@ -260,7 +260,7 @@ n50_plot <- ggplot(
     width = 0.7,
     fill = "steelblue"
   ) + 
-  ggtitle("N50") +
+  ggtitle("N50 (Mb)") +
   barplots_theme +
   theme(plot.title = element_text(size = 9, hjust = 0.5, vjust = -0.4)) +
   coord_flip() +
@@ -359,11 +359,7 @@ new_ylim <- ylim(c(min(p_ranges_y), max(p_ranges_y)))
 # using coord_flip()
 new_xlim <- xlim(c(min(p_ranges_y), max(p_ranges_y)))
 
-#n=5
-
-#tree_plot <- tree_plot + ggplot2::xlim(0, n*max(tree2$edge.length)) + new_ylim
-
-# Set new ylim for chromosome tree
+# Set new ylim for sequnces
 ch_plot <- ch_plot + new_ylim
 
 # Set new xlim for Quast genome size (equivalent to ylim)
@@ -382,20 +378,22 @@ gene_plot <- gene_plot + new_xlim
 tree_plot <- ggtree(tree) +
   # Tip font size, should be an arg
   geom_tiplab(size=3, fontface = "italic", align = TRUE) +
-  # This avoids the cropping of tips, it takes into consideration
-  # the max edge length to set the xlim
-  # This is later reset, the value here is for tree alone
-  # Might need to be increased a bit
-  ggplot2::xlim(0, 5*max(tree$edge.length)) + #2.5 as default
-  theme(plot.margin = margin(10, 10, 10, 10))  # Increase margins
+  theme(plot.margin = margin(10, 10, 10, 10)) + # Increase margins
+  coord_cartesian(clip="off")
 
 # Set new ylim and xlim for tree
 tree_plot <- tree_plot + new_ylim
 
+# Set value for tree xlim to avoid the truncation of labels:
+# Why "^2*0.001"? ^2 is because the relatin between number of characters and the number
+# of pixels is close to beexponential, not proportional. 0.001 would be the length
+# per character in the x axis scale. Script should allow to change this value
+m = max(tree_plot$data$x) + max(nchar(tree_plot$data$label))^2*args$tree_size
+
 # Call the function
 final_plot <- build_tree_plot(
   tree = tree_plot,
-  n = args$tree_size, # Only affects tree_plot (default 4.5)
+  n = m, # Only affects tree_plot
   plots = list(ch_plot, len_plot, gene_plot, n50_plot, pies_plot),
   legends = list(NULL, legend_len, legend_gene, NULL, legend_busco),
   new_xlim,
