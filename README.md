@@ -14,50 +14,54 @@
 
 The pipeline takes a list of genomes and annotations (from raw files or Refseq IDs), and runs commonly used tools to assess their quality.
 
-There are three different ways you can run this pipeline. 1. Genome only, 2. Annotation only, or 3. Genome and Annotation. **Only Genome plus Annotation is functional**
+There are three different ways you can run this pipeline. 1. Genome only, 2. Annotation only, or 3. Genome and Annotation. **Currently, only Genome plus Annotation is functional**
 
 <!-- TODO nf-core:
 For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#introduction
 -->
 
 <!-- TODO nf-core: Include a figure that guides the user through the major workflow steps. Many nf-core
-     workflows use the "tube map" design for that. See https://nf-co.re/docs/contributing/design_guidelines#examples for examples.   
+     workflows use the "tube map" design for that. See https://nf-co.re/docs/contributing/design_guidelines#examples for examples.
 -->
 
-**Genome and Annnotation:**
+**Genome and Annotation:**
 1. Downloads the genome and gene annotation files from NCBI `[NCBIGENOMEDOWNLOAD]` - Or you provide your own genomes/annotations
 2. Describes genome assembly:
-2a. `[BUSCO_BUSCO]`: Determines how complete is the genome compared to expected (protein mode).
-2b. `[BUSCO_IDEOGRAM]`: Plots the location of BUSCO markers on the assembly.
-2c. `[QUAST]`: Determines the N50, how contiguous the genome is.
-2d. More options
-3. Describes your annotation : `[AGAT]`: Gene, feature, length, averages, counts. 
-4. Extract longest protein fasta sequences `[GFFREAD]`.
-5. Finds orthologous genes `[ORTHOFINDER]`.
-6. Summary with MulitQC.
-
-> [!WARNING]
-> We strongly suggest users to specify the lineage using the `--busco_lineage` parameter, as setting the lineage to `auto` (default value) might cause problems with `[BUSCO]` during the leneage determination step.
-
-> [!NOTE]
-> `BUSCO_IDEOGRAM` will only plot those chromosomes -or scaffolds- that contain single copy markers.
+   1. `[BUSCO_BUSCO]`: Determines how complete is the genome compared to expected number of single copy markers (protein mode).
+   2. `[BUSCO_IDEOGRAM]`: Plots the location of markers on the assembly.
+   3. `[QUAST]`: Computes contiguity and integrity statistics: N50, N90, GC%, number of sequences.
+   4. More options...
+3. Describes annotation : `[AGAT]`: Gene, feature, length, averages, counts.
+4. Finds the number of overlapping genes `[GENE_OVERLAPS]`.
+5. Extracts longest protein isoform `[GFFREAD]`.
+6. Finds orthologous genes `[ORTHOFINDER]`.
+7. Plots an orthology-based phylogenetic tree `[TREE_SUMMARY]`, as well as other relevant stats from the above steps.
+8. Summary with MulitQC `[MULTIQC]`.
 
 **Genome Only (in development):**
 1. Downloads the genome files from NCBI `[NCBIGENOMEDOWNLOAD]` - Or you provide your own genomes
 2. Describes genome assembly:
-2a. `[BUSCO_BUSCO]`: Determines how complete is the genome compared to expected (genome mode).
-2b. `[QUAST]`: Determines the N50, how contiguous the genome is.
-2c. More options
-3. Summary with MulitQC.
+   1. `[BUSCO_BUSCO]`: Determines how complete is the genome compared to expected number of single copy markers (protein mode).
+   2. `[BUSCO_IDEOGRAM]`: Plots the location of markers on the assembly.
+   3. `[QUAST]`: Computes contiguity and integrity stats: N50, N90, GC%, number of sequences.
+3. Summary with MulitQC `[MULTIQC]`.
 
 **Annnotation Only (in development):**
 1. Downloads the gene annotation files from NCBI `[NCBIGENOMEDOWNLOAD]` - Or you provide your own annotations.
 2. Describes your annotation : `[AGAT]`: Gene, feature, length, averages, counts.
 3. Summary with MulitQC.
 
-In addition to the three different modes described above, it is also possible to run the pipeline with or without sequencing reads. When supplying sequencing reads, Merqury can also be run. [Merqury](https://github.com/marbl/merqury) is a tool for genome quality assessment that uses k-mer counts from raw sequencing data to evaluate the accuracy and completeness of a genome assembly. Meryl is the companion tool that efficiently counts and stores k-mers from sequencing reads, enabling Merqury to estimate metrics like assembly completeness and base accuracy. These tools provide a k-mer-based approach to assess assembly quality, helping to identify potential errors or gaps.​
+**Merqury**
+
+Optionally, user can also run the pipeline **Genome only** and **Genome and Annotation** pipelines with **Merqury** by supplying sequencing reads (in _fastq_ format). [Merqury](https://github.com/marbl/merqury) is a tool for genome quality assessment that uses k-mer counts from raw sequencing data to evaluate the accuracy and completeness of a genome assembly. Meryl is the companion tool that enables Merqury to estimate metrics like assembly completeness and base accuracy. These tools provide a k-mer-based approach to assess assembly quality, helping to identify potential errors or gaps.​
 
 To run the pipeline with reads, you must supply a single FASTQ file for each genome in the samplesheet, alongside the `--run_merqury` flag. It is assumed that reads used to create the assembly are from long read technology such as PacBio or ONT, and are therefore single end. If reads are in a .bam file, they must be converted to FASTQ format first. If you have paired end reads, these must be interleaved first.
+
+> [!WARNING]
+> We strongly suggest users to specify the lineage using the `--busco_lineage` parameter, as setting the lineage to `auto` (value by default) might cause problems with `[BUSCO]` during the lineage determination step.
+
+> [!NOTE]
+> `BUSCO_IDEOGRAM` will only plot those chromosomes -or scaffolds- that contain single copy markers.
 
 ## Usage
 
