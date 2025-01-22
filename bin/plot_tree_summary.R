@@ -1,33 +1,26 @@
 #!/usr/bin/Rscript
 
-# Written by Chris Wyatt and Fernando Duarte and released under the MIT license. 
-# Plots the phylogenetic tree with BUSCO result in pie charts and Quast
-
-#--------FUNCTIONS-------#
-
-# Function to rotate legends (not used)
-rotate_grob <- function(grob, angle) {
-  gTree(children = gList(grob), vp = viewport(angle = angle))
-}
+# Written by Chris Wyatt and Fernando Duarte and released under the MIT license.
+# Plots the phylogenetic tree with BUSCO, Quast and gene stats results
 
 # Function to plot tree and plots
 build_tree_plot <- function(tree, n, plots, legends, xlimit, rigth_margin, bottom_margin) { #xlim for legends, use same xlim as barplots (new_xlim)
   # Update xlim for the tree plot
   tree <- tree + ggplot2::xlim(0, n)
-  
+
   # Initialize combined plot with the tree
   combined_plots <- tree
   widths <- c(10 - length(plots)) # Dynamic width for the tree
-  
+
   # Add each additional plot
   for (plot in plots) {
     combined_plots <- combined_plots | plot
     widths <- c(widths, 1) # Same widths for plots and legends
   }
-  
+
   # Initialize combined legends with empty plot aligned w/ tree
   combined_legends <- plot_spacer() + xlimit
-  
+
   # Add each additional legend
   for (legend in legends) {
     if (length(legend) != 0) {
@@ -37,33 +30,29 @@ build_tree_plot <- function(tree, n, plots, legends, xlimit, rigth_margin, botto
     }
     combined_legends <- combined_legends | legend
   }
-  
+
   # Apply the layout widths
   combined_plots <- combined_plots + plot_layout(widths = widths)
-  
-  combined_legends <- combined_legends + 
-    plot_layout(widths = widths) + 
+
+  combined_legends <- combined_legends +
+    plot_layout(widths = widths) +
     theme(plot.margin = margin(0, rigth_margin, bottom_margin, 0))
-  #theme(plot.margin = margin(0, 15, 60, 0))
-  
-  combined_plots <- combined_plots / combined_legends + 
+
+  combined_plots <- combined_plots / combined_legends +
     plot_layout(heights = c(0.99, 0.01))
-  
+
   return(combined_plots)
 }
 
+# Load libraries
 library(ggtree)
 library(ggplot2)
-#library(cowplot)
 library(patchwork)
 library(argparse)
 library(dplyr)
 library(tidyr)
-#library(ggtreeExtra)
 library(scatterpie)
 library(scales)
-#library(grid)
-#library(gridExtra)
 
 # Parse command-line arguments
 parser <- ArgumentParser(description = 'Plot phylogenetic tree with statistics and true/false data')
@@ -71,8 +60,10 @@ parser$add_argument('tree_file', type = 'character', help = 'Path to the Newick 
 parser$add_argument('busco_file', type = 'character', help = 'Path to processed BUSCO output file')
 parser$add_argument('quast_file', type = 'character', help = 'Path to processed Quast output file')
 parser$add_argument('genes_file', type = 'character', help = 'Path to gene stats output file')
-parser$add_argument('--text_size', type = 'double', default = 3, help = 'Text size for the plots')
-parser$add_argument('--tree_size', type = 'double', default = 0.0005, help = 'Change x axis limits for tree plot (useful when tree labels appear truncated)')
+parser$add_argument('--text_size', type = 'double', default = 3, help = 'Text size for the tree plot')
+parser$add_argument('--tree_scale', type = 'double', default = 0.0005, help = 'x axis limits scaling for tree plot (useful when tree labels appear truncated)')
+parser$add_argument('--bar_width', type = 'double', default = 0.7, help = 'Width of bar plots')
+parser$add_argument('--rad_width', type = 'double', default = 0.4, help = 'Radius of pie charts')
 args <- parser$parse_args()
 
 # Avoid scientific notation in all plots
@@ -85,8 +76,16 @@ tree <- read.tree(args$tree_file)
 tree$tip.label <- trimws(tree$tip.label)
 tree$tip.label <- tolower(tree$tip.label)
 
+# If radious of pie charts is to big, it can
+# mess the position of the pies, make them
+# smaller
+if (length(tree$tip.label) < 7) {
+  args$bar_width <- args$bar_width/1.5
+  args$rad_width <- args$rad_width/2
+}
+
 # Capitalize first letter of tip labels
-tree$tip.label <- sub("^(\\w)(.*)", "\\U\\1\\L\\2", tree$tip.label, perl = TRUE) 
+tree$tip.label <- sub("^(\\w)(.*)", "\\U\\1\\L\\2", tree$tip.label, perl = TRUE)
 
 # Read the data table from the file, ensuring species column is read as character
 # Load BUSCO
@@ -133,18 +132,24 @@ data_genes <- data_genes %>%
   # Remove prefix and suffix
   mutate(species = gsub("Count\\.|\\.tsv", "", species))
 
+# Extract names for debugging
+tree_sp <- sort(tree$tip.label)
+quast_sp <- sort(unique(data_quast$species))
+busco_sp <- sort(data_busco$species)
+gene_sp <- sort(unique(data_genes$species))
+
 # Debugging: Print species names from the tree and the data
 cat("Species names in the tree based on nw:\n")
-print(tree$tip.label)
+print(tree_sp )
 cat("\nSpecies names in data tables:\n")
-quast_sp <- unique(data_quast$species)
-cat("BUSCO:", data_busco$species, "\nQUAST:", quast_sp)
+cat("BUSCO:", busco_sp, "\nQUAST:", quast_sp, "\ngene_stats:", gene_sp)
 
 # Debugging: Check if there are any mismatches in species names
-if (all(sort(tree$tip.label) != sort(data_busco$species))) {
-  stop("Species names in BUSCO and tree labels do not match")
-} else if (all(sort(quast_sp) != sort(data_busco$species))) {
-  stop("Species names in Quast and tree labels do not match")
+datasets <- list(BUSCO = busco_sp, Quast = quast_sp, GeneStats = gene_sp)
+for (name in names(datasets)) {
+  if (any(tree_sp != datasets[[name]])) {
+    stop(paste("Species names in", name, "and tree labels do not match"))
+  }
 }
 
 # Get order of tips
@@ -168,8 +173,8 @@ data_genes <- data_genes %>%
 # For N50/N90
 data_quast_n5090 <- data_quast %>%
   # Convert wide to long format
-  pivot_longer(cols = c(N50, N90), 
-               names_to = "metric", 
+  pivot_longer(cols = c(N50, N90),
+               names_to = "metric",
                values_to = "value") %>%
   # Convert value column to numeric if needed
   mutate(value = as.numeric(value)) %>%
@@ -177,14 +182,14 @@ data_quast_n5090 <- data_quast %>%
 
 # For GC content and length
 data_quast_len <- data_quast %>%
-  pivot_longer(cols = c(GC, Length), 
-               names_to = "metric", 
+  pivot_longer(cols = c(GC, Length),
+               names_to = "metric",
                values_to = "value")
 
 # Tidy gene stats data
 data_genes <- data_genes %>%
-  pivot_longer(cols = c(Total, Overlapping), 
-               names_to = "stat", 
+  pivot_longer(cols = c(Total, Overlapping),
+               names_to = "stat",
                values_to = "value")
 
 # Add node column
@@ -196,7 +201,7 @@ tree$tip.label <- gsub("_", " ", tree$tip.label)
 
 # Plot number of chromosomes/sequences
 ch_plot <- ggplot(data_quast, aes(x=1, y=node)) +
-  geom_text(aes(label = Sequences)) + 
+  geom_text(aes(label = Sequences)) +
   theme_void() +
   ggtitle("Sequence\nnumber") +
   theme(plot.title = element_text(size = 9, hjust = 0.5, vjust = -2.2))
@@ -206,8 +211,8 @@ barplots_theme <- theme_classic() +
   theme(
     axis.text.y=element_blank(),
     axis.text.x = element_text(angle = 60, vjust = 1, hjust = 1, size = 6),
-    axis.ticks.y=element_blank(), 
-    axis.line.x = element_line(), 
+    axis.ticks.y=element_blank(),
+    axis.line.x = element_line(),
     axis.line.y = element_blank()
   )
 
@@ -217,14 +222,14 @@ data_quast_n50 <- data_quast_n5090[data_quast_n5090$metric %in% "N50",]
 
 # Plot Quast data genome size
 len_plot <- ggplot(
-  data_quast_len, 
+  data_quast_len,
   aes(y=value, x=node)
 ) +
   geom_col(
     aes(fill=metric),
     position = position_stack(reverse = TRUE),
-    width = 0.7
-  ) + 
+    width = args$bar_width
+  ) +
   scale_fill_manual(labels = c("GC %", "Length"), values = c("brown1", "cornflowerblue")) +
   ggtitle("Genome\nsize (Mb)") +
   barplots_theme +
@@ -235,17 +240,17 @@ len_plot <- ggplot(
 
 # Extract legend
 legend_len <- cowplot::get_legend(
-  len_plot + 
+  len_plot +
     theme(legend.position = "right",
           legend.justification = c(0, 1.2), # This is what actually move the legend, play with it, default position is c(1,0.5)
-          legend.title = element_blank(), 
-          legend.key.size = unit(0.2, "cm"), 
+          legend.title = element_blank(),
+          legend.key.size = unit(0.2, "cm"),
           legend.background = element_rect(fill = NA),
           legend.text = element_text(size = 8))
 )
 
 # Display the legend alone
-cowplot::ggdraw() + cowplot::draw_grob(legend_len)
+#cowplot::ggdraw() + cowplot::draw_grob(legend_len)
 
 # Remove legend
 len_plot <- len_plot + guides(fill="none")
@@ -257,9 +262,9 @@ n50_plot <- ggplot(
 ) +
   geom_col(
     position = position_stack(reverse = TRUE), # For GC%
-    width = 0.7,
+    width = args$bar_width,
     fill = "steelblue"
-  ) + 
+  ) +
   ggtitle("N50 (Mb)") +
   barplots_theme +
   theme(plot.title = element_text(size = 9, hjust = 0.5, vjust = -0.4)) +
@@ -273,7 +278,7 @@ n50_plot <- n50_plot + guides(fill="none")
 # Create the scatterpie plot
 pies_plot <- ggplot() +
   geom_scatterpie(
-    aes(x = 1, y = node, group = species, r = 0.4),  # r determines the radius of the pies
+    aes(x = 0, y = node, group = species, r = args$rad_width),  # r determines the radius of the pies
     data = data_busco,
     cols = c("Single", "Duplicated", "Fragmented", "Missing"),
     color = NA
@@ -286,18 +291,18 @@ pies_plot <- ggplot() +
 
 # Extract legend
 legend_busco <- cowplot::get_legend(
-  pies_plot + 
+  pies_plot +
     #guides(fill=guide_legend(ncol=2)) +
-    theme(legend.position = "right", 
-          legend.justification = c(2.5, 1.08),
-          legend.title = element_blank(), 
-          legend.key.size = unit(0.2, "cm"), 
+    theme(legend.position = "right",
+          legend.justification = c(0, 1.08),
+          legend.title = element_blank(),
+          legend.key.size = unit(0.2, "cm"),
           #legend.background = element_rect(fill = NA), # I don't know why this doesn't work, if I set this to NA an outline appears around the legend
           legend.text = element_text(size = 8))
 )
 
 # Display the legend alone
-cowplot::ggdraw() + cowplot::draw_grob(legend_busco)
+#cowplot::ggdraw() + cowplot::draw_grob(legend_busco)
 
 # Remove lenged for pieplot
 pies_plot <- pies_plot + guides(fill="none")
@@ -305,14 +310,14 @@ pies_plot <- pies_plot + guides(fill="none")
 # Plot gene stats
 
 gene_plot <- ggplot(
-  data_genes, 
+  data_genes,
   aes(y=value, x=node)
 ) +
   geom_col(
     aes(fill=stat),
     position = position_stack(reverse = TRUE),
-    width = 0.7
-  ) + 
+    width = args$bar_width
+  ) +
   scale_fill_manual(values = c("indianred1", "lightsteelblue")) +
   ggtitle("Gene\nnumber") +
   barplots_theme +
@@ -325,17 +330,17 @@ gene_plot <- ggplot(
 
 # Extract legend
 legend_gene <- cowplot::get_legend(
-  gene_plot + 
+  gene_plot +
     theme(legend.position = "right",
           legend.justification = c(0, 1.2),
-          legend.title = element_blank(), 
-          legend.key.size = unit(0.2, "cm"), 
+          legend.title = element_blank(),
+          legend.key.size = unit(0.2, "cm"),
           legend.background = element_rect(fill = NA),
           legend.text = element_text(size = 8))
 )
 
 # Display the legend alone
-cowplot::ggdraw() + cowplot::draw_grob(legend_gene)
+#cowplot::ggdraw() + cowplot::draw_grob(legend_gene)
 
 # Remove legend from pie plot
 pies_plot <- pies_plot + guides(fill="none")
@@ -355,7 +360,7 @@ p_ranges_y <- c(
 # Set new ylim based on the highest value taking into account both plots
 # Add -0,1 and 0.5 to avoid the cropping of first and last pies
 new_ylim <- ylim(c(min(p_ranges_y), max(p_ranges_y)))
-# A new xlim is needed for barplots (equivalent to ylim), as these are flipped 
+# A new xlim is needed for barplots (equivalent to ylim), as these are flipped
 # using coord_flip()
 new_xlim <- xlim(c(min(p_ranges_y), max(p_ranges_y)))
 
@@ -388,7 +393,7 @@ tree_plot <- tree_plot + new_ylim
 # Why "^2*0.001"? ^2 is because the relatin between number of characters and the number
 # of pixels is close to beexponential, not proportional. 0.001 would be the length
 # per character in the x axis scale. Script should allow to change this value
-m = max(tree_plot$data$x) + max(nchar(tree_plot$data$label))^2*args$tree_size
+m = max(tree_plot$data$x) + max(nchar(tree_plot$data$label))^2*args$tree_scale
 
 # Call the function
 final_plot <- build_tree_plot(
@@ -404,35 +409,3 @@ final_plot <- build_tree_plot(
 pdf("tree_plot.pdf")
 final_plot
 dev.off()
-
-######OLD CODE#####
-# Now to add annotations. This is a random example
-
-#Vspecies_sy <- data_busco[c(1,5,8,15,17),]$species
-#species_sy <- gsub("_", " ", species_sy)
-
-#tree_plot2 <- tree_plot
-
-#tree_plot2$data$label <- ifelse(tree_plot2$data$label %in% species_sy, paste0(tree_plot2$data$label, "  *"), tree_plot2$data$label)
-
-#annotation$offset <- 0.35
-
-#tree_plot2 <- tree_plot + geom_point(data = annotation, aes(x = offset+0.35, y = node), shape = 18, color = "green3", size = 3)
-# Padding label names for right alignment
-#padding_labels <- data.frame(label = tree$tip.label, 
-#                             newlabel = label_pad(tree$tip.label),
-#                             newlabel2 = label_pad(tree$tip.label, pad = " "))
-# Plot the phylogenetic tree prob not necessary
-#tree_plot <- ggtree(tree) %<+% padding_labels
-
-#tree_plot <- tree_plot +
-  # Tip font size, should be an arg
-#  geom_tiplab(aes(label=newlabel2), size=3, family='mono', fontface = "italic", align = TRUE, linetype = NULL) +
-  # This avoids the cropping of tips, it takes into consideration
-  # the max edge length to set the xlim
-  # This is later reset, the value here is for tree alone
-  # Might need to be increased a bit
-#  ggplot2::xlim(0, 5*max(tree2$edge.length)) + #2.5 as default
-#  theme(plot.margin = margin(10, 10, 10, 10))  # Increase margins
-
-#tree_plot

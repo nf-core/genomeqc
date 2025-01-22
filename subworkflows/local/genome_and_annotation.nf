@@ -9,7 +9,6 @@ include { GFFREAD                             } from '../../modules/nf-core/gffr
 include { ORTHOFINDER                         } from '../../modules/nf-core/orthofinder/main'
 include { FASTAVALIDATOR                      } from '../../modules/nf-core/fastavalidator/main'
 include { GENE_OVERLAPS                       } from '../../modules/local/gene_overlaps'
-include { NUMBER_SEQS                         } from '../../modules/local/number_seqs'
 
 workflow GENOME_AND_ANNOTATION {
 
@@ -58,15 +57,6 @@ workflow GENOME_AND_ANNOTATION {
                          gff_unfilt : gff_unfilt ? tuple( meta, file(gff_unfilt) ) : null // channel: [ val(meta), [ gff ] ], unfiltered
                          gff_filt   : gff_filt   ? tuple( meta, file(gff_filt)   ) : null // channel: [ val(meta), [ gff ] ], filtered for longest isoform
                  }
-
-    //
-    // Check number of sequences
-    //
-
-    NUMBER_SEQS (
-        ch_input.fasta
-    )
-    ch_tree_data = ch_tree_data.mix(NUMBER_SEQS.out.n_seqs.collect { meta, file -> file })
 
     //
     // Run AGAT Spstatistics
@@ -160,14 +150,14 @@ workflow GENOME_AND_ANNOTATION {
 
     // Prepare BUSCO output
     ch_busco_full_table = BUSCO_BUSCO.out.full_table
-                            .map { meta, full_tables ->
-                                def lineages = full_tables.toString().split('/')[-2].replaceAll('run_', '').replaceAll('_odb\\d+', '')
-                                [meta.id, lineages, full_tables]
-                            }
-                            .groupTuple(by: 0)
-                            .map { id, lineages, full_tables ->
-                                [id, lineages.flatten(), full_tables.flatten()]
-                            }
+                        | map { meta, full_tables ->
+                            def lineages = full_tables.toString().split('/')[-2].replaceAll('run_', '').replaceAll('_odb\\d+', '')
+                            [meta.id, lineages, full_tables]
+                        }
+                        | groupTuple(by: 0)
+                        | map { id, lineages, full_tables ->
+                            [id, lineages.flatten(), full_tables.flatten()]
+                        }
 
     // Add genome to channel
     fnaChannel_busco    = ch_input.fasta
