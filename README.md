@@ -155,8 +155,8 @@ ecoflow/genomeqc was originally written by [Chris Wyatt](https://github.com/chri
 We thank the following people for their extensive assistance in the development of this pipeline:
 
 - [Stephen Turner](https://github.com/stephenturner/) ([Colossal Biosciences](https://colossal.com/))
-- [LaurenHuet](https://github.com/LaurenHuet)
-- [Felipe Perez Cobos](https://github.com/fperezcobos)
+- [Lauren Huet](https://github.com/LaurenHuet) ([Schmidt Ocean Institute](https://schmidtocean.org/))
+- [Felipe Perez Cobos](https://github.com/fperezcobos) ([Institute of Agrifood Research and Technology](https://www.irta.cat/en/))
 
 <!-- TODO nf-core: If applicable, make list of people who have also contributed -->
 
