@@ -1,3 +1,5 @@
+# ![nf-core/genomeqc](docs/images/nf-core-genomeqc_logo_light.png#gh-light-mode-only) ![nf-core/genomeqc](docs/images/nf-core-genomeqc_logo_dark.png#gh-dark-mode-only)
+
 [![GitHub Actions CI Status](https://github.com/ecoflow/genomeqc/actions/workflows/ci.yml/badge.svg)](https://github.com/ecoflow/genomeqc/actions/workflows/ci.yml)
 [![GitHub Actions Linting Status](https://github.com/ecoflow/genomeqc/actions/workflows/linting.yml/badge.svg)](https://github.com/ecoflow/genomeqc/actions/workflows/linting.yml)[![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXXX-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.XXXXXXX)
 [![nf-test](https://img.shields.io/badge/unit_tests-nf--test-337ab7.svg)](https://www.nf-test.com)
@@ -28,6 +30,8 @@ For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#intr
 <!-- TODO nf-core: Include a figure that guides the user through the major workflow steps. Many nf-core
      workflows use the "tube map" design for that. See https://nf-co.re/docs/contributing/design_guidelines#examples for examples.
 -->
+
+![pipeline_diagram](docs/images/nf-core-genomeqc_metro_map.png)
 
 **1. Genome and Annotation:**
 1. Downloads the genome and gene annotation files from NCBI `[NCBIGENOMEDOWNLOAD]` - Or you provide your own genomes/annotations
