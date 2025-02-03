@@ -36,38 +36,35 @@ For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#intr
 **1. Genome and Annotation:**
 1. Downloads the genome and gene annotation files from NCBI `[NCBIGENOMEDOWNLOAD]` - Or you provide your own genomes/annotations
 2. Describes genome assembly:
-   1. `[BUSCO_BUSCO]`: Determines how complete is the genome compared to expected number of single copy markers (protein mode).
+   1. `[BUSCO_BUSCO]`: Evaluates genome completness based on **single copy markers**.
    2. `[BUSCO_IDEOGRAM]`: Plots the location of markers on the assembly.
-   3. `[QUAST]`: Computes contiguity and integrity statistics: N50, N90, GC%, number of sequences.
-   4. More options...
-3. Describes annotation : `[AGAT]`: Gene, feature, length, averages, counts.
+   3. `[MERQURY]` (optional): Evaluates genome completness based on sequencing reads.
+   4. `[TIDK]` (optional): Indetifies and visualises telomeric repeats.
+   5. `[QUAST]`: Computes contiguity and integrity statistics: N50, N90, GC%, number of sequences.
+   6. More options...
+3. Describes annotation : `[AGAT]`: Gene, feature, length, counts.
 4. Finds the number of overlapping genes `[GENE_OVERLAPS]`.
 5. Extracts longest protein isoform `[GFFREAD]`.
 6. Finds orthologous genes `[ORTHOFINDER]`.
 7. Plots an orthology-based phylogenetic tree `[TREE_SUMMARY]`, as well as other relevant stats from the above steps.
-8. Summary with MulitQC `[MULTIQC]`.
+8. Summary with `[MULTIQC]`.
 
 **2. Genome Only (in development):**
 1. Downloads the genome files from NCBI `[NCBIGENOMEDOWNLOAD]` - Or you provide your own genomes
 2. Describes genome assembly:
-   1. `[BUSCO_BUSCO]`: Determines how complete is the genome compared to expected number of single copy markers (protein mode).
+   1. `[BUSCO_BUSCO]`: Evaluates genome completness based on **single copy markers**.
    2. `[BUSCO_IDEOGRAM]`: Plots the location of markers on the assembly.
-   3. `[QUAST]`: Computes contiguity and integrity stats: N50, N90, GC%, number of sequences.
-3. Summary with MulitQC `[MULTIQC]`.
+   3. `[TIDK]` (optional): Indetfies and visualises telomeric repeats.
+   3. `[QUAST]`: Computes contiguity and integrity statistics: N50, N90, GC%, number of sequences.
+3. Summary with `[MULTIQC]`.
 
 **3. Annnotation Only (in development):**
 1. Downloads the gene annotation files from NCBI `[NCBIGENOMEDOWNLOAD]` - Or you provide your own annotations.
 2. Describes your annotation : `[AGAT]`: Gene, feature, length, averages, counts.
 3. Summary with MulitQC.
 
-**Run with Merqury**
-
-Optionally, users can also run the pipeline **Genome only** and **Genome and Annotation** pipelines with `[MERQURY]` by supplying sequencing reads in FASTQ format. [Merqury](https://github.com/marbl/merqury) is a tool for genome quality assessment that uses k-mer counts from raw sequencing data to evaluate the accuracy and completeness of a genome assembly.
-
-To run the pipeline with reads, you must supply a single FASTQ file for each genome in the samplesheet, alongside the `--run_merqury` flag. It is assumed that reads used to create the assembly are from long read technology such as PacBio or ONT, and are therefore single end. If reads are in a BAM file, they must be converted to FASTQ format first. If you have paired end reads, these must be interleaved first.
-
 > [!WARNING]
-> We strongly suggest users to specify the lineage using the `--busco_lineage` parameter, as setting the lineage to `auto` (value by default) might cause problems with `[BUSCO]` during the lineage determination step.
+> We strongly suggest users to specify the lineage using the `--busco_lineage` parameter, as setting the lineage to `auto` (default value) might cause problems with `[BUSCO]` during the lineage determination step.
 
 > [!NOTE]
 > `BUSCO_IDEOGRAM` will only plot those chromosomes -or scaffolds- that contain single copy markers.
@@ -94,7 +91,7 @@ When running on ``--genome_only`` mode, you can leave the `gff` field empty. Oth
 
 ### 2. Refseq IDs
 
-Additionally, you can run the pipeline using the Refseq IDs of the assemblies of interest using the `refseq` field, leaving the rest of the fields empty:
+Additionally, you can run the pipeline using the Refseq IDs of the assemblies of interest in the `refseq` field, leaving the rest of the fields empty:
 
 ```csv
 species,refseq,fasta,gff,fastq
@@ -104,7 +101,9 @@ Macaca_mulatta,GCF_003339765.1,,,
 
 ### Run the pipeline
 
+<!--
 You can mix the two input types **(in development)**.
+-->
 
 Run the pipeline using:
 
@@ -115,11 +114,11 @@ nextflow run nf-core/genomeqc \
    --outdir <OUTDIR>
 ```
 
-You can run the pipeline using test profiles or example input samplesheets:
+You can run the pipeline using a test dataset and parameters:
 
 ```bash
-nextflow run nf-core \
-   -profile docker,test \
+nextflow run nf-core/genomeqc \
+   -profile <docker/singularity/.../institute>,test \
    --outdir <OUTDIR>
 ```
 
@@ -127,7 +126,7 @@ nextflow run nf-core \
 
 ### Running with Merqury
 
-In order to run the pipeline with Mequry, users must provide the location of the FASTQ files in the `fastq` field:
+In order to run the pipeline with Mequry, users must provide at least the genome assemblies alongside the location of the FASTQ files in the `fastq` field:
 
 ```csv
 species,refseq,fasta,gff,fastq
@@ -138,11 +137,13 @@ Pan_paniscus,,/path/to/genome.fasta,/path/to/annotation.gff3,/path/to/reads.fq.g
 
 After supplying the reads, use the `--run_merqury` flag. Otherwise, this field will be ignored:
 
+```bash
 nextflow run nf-core/genomeqc \
    -profile <docker/singularity/.../institute> \
    --input samplesheet.csv \
    --outdir <OUTDIR>
-   `--run_merqury`
+   --run_merqury`
+```
 
 > [!WARNING]
 > Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_;
@@ -150,7 +151,9 @@ nextflow run nf-core/genomeqc \
 
 ## Pipeline output
 
-<!-- TODO nf-core:  -->
+To see the results of an example test run with a full size dataset refer to the [results](https://nf-co.re/genomeqc/results) tab on the nf-core website pipeline page.
+For more details about the output files and reports, please refer to the
+[output documentation](https://nf-co.re/genomeqc/output).
 
 ## Credits
 
