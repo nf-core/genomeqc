@@ -31,43 +31,43 @@ For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#intr
      workflows use the "tube map" design for that. See https://nf-co.re/docs/contributing/design_guidelines#examples for examples.
 -->
 
-![pipeline_diagram](docs/images/nf-core-genomeqc_metro_map.png)
+![pipeline_diagram](docs/images/nf-core-genomeqc_metro_map_v2.png)
 
 **1. Genome and Annotation:**
-1. Downloads the genome and gene annotation files from NCBI `[NCBIGENOMEDOWNLOAD]` - Or you provide your own genomes/annotations
+1. Downloads the genome and gene annotation files from NCBI: [NCBI genome download](https://github.com/kblin/ncbi-genome-download) - Or you provide your own genomes/annotations
 2. Describes genome assembly:
-   1. `[BUSCO_BUSCO]`: Evaluates genome completness based on **single copy markers**.
-   2. `[BUSCO_IDEOGRAM]`: Plots the location of markers on the assembly.
-   3. `[MERQURY]` (optional): Evaluates genome completness based on sequencing reads.
-   4. `[TIDK]` (optional): Indetifies and visualises telomeric repeats.
-   5. `[QUAST]`: Computes contiguity and integrity statistics: N50, N90, GC%, number of sequences.
+   1. [BUSCO](https://busco.ezlab.org/): Evaluates genome completness based on **single copy markers**.
+   2. **BUSCO Ideogram**: Plots the location of markers on the assembly.
+   3. [Merqury](https://github.com/marbl/merqury) (optional): Evaluates genome completness based on sequencing reads.
+   4. [tidk](https://github.com/tolkit/telomeric-identifier) (optional): Indetifies and visualises telomeric repeats.
+   5. [QUAST](https://github.com/ablab/quast): Computes contiguity and integrity statistics: N50, N90, GC%, number of sequences.
    6. More options...
-3. Describes annotation : `[AGAT]`: Gene, feature, length, counts.
-4. Finds the number of overlapping genes `[GENE_OVERLAPS]`.
-5. Extracts longest protein isoform `[GFFREAD]`.
-6. Finds orthologous genes `[ORTHOFINDER]`.
-7. Plots an orthology-based phylogenetic tree `[TREE_SUMMARY]`, as well as other relevant stats from the above steps.
-8. Summary with `[MULTIQC]`.
+3. Describes annotation : [AGAT](https://agat.readthedocs.io/en/latest/): Gene, feature, length, counts.
+4. Finds the number of overlapping genes: **Gene Overlaps**.
+5. Extracts longest protein isoform: [GffRead](https://github.com/gpertea/gffread).
+6. Finds orthologous genes: [Orthofinder](https://github.com/davidemms/OrthoFinder).
+7. Plots an orthology-based phylogenetic tree : **Tee Summary**, as well as other relevant stats from the above steps.
+8. Summary with [MultiQC](http://multiqc.info).
 
 **2. Genome Only (in development):**
-1. Downloads the genome files from NCBI `[NCBIGENOMEDOWNLOAD]` - Or you provide your own genomes
+1. Downloads the genome files from NCBI: [NCBI genome download](https://github.com/kblin/ncbi-genome-download) - Or you provide your own genomes
 2. Describes genome assembly:
-   1. `[BUSCO_BUSCO]`: Evaluates genome completness based on **single copy markers**.
-   2. `[BUSCO_IDEOGRAM]`: Plots the location of markers on the assembly.
-   3. `[TIDK]` (optional): Indetfies and visualises telomeric repeats.
-   3. `[QUAST]`: Computes contiguity and integrity statistics: N50, N90, GC%, number of sequences.
-3. Summary with `[MULTIQC]`.
+   1. [BUSCO](https://busco.ezlab.org/): Evaluates genome completness based on **single copy markers**.
+   2. **BUSCO Ideogram**: Plots the location of markers on the assembly.
+   3. [tidk](https://github.com/tolkit/telomeric-identifier) (optional): Indetfies and visualises telomeric repeats.
+   3. [QUAST](https://github.com/ablab/quast): Computes contiguity and integrity statistics: N50, N90, GC%, number of sequences.
+3. Summary with [MultiQC](http://multiqc.info).
 
 **3. Annnotation Only (in development):**
-1. Downloads the gene annotation files from NCBI `[NCBIGENOMEDOWNLOAD]` - Or you provide your own annotations.
-2. Describes your annotation : `[AGAT]`: Gene, feature, length, averages, counts.
-3. Summary with MulitQC.
+1. Downloads the gene annotation files from NCBI: [NCBI genome download](https://github.com/kblin/ncbi-genome-download) - Or you provide your own annotations.
+2. Describes your annotation : [AGAT](https://agat.readthedocs.io/en/latest/): Gene, feature, length, averages, counts.
+3. Summary with [MultiQC](http://multiqc.info).
 
 > [!WARNING]
-> We strongly suggest users to specify the lineage using the `--busco_lineage` parameter, as setting the lineage to `auto` (default value) might cause problems with `[BUSCO]` during the lineage determination step.
+> We strongly suggest users to specify the lineage using the `--busco_lineage` parameter, as setting the lineage to `auto` (default value) might cause problems with `BUSCO` during the lineage determination step.
 
 > [!NOTE]
-> `BUSCO_IDEOGRAM` will only plot those chromosomes -or scaffolds- that contain single copy markers.
+> `BUSCO Ideogram` will only plot those chromosomes -or scaffolds- that contain single copy markers.
 
 ## Usage
 
@@ -114,7 +114,7 @@ nextflow run nf-core/genomeqc \
    --outdir <OUTDIR>
 ```
 
-You can run the pipeline using a test dataset and parameters:
+You can run the pipeline using a test profile:
 
 ```bash
 nextflow run nf-core/genomeqc \
@@ -123,27 +123,6 @@ nextflow run nf-core/genomeqc \
 ```
 
 <!-- TODO nf-core: update the following command to include all required parameters for a minimal example -->
-
-### Running with Merqury
-
-In order to run the pipeline with Mequry, users must provide at least the genome assemblies alongside the location of the FASTQ files in the `fastq` field:
-
-```csv
-species,refseq,fasta,gff,fastq
-Homo_sapiens,,/path/to/genome.fasta,/path/to/annotation.gff3,/path/to/reads.fq.gz
-Gorilla_gorilla,,/path/to/genome.fasta,/path/to/annotation.gff3,/path/to/reads.fq.gz
-Pan_paniscus,,/path/to/genome.fasta,/path/to/annotation.gff3,/path/to/reads.fq.gz
-```
-
-After supplying the reads, use the `--run_merqury` flag. Otherwise, this field will be ignored:
-
-```bash
-nextflow run nf-core/genomeqc \
-   -profile <docker/singularity/.../institute> \
-   --input samplesheet.csv \
-   --outdir <OUTDIR>
-   --run_merqury`
-```
 
 > [!WARNING]
 > Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_;
@@ -189,3 +168,6 @@ This pipeline uses code and infrastructure developed and maintained by the [nf-c
 > Philip Ewels, Alexander Peltzer, Sven Fillinger, Harshil Patel, Johannes Alneberg, Andreas Wilm, Maxime Ulysse Garcia, Paolo Di Tommaso & Sven Nahnsen.
 >
 > _Nat Biotechnol._ 2020 Feb 13. doi: [10.1038/s41587-020-0439-x](https://dx.doi.org/10.1038/s41587-020-0439-x).
+
+
+python  app/downloader-utility.py --clade "Chordata" --project_name "DToL" --data_status "Mapped Reads - Done" --experiment_type "Chromium genome"  --download_location "/Users/raheela/Documents" --download_option "assemblies" --species_list "Apamea sordens,Bufo bufo"
