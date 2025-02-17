@@ -79,6 +79,8 @@ It will use a known telomeric repeat as input string, and will find occurrences 
 
 To run nf-core/genomeqc with idk, the flag `--run_tidk` must be provided.
 
+![output_example_tidk](images/output_example/meles_meles_tidk.png)
+
 ### Merqury
 
 [Merqury](https://github.com/marbl/merqury) uses k-mers from sequencing reads to evaluate the assembly quality and completness without the need of a high quality reference.
@@ -164,8 +166,10 @@ It outputs a report with completness stats, and a summarized table with these st
 - `busco/`
   - `short_summary.specific.<busco_db>.<species_name>.fasta.txt` Completness report in tsv format
   - `<species_name>-<busco_db-busco.batch_summary.txt`: Summarized completness report in tsv format
-
+  - `<species_name>.lineage.png` Ideogram with the location of single copy markers
 </details>
+
+![output_example_busco](images/output_example/taurulus_bubalis_ideogram.png)
 
 ### Orthofinder
 
@@ -183,6 +187,8 @@ The idea of the tree summary is to give some phylogenetic context to the quality
   - `tree_plot.pdf` Tree summary with quality statistics
 
 </details>
+
+![output_example_tree](images/output_example/tree_plot.png)
 
 ### MultiQC
 
