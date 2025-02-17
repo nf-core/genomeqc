@@ -2,6 +2,7 @@
 
 # Code written by Chris Wyatt with some editing by ChatGPT
 
+library(dplyr)
 library(GenomicRanges)
 
 # Parse command-line arguments
@@ -19,6 +20,9 @@ read_gff_to_granges <- function(gff_file) {
     gff_data <- read.delim(gff_file, header = FALSE, comment.char = "#")
     colnames(gff_data) <- c("seqname", "source", "feature", "start", "end",
                             "score", "strand", "frame", "attribute")
+    gff_data <- gff_data %>%
+      filter(strand %in% c("-","+")) 
+
     gr <- GRanges(
         seqnames = gff_data$seqname,
         ranges = IRanges(start = gff_data$start, end = gff_data$end),
@@ -67,7 +71,6 @@ for (i in seq_len(length(overlap_results))) {
     if (query_idx != subject_idx) {
         query_gene <- genes[query_idx]
         subject_gene <- genes[subject_idx]
-
         overlap_range <- intersect(ranges(query_gene), ranges(subject_gene))
         overlap_length <- width(overlap_range)
 
