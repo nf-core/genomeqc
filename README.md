@@ -36,14 +36,16 @@ For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#intr
 **1. Genome and Annotation:**
 1. Downloads the genome and gene annotation files from NCBI: [NCBI genome download](https://github.com/kblin/ncbi-genome-download) - Or you provide your own genomes/annotations
 2. Describes genome assembly:
-   1. [BUSCO](https://busco.ezlab.org/): Evaluates genome completness based on **single copy markers**.
+   1. [BUSCO](https://busco.ezlab.org/): Evaluates genome completeness based on **single copy markers**.
    2. **BUSCO Ideogram**: Plots the location of markers on the assembly.
-   3. [Merqury](https://github.com/marbl/merqury) (optional): Evaluates genome completness based on sequencing reads.
+   3. [Merqury](https://github.com/marbl/merqury) (optional): Evaluates genome completeness based on sequencing reads.
    4. [tidk](https://github.com/tolkit/telomeric-identifier) (optional): Indetifies and visualises telomeric repeats.
    5. [QUAST](https://github.com/ablab/quast): Computes contiguity and integrity statistics: N50, N90, GC%, number of sequences.
    6. More options...
-3. Describes annotation : [AGAT](https://agat.readthedocs.io/en/latest/): Gene, feature, length, counts.
-4. Finds the number of overlapping genes: **Gene Overlaps**.
+3. Describes annotation : 
+   1. [AGAT](https://agat.readthedocs.io/en/latest/): Number of genes, features, length...
+   2. **Gene Overlaps**: Finds the number of overlapping genes.
+   3. More options...
 5. Extracts longest protein isoform: [GffRead](https://github.com/gpertea/gffread).
 6. Finds orthologous genes: [Orthofinder](https://github.com/davidemms/OrthoFinder).
 7. Plots an orthology-based phylogenetic tree : **Tee Summary**, as well as other relevant stats from the above steps.
@@ -52,7 +54,7 @@ For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#intr
 **2. Genome Only (in development):**
 1. Downloads the genome files from NCBI: [NCBI genome download](https://github.com/kblin/ncbi-genome-download) - Or you provide your own genomes
 2. Describes genome assembly:
-   1. [BUSCO](https://busco.ezlab.org/): Evaluates genome completness based on **single copy markers**.
+   1. [BUSCO](https://busco.ezlab.org/): Evaluates genome completeness based on **single copy markers**.
    2. **BUSCO Ideogram**: Plots the location of markers on the assembly.
    3. [tidk](https://github.com/tolkit/telomeric-identifier) (optional): Indetfies and visualises telomeric repeats.
    3. [QUAST](https://github.com/ablab/quast): Computes contiguity and integrity statistics: N50, N90, GC%, number of sequences.

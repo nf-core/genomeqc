@@ -10,15 +10,13 @@
 
 ## Samplesheet input
 
-You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 5 columns, and a header row as shown in the examples below.
+Before running the pipeline, you will need to create a samplesheet with information about the samples you would like to analyse. Use this parameter to specify its location. It has to be a comma-separated file with 5 columns, and a header row as shown in the examples below.
 
 ```bash
 --input '[path to samplesheet file]'
 ```
 
-The content of the samplesheet will depend on the mode you are using to run the pipeline -**genome only** or **genome and annotation**-, the inclusion of FASTQ reads to run **Merqury**, and the origin of the genome assemblies and annotations (**local** or **RefSeq**). However, you must always indicate the species name of each sample using the **species** field.
-
-Examples of the samplesheet are shown below. We are going to highlight the differences in samplesheets depending on the origing of the files (**local** or **RefSeq**). Refer to their sections for more information on [running modes](#modes) and [running with **Merqury**](#running-with-merqury).
+The content of the samplesheet will depend on the mode you are using to run the pipeline -**genome only** or **genome and annotation**-, the inclusion of FASTQ reads to run **Merqury**, and the origin of the genome assemblies and annotations (**local** or **RefSeq**). Refer to their sections for more information on [running modes](#modes) and [running with **Merqury**](#running-with-merqury). Nonetheless, you must always indicate the species name of each sample using the **species** field.
 
 If running the pipeline on **local** files, point to the location these files using the **fasta** and **gff** fields:
 
@@ -38,7 +36,7 @@ Gorilla_gorilla,GCF_029281585.2,,,
 Pan_paniscus,GCF_029289425.2,,,
 ```
 
-If running with **Merqury**, you must point to the location of fastq files using the **fastq** field:
+If running with **Merqury**, you must point to the location of FASTQ files using the **fastq** field:
 
 ```csv title="samplesheet.csv"
 species,refseq,fasta,gff,fastq
@@ -47,7 +45,7 @@ Gorilla_gorilla,,/path/to/genome.fasta,/path/to/annotation.gff3,/path/to/annotat
 Pan_paniscus,,/path/to/genome.fasta,/path/to/annotation.gff3,/path/to/annotation.fastq
 ```
 
-As for now, the pipeline doesn't support SRA accession for **Merqury**, but is an option we are considering for the future.
+As for now, the pipeline doesn't support SRA accession for **Merqury**. We will consider this option  the future.
 
 | Column    | Description                                                                                                                                                                            |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -64,7 +62,7 @@ An [example samplesheet](../assets/samplesheet.csv) has been provided with the p
 The typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run ecoflow/genomeqc --input ./samplesheet.csv --outdir ./results -profile docker
+nextflow run nf-core/genomeqc --input ./samplesheet.csv --outdir ./results -profile docker
 ```
 
 This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
@@ -104,13 +102,18 @@ You can also generate such `YAML`/`JSON` files via [nf-core/launch](https://nf-c
 
 ### Modes
 
-By the default, the pipeline will try run on both fasta genome and gff annoation. This is known as the **genome and annotation** mode. If a RefSeq ID is not provided, or, alternatively, both local genome and annoation files are not provided, the pipeline will fail.
+#### Genome and annotation (_default_)
+By the default, the pipeline will run on both **genome and annotation**, whether it be from **local files** or **RefSeq IDs**. If RefSeq IDs are not provided, or, alternatively, both local FASTA genome and GFF annotation files are not provided, the pipeline will fail.
 
-If the flag ``--genome_only`` is provided, then pipeline will run only on fasta genome files. This is know as the **genome only mode**. In this mode, annotation files are not necessary and, if provided, will be ignored.
+#### Genome only
+
+If the flag ``--genome_only`` is provided, the pipeline will only run on **FASTA genome** files. In this mode, annotation files are not necessary and, if included in the samplesheet, will be ignored.
+
+This mode is less developed than the **genome and annotation** mode.
 
 ### Running with Merqury
 
-Optionally, users can also run the pipeline on **genome only** and **genome and annotation** modes by supplying sequencing reads in FASTQ format under the **fastq** field and using the ``--run_merqury`` flag.
+Optionally, users can also run the pipeline on **genome only** and **genome and annotation** modes by supplying sequencing reads in FASTQ format under the **fastq** field and using the ``--run_merqury`` flag. Refer the [GitHub page](https://github.com/marbl/merqury) for more information on Merqury.
 
 ### Updating the pipeline
 

@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This document describes the output produced by the pipeline. Most of the plots are taken from the MultiQC report, which summarises results at the end of the pipeline.
+This document describes the output produced by the nf-core/genomeqc.
 
 The directories listed below will be created in the results directory after the pipeline has finished. All paths are relative to the top-level results directory.
 
@@ -13,17 +13,19 @@ The directories listed below will be created in the results directory after the 
 The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes data using the following steps:
 
 <!-- [pigz uncompress](#pigz-uncompress) - Uncompresses FASTA and GFF files -->
-- [NCBI genome download](#ncbi-genome-download) - Download genomes and their annotations from RefSeq
 <!-- [FastaValidator](#fastavalidator) Validate FASTA files -->
-- [Quast](#quast) - Genome quality and contiguity -%GC content, N50, N90, number of contigs, etc
-- [tidk](#tidk) - Identify telomeric repeats
-- [Merqury](#merqury) - Genome completness and accuracy basedon raw sequecing k-mer counts
-- [AGAT sp_statistics](#agat-sp_statistics) - Report with gene statistics
 <!-- [AGAT convert sp_GXF2GXF]() - Standataizes gff files -->
-- [AGAT sp_keep_longest_isoform](#agat-sp_keep_longest_isoform) - Filters longest isoform
-- [Gene overlaps](#gene-overlaps) - Finds overlapping genes (sense and antisense)
+- [NCBI genome download](#ncbi-genome-download) - Download genomes and their annotations from RefSeq
+- Genome quality metrics:
+  - [Quast](#quast) - Genome quality and contiguity metrics
+  - [tidk](#tidk) - Identify telomeric repeats
+  - [Merqury](#merqury) - Genome completeness and accuracy basedon raw sequecing k-mer counts
+- Annotation quality metrics:
+  - [AGAT sp_statistics](#agat-sp_statistics) - Report with gene statistics
+  - [AGAT sp_keep_longest_isoform](#agat-sp_keep_longest_isoform) - Filter longest isoform from GFF file
+  - [Gene overlaps](#gene-overlaps) - Find overlapping genes (sense and antisense)
 - [GffRead](#gffread) - Extract longest isoform from FASTA file
-- [BUSCO](#busco) - Genome completness based on single copy orthologus markers
+- [BUSCO](#busco) - Genome completeness based on single copy markers
 - [Orthofinder](#orthofinder) - Phylogenetic orthology inference
 - [Tree summary](#tree-summary) - Phylogenetic summary plot
 - [MultiQC](#multiqc) - Aggregate report describing results and QC from the whole pipeline
@@ -37,7 +39,7 @@ pigz is used to uncompress `.gz` input files, as some nf-core/genomeqc modules r
 
 [NCBI genome download](https://github.com/kblin/ncbi-genome-download) is a tool for downloading assemlbies from the NCBI FTP site.
 
-In nf-core/genomeqc, it inputs RefSeq IDs and donwloads the respective assembly and annotation. 
+In nf-core/genomeqc, it inputs RefSeq IDs and donwloads the respective assembly and annotation in FASTA and GFF formats. If local files are provided, this step is skipped.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -52,7 +54,7 @@ This directory will only be present if `--save_assembly` flag is set.
 
 ### Quast
 
-[Quast](https://github.com/ablab/quast) provides different quality metrics about the genome assembly. It evaluates contiguity -N50, N90-, genome size, GC% content and number of sequences.
+[Quast](https://github.com/ablab/quast) provides different quality metrics about the genome assembly. It computes contiguity stats (N50, N90), genome size, GC% content and number of sequences.
 
 It generates a report in different formats, as well as an HTML file with in integrated contig viewer.
 
@@ -77,7 +79,7 @@ It will use a known telomeric repeat as input string, and will find occurrences 
   - `<species_name>.tsv`: Report with the number of repeats found in different number of windows
   - `<species_name>.svg`: Plot with the repeat distribution
 
-To run nf-core/genomeqc with idk, the flag `--run_tidk` must be provided.
+To run nf-core/genomeqc with tidk, the flag `--run_tidk` must be provided.
 
 ![output_example_tidk](images/output_example/meles_meles_tidk.png)
 
@@ -158,15 +160,15 @@ This directory will only be present if `--save_extracted_seqs` flag is set.
 
 [BUSCO](https://busco.ezlab.org/) is a tool for assessing the quality of assemblies based on the presence of single copy orthotologues. It computes the compleness based on evolutionarily informed expectations of gene content, whether this single copy markers are present in single copy, duplicated, fragmented or absent.
 
-It outputs a report with completness stats, and a summarized table with these stats.
+It outputs a report with completness stats, a summarized table with these stats, and an ideaogram with single copy markers mapped against each chromosome or sequence.
 
 <details markdown="1">
 <summary>Output files</summary>
 
 - `busco/`
   - `short_summary.specific.<busco_db>.<species_name>.fasta.txt` Completness report in tsv format
-  - `<species_name>-<busco_db-busco.batch_summary.txt`: Summarized completness report in tsv format
-  - `<species_name>_lineage.png` Ideogram with the location of single copy markers
+  - `<species_name>-<busco_db>-busco.batch_summary.txt`: Summarized completness report in tsv format
+  - `<species_name>_<lineage>.png` Ideogram with the location of single copy markers
 </details>
 
 ![output_example_busco](images/output_example/syngnathus_acus_ideogram.png)
