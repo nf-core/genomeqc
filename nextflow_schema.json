@@ -321,12 +321,6 @@
           "description": "Do not run TIDK",
           "hidden": true,
           "help_text": "You may wish to turn off the tidk subworkflow"
-        },
-        "karyotype": {
-          "type": "string",
-          "description": "Path to the karyotype file for ideogram plotting",
-          "help_text": "A tab-delimited file containing chromosome information for ideogram plotting",
-          "fa_icon": "fas fa-dna"
         }
       }
     }
@@ -351,7 +345,7 @@
   "properties": {
     "save_sorted_seqs": {
       "type": "boolean",
-      "description": "Publish sorted fasta genome files from TIDK Explore subworkflow"
+      "description": "Publish sorted fasta genome files from seqkit"
     },
     "save_validated_annotation": {
       "type": "boolean",
@@ -372,6 +366,14 @@
     "save_longest_isoform": {
       "type": "boolean",
       "description": "Publish longest protein isoform fasta files"
+    },
+    "save_filtered_seqs": {
+      "type": "boolean",
+      "description": "Publish filtered fasta genome files from seqkit"
+    },
+    "tree_scale": {
+      "type": "integer",
+      "description": "Modifies scale of the tree plot in the tree summary, default value is '0.0005'. Useful if tree tips overlap with the concatenated plots. Very sensitive, increase/decrease by two-fold"
     }
   }
 }
