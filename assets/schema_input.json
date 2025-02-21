@@ -7,27 +7,31 @@
     "items": {
         "type": "object",
         "properties": {
-            "sample": {
+            "species": {
                 "type": "string",
-                "pattern": "^\\S+$",
-                "errorMessage": "Sample name must be provided and cannot contain spaces",
+                "errorMessage": "Species name must be provided and cannot contain spaces",
                 "meta": ["id"]
             },
-            "fastq_1": {
+            "refseq": {
                 "type": "string",
-                "format": "file-path",
-                "exists": true,
-                "pattern": "^\\S+\\.f(ast)?q\\.gz$",
-                "errorMessage": "FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+                "errorMessage": "RefSeq accession number"
             },
-            "fastq_2": {
+            "fasta": {
                 "type": "string",
                 "format": "file-path",
-                "exists": true,
-                "pattern": "^\\S+\\.f(ast)?q\\.gz$",
-                "errorMessage": "FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+                "errorMessage": "FASTA file with genome assembly"
+            },
+            "gff": {
+                "type": "string",
+                "format": "file-path",
+                "errorMessage": "GFF file with genome annotation"
+            },
+            "fastq": {
+                "type": "string",
+                "format": "file-path",
+                "errorMessage": "Single compressed FASTQ file, must have extension '.fq.gz' or '.fastq.gz'"
             }
         },
-        "required": ["sample", "fastq_1"]
+        "required": ["species"]
     }
 }
