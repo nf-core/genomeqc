@@ -38,13 +38,23 @@ workflow GENOMEQC {
     ch_multiqc_files = Channel.empty()
 
     ch_input = ch_samplesheet
-                | map {
-                    validateInputSamplesheet(it) // Input validation (check local subworkflow)
-                }
-                | branch {
-                    ncbi  : it[1] != null
-                    local : it[1] == null
-                }
+        | map {
+            validateInputSamplesheet(it) // Input validation (check local subworkflow)
+        }
+        | branch {
+            ncbi: { row ->
+                row[1] != null && row[2] == null
+            }
+            local: { row ->
+                row[1] == null && row[2] != null && row[3] != null
+            }
+            genome: { row ->
+                row[1] == null && row[2] != null && row[2] == null
+            }
+        }
+
+    // Debug output
+    ch_input.ncbi.view{ "NCBI: $it" }
 
     // MODULE: Run create_path
 
@@ -67,24 +77,24 @@ workflow GENOMEQC {
     // MODULE: Run ncbigenomedownlaod for RefSeq IDs
     //
 
-    NCBIGENOMEDOWNLOAD ( 
+    NCBIGENOMEDOWNLOAD (
         ch_ncbi_input.meta,
         ch_ncbi_input.accession,
         [],
         params.groups
     )
     ch_versions = ch_versions.mix(NCBIGENOMEDOWNLOAD.out.versions.first())
-    
+
     //
     // Perpare input channels
     //
-    
+
     // gff. We use mix() here becuase when local files are present,
     // then RefSeq IDs should be missing, and viceversa
     fasta = ch_input.local
             | map { meta, fasta, gff, fq -> tuple( meta, file(fasta) ) }
             | mix ( NCBIGENOMEDOWNLOAD.out.fna )
- 
+
     // fasta. We use mix() here becuase when local files are present, then RefSeq IDs should be missing, and viceversa
     gff   = ch_input.local
             | map { meta, fasta, gff, fq -> tuple( meta, file(gff) ) }
@@ -97,7 +107,7 @@ workflow GENOMEQC {
 
     // Run module uncompress_fasta
 
-    UNCOMPRESS_FASTA (gz_fasta )
+    UNCOMPRESS_FASTA (gz_fasta)
     ch_versions = ch_versions.mix(UNCOMPRESS_FASTA.out.versions.first())
 
     // Filter gff files by extension and create channels for each file type
@@ -110,7 +120,7 @@ workflow GENOMEQC {
     UNCOMPRESS_GFF(gz_gff)
     ch_versions = ch_versions.mix(UNCOMPRESS_GFF.out.versions.first())
 
-    // Combine the channels back together so that all the uncompressed files are in channels 
+    // Combine the channels back together so that all the uncompressed files are in channels
 
     ch_fasta  = UNCOMPRESS_FASTA.out.file.mix(non_gz_fasta)
     ch_gff    = UNCOMPRESS_GFF.out.file.mix(non_gz_gff)
@@ -119,7 +129,7 @@ workflow GENOMEQC {
     // Define fastq input channel
     //
 
-    // FASTQ file is optional in the samplesheet. 
+    // FASTQ file is optional in the samplesheet.
     // First, get it like you do for gff and fasta
 
     ch_fastq = ch_input.ncbi
@@ -127,14 +137,14 @@ workflow GENOMEQC {
                 | mix( ch_input.local.map{ meta, fasta, gff, fq -> tuple( meta, fq ) } )
 
     // Then, check to see that element 1 is not empty, and if not, make it file()
-    // You have to do this because if you pass in file() in the initial map, 
+    // You have to do this because if you pass in file() in the initial map,
     // it'll fail if you don't supply a fastq, because you can't pass an empty to file()
 
     //ch_fastq
     //    | map{meta, fq -> fq ? [meta, file(fq)] : [meta, fq]}
     //    | filter { meta, fq -> fq && fq.name =~ /(\.fastq|\.fq|\.fastq\.gz|\.fq\.gz)$/ }
     //    | set {ch_fastq}
-    
+
     //
     // Define multi-channel object
     //
@@ -154,7 +164,7 @@ workflow GENOMEQC {
     //
     // Run TIDK
     //
-    
+
     if (!params.skip_tidk) {
         FASTA_EXPLORE_SEARCH_PLOT_TIDK (
             ch_input.fasta,
@@ -169,7 +179,7 @@ workflow GENOMEQC {
         // MODULE: MERYL_COUNT
         MERYL_COUNT(
             ch_input.fq,
-            params.kvalue 
+            params.kvalue
         )
         ch_meryl_db = MERYL_COUNT.out.meryl_db
         ch_versions = ch_versions.mix(MERYL_COUNT.out.versions.first())
@@ -182,7 +192,7 @@ workflow GENOMEQC {
         ch_versions    = ch_versions.mix(MERYL_UNIONSUM.out.versions.first())
         // MODULE: MERQURY_MERQURY
         ch_merqury_inputs = ch_meryl_union.join(ch_input.fasta)
-        
+
         MERQURY_MERQURY ( ch_merqury_inputs )
         ch_merqury_qv                           = MERQURY_MERQURY.out.assembly_qv
         ch_merqury_stats                        = MERQURY_MERQURY.out.stats
@@ -199,36 +209,37 @@ workflow GENOMEQC {
     }
 
 
-    // Run genome only or genome + gff
-    if (params.genome_only) {
-        GENOME_ONLY (
-            ch_input.fasta
-        )
-        ch_multiqc_files = ch_multiqc_files
-                         | mix(GENOME_ONLY.out.quast_results.map { meta, results -> results })
-                         | mix(GENOME_ONLY.out.busco_short_summaries.map { meta, txt -> txt })
-        ch_versions      = ch_versions.mix(GENOME_ONLY.out.versions)
-    } else {
-        GENOME_AND_ANNOTATION (
-            ch_input.fasta,
-            ch_input.gff
-        )
-        ch_multiqc_files = ch_multiqc_files
-                         | mix(GENOME_AND_ANNOTATION.out.quast_results.map { meta, results -> results })
-                         | mix(GENOME_AND_ANNOTATION.out.busco_short_summaries.map { meta, txt -> txt })
-        ch_versions      = ch_versions.mix(GENOME_AND_ANNOTATION.out.versions)
-        //ch_versions.view()
+    // Run genome only and/or genome + gff
 
-        //
-        // MODULE: Run TREE SUMMARY
-        //  
+    GENOME_ONLY (
+        ch_input.fasta
+    )
+    ch_multiqc_files = ch_multiqc_files
+                        | mix(GENOME_ONLY.out.quast_results.map { meta, results -> results })
+                        | mix(GENOME_ONLY.out.busco_short_summaries.map { meta, txt -> txt })
+    ch_versions      = ch_versions.mix(GENOME_ONLY.out.versions)
 
-        TREE_SUMMARY (
-            GENOME_AND_ANNOTATION.out.orthofinder,
-            GENOME_AND_ANNOTATION.out.tree_data
-        )
-        ch_versions      = ch_versions.mix(TREE_SUMMARY.out.versions.first())
-    }
+
+    GENOME_AND_ANNOTATION (
+        ch_input.fasta,
+        ch_input.gff
+    )
+    ch_multiqc_files = ch_multiqc_files
+                        | mix(GENOME_AND_ANNOTATION.out.quast_results.map { meta, results -> results })
+                        | mix(GENOME_AND_ANNOTATION.out.busco_short_summaries.map { meta, txt -> txt })
+    ch_versions      = ch_versions.mix(GENOME_AND_ANNOTATION.out.versions)
+    //ch_versions.view()
+
+    //
+    // MODULE: Run TREE SUMMARY
+    //
+
+    TREE_SUMMARY (
+        GENOME_AND_ANNOTATION.out.orthofinder,
+        GENOME_AND_ANNOTATION.out.tree_data
+    )
+    ch_versions      = ch_versions.mix(TREE_SUMMARY.out.versions.first())
+
 
     //
     // Collate and save software versions
@@ -258,7 +269,7 @@ workflow GENOMEQC {
 
     summary_params      = paramsSummaryMap(
         workflow, parameters_schema: "nextflow_schema.json")
-        
+
     ch_workflow_summary = Channel.value(paramsSummaryMultiqc(summary_params))
 
     ch_multiqc_custom_methods_description = params.multiqc_methods_description ?
@@ -268,10 +279,10 @@ workflow GENOMEQC {
 
     ch_methods_description                = Channel.value(
         methodsDescriptionText(ch_multiqc_custom_methods_description))
-    
+
     ch_multiqc_files = ch_multiqc_files.mix(
         ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-        
+
     ch_multiqc_files = ch_multiqc_files.mix(ch_collated_versions)
 
     ch_multiqc_files = ch_multiqc_files.mix(
