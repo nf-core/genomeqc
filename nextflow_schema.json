@@ -349,18 +349,25 @@
     "skip_plots_genome_anno": {
       "type": "string",
       "description": "Skip these stat plots in the genome and annotation tree plot",
-      "pattern": "^(ch_plot|len_plot|gene_plot|n50_plot|pies_plot)(,(ch_plot|len_plot|gene_plot|n50_plot|pies_plot))*$",
-      "help_text": "Comma-separated list of plot types to skip. Valid values: ch_plot, len_plot, gene_plot, n50_plot, pies_plot\nch_plot: Number of sequences\nlen_plot: Genome size and GC cotent\ngene_plot: Numeber of genes and overlapping genes\nn50_plot: N50\npies_plot: BUSCO stats"
+      "pattern": "^(ch_plot|nseqs_plot|ortho_plot|len_plot|gene_plot|n50_plot|pies_plot)(,(ch_plot|len_plot|gene_plot|n50_plot|pies_plot))*$",
+      "help_text": "Comma-separated list of plot types to skip. Valid values: ch_plot, len_plot, gene_plot, n50_plot, pies_plot\nch_plot: Number of sequences\nlen_plot: Genome size and GC cotent\ngene_plot: Numeber of genes and overlapping genes\nn50_plot: N50\npies_plot: BUSCO stats",
+      "default": "nseqs_plot"
     },
     "skip_plots_genome_only": {
       "type": "string",
       "description": "Skip these stat plots in the genome only tree plot",
-      "pattern": "^(ch_plot|len_plot|n50_plot|pies_plot)(,(ch_plot|len_plot|n50_plot|pies_plot))*$",
-      "help_text": "Comma-separated list of plot types to skip. Valid values: ch_plot, len_plot, n50_plot, pies_plot\nch_plot: Number of sequences\nlen_plot: Genome size and GC content\nn50_plot: N50\npies_plot: BUSCO stats"
+      "pattern": "^(ch_plot|nseqs_plot|ortho_plot|len_plot|n50_plot|pies_plot)(,(ch_plot|len_plot|n50_plot|pies_plot))*$",
+      "help_text": "Comma-separated list of plot types to skip. Valid values: ch_plot, len_plot, n50_plot, pies_plot\nch_plot: Number of sequences\nlen_plot: Genome size and GC content\nn50_plot: N50\npies_plot: BUSCO stats",
+      "default": "nseqs_plot"
     },
     "gxdb_manifiest": {
       "type": "string",
       "description": "Path to FCS GX contamination screening database"
+    },
+    "min_buscos": {
+      "type": "integer",
+      "help_text": "Threshold for BUSCO count table: counts how many sequences in each assembly have at least this many Complete BUSCOs.\n",
+      "description": "Minimum number of Complete BUSCOs a sequence must have to be counted"
     }
   }
 }

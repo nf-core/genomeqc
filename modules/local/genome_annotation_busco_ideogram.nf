@@ -11,6 +11,7 @@ process GENOME_ANNOTATION_BUSCO_IDEOGRAM {
     output:
     tuple val(genusspeci), val(lineage), path("*.svg"), emit: svg
     tuple val(genusspeci), val(lineage), path("*.png"), emit: png
+    tuple val(genusspeci), path("*.csv"), emit: busco_mappings
     path "versions.yml"           , emit: versions
 
     script:
@@ -29,10 +30,10 @@ process GENOME_ANNOTATION_BUSCO_IDEOGRAM {
     plot_busco_ideogram.R \\
         --busco_output busco_data_to_plot.tsv \\
         --karyotype ${prefix}_karyotype.txt \\
-        --prefix ${prefix} \\
+        --prefix ${genusspeci} \\
         $args
 
-    
+
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

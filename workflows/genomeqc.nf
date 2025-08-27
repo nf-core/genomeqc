@@ -3,26 +3,30 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { MERYL_UNIONSUM                      } from '../modules/nf-core/meryl/unionsum/main'
-include { MERYL_COUNT                         } from '../modules/nf-core/meryl/count/main'
-include { MERQURY_MERQURY                     } from '../modules/nf-core/merqury/merqury/main'
-include { CREATE_PATH                         } from '../modules/local/create_path'
-include { NCBIGENOMEDOWNLOAD                  } from '../modules/nf-core/ncbigenomedownload/main'
-include { PIGZ_UNCOMPRESS as UNCOMPRESS_FASTA } from '../modules/nf-core/pigz/uncompress/main'
-include { PIGZ_UNCOMPRESS as UNCOMPRESS_GXF   } from '../modules/nf-core/pigz/uncompress/main'
-include { GENOME_ONLY                         } from '../subworkflows/local/genome_only'
-include { GENOME_AND_ANNOTATION               } from '../subworkflows/local/genome_and_annotation'
-include { MULTIQC                             } from '../modules/nf-core/multiqc/main'
+include { MERYL_UNIONSUM                       } from '../modules/nf-core/meryl/unionsum/main'
+include { MERYL_COUNT                          } from '../modules/nf-core/meryl/count/main'
+include { MERQURY_MERQURY                      } from '../modules/nf-core/merqury/merqury/main'
+include { CREATE_PATH                          } from '../modules/local/create_path'
+include { NCBIGENOMEDOWNLOAD                   } from '../modules/nf-core/ncbigenomedownload/main'
+include { PIGZ_UNCOMPRESS as UNCOMPRESS_FASTA  } from '../modules/nf-core/pigz/uncompress/main'
+include { PIGZ_UNCOMPRESS as UNCOMPRESS_GXF    } from '../modules/nf-core/pigz/uncompress/main'
+include { GENOME_ONLY                          } from '../subworkflows/local/genome_only'
+include { GENOME_AND_ANNOTATION                } from '../subworkflows/local/genome_and_annotation'
+include { MULTIQC                              } from '../modules/nf-core/multiqc/main'
 include { TREE_SUMMARY as TREE_SUMMARY_GENO_ANNO } from '../modules/local/tree_summary'
 include { TREE_SUMMARY as TREE_SUMMARY_GENO      } from '../modules/local/tree_summary'
-include { paramsSummaryMap                    } from 'plugin/nf-validation'
-include { paramsSummaryMultiqc                } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML              } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText              } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
-include { validateInputSamplesheet            } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
-include { FASTA_EXPLORE_SEARCH_PLOT_TIDK      } from '../subworkflows/nf-core/fasta_explore_search_plot_tidk/main'
-include { DECONTAMINATION                     } from '../subworkflows/local/decontamination'
-include { FCSGX_FETCHDB                       } from '../modules/nf-core/fcsgx/fetchdb/main'
+include { paramsSummaryMap                     } from 'plugin/nf-validation'
+include { paramsSummaryMultiqc                 } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML               } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText               } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
+include { validateInputSamplesheet             } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
+include { FASTA_EXPLORE_SEARCH_PLOT_TIDK       } from '../subworkflows/nf-core/fasta_explore_search_plot_tidk/main'
+include { DECONTAMINATION                      } from '../subworkflows/local/decontamination'
+include { FCSGX_FETCHDB                        } from '../modules/nf-core/fcsgx/fetchdb/main'
+include { BUSCO_SEQS as BUSCO_SEQS_GENOME_ANNO } from '../modules/local/buscos_seqs/main'
+include { BUSCO_SEQS as BUSCO_SEQS_GENOME      } from '../modules/local/buscos_seqs/main'
+include { SHINY_APP as SHINY_APP_GENOME_ANNO   } from '../modules/local/shiny_app/main'
+include { SHINY_APP as SHINY_APP_GENOME        } from '../modules/local/shiny_app/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -219,7 +223,7 @@ workflow GENOMEQC {
     ch_versions                             = ch_versions.mix(MERQURY_MERQURY.out.versions.first())
 
     // Run genome only or genome + gxf
-    if (params.genome_only) {
+    if (params.genome_only) { // Does this work or should I remove it?
         GENOME_ONLY (
             ch_input.fasta
         )
@@ -240,21 +244,66 @@ workflow GENOMEQC {
                          | mix(GENOME_AND_ANNOTATION.out.busco_short_summaries.map { meta, txt -> txt })
         ch_versions      = ch_versions.mix(GENOME_AND_ANNOTATION.out.versions)
 
+        // Number of sequences with more than x complete single copy buscos
+        // this should depend on whether protein mode was used or not, not
+
+        BUSCO_SEQS_GENOME_ANNO(
+            GENOME_AND_ANNOTATION.out.buscos_per_seqs.map { tables -> [[id:"tables"], tables] }
+        )
+
+        BUSCO_SEQS_GENOME(
+            GENOME_ONLY.out.buscos_per_seqs.map { tables -> [[id:"tables"], tables] }
+        )
+
+        // Prepare channels for tree plot
+        ch_tree_genome_anno = GENOME_AND_ANNOTATION.out.tree_data
+                            | concat(BUSCO_SEQS_GENOME_ANNO.out.table.map { meta, table -> table})
+                            | collect
+        ch_tree_genome      = GENOME_ONLY.out.tree_data
+                            | concat(BUSCO_SEQS_GENOME.out.table.map { meta, table -> table})
+                            | collect
+
         //
         // MODULE: Run TREE SUMMARY
         //
 
         TREE_SUMMARY_GENO_ANNO (
             GENOME_AND_ANNOTATION.out.orthofinder,
-            GENOME_AND_ANNOTATION.out.tree_data
+            ch_tree_genome_anno
         )
         ch_versions      = ch_versions.mix(TREE_SUMMARY_GENO_ANNO.out.versions)
-        
+
         TREE_SUMMARY_GENO (
             GENOME_ONLY.out.orthofinder,
-            GENOME_ONLY.out.tree_data
+            ch_tree_genome
         )
         ch_versions      = ch_versions.mix(TREE_SUMMARY_GENO.out.versions)
+
+        //
+        // MODULE: Run SHINY APP
+        //
+
+        // Prepare script with functions channel
+        ch_functions = Channel.fromPath("$projectDir/bin/tree_functions.R", checkIfExists: true)
+        ch_app       = Channel.fromPath("$projectDir/bin/shiny_app.R", checkIfExists: true)
+
+        // For genome and annotation
+        SHINY_APP_GENOME_ANNO (
+            TREE_SUMMARY_GENO_ANNO.out.tables,
+            TREE_SUMMARY_GENO_ANNO.out.tree,
+            ch_functions,
+            ch_app
+        )
+        ch_versions      = ch_versions.mix(SHINY_APP_GENOME_ANNO.out.versions)
+
+        // For genome only
+        SHINY_APP_GENOME (
+            TREE_SUMMARY_GENO.out.tables,
+            TREE_SUMMARY_GENO.out.tree,
+            ch_functions,
+            ch_app
+        )
+        ch_versions      = ch_versions.mix(SHINY_APP_GENOME.out.versions)
     }
 
     //

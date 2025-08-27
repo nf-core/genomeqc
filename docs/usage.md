@@ -16,60 +16,80 @@ Before running the pipeline, you will need to create a samplesheet with informat
 --input '[path to samplesheet file]'
 ```
 
-The pipeline can be ran using ncbi accessions (RefSeq of GenBank) or local files. It needs at least a **fasta** (GenBank accession or local fasta) file per species to run. If annotations (RefSeq accession or local gtf/gff) are added, the pipeline will run on both **genomes and annotations**. Additionally, if a reads (local fastq) are provided, it will run Merqury.
+The pipeline can be run using NCBI accessions (RefSeq or GenBank) or local files. It needs at least an **genome** (GenBank accession or local file in FASTA format) per species to run. If annotations (RefSeq accession or local file in GTF/GFF format) are added, the pipeline will on both **genomes and annotations**, and will use the sequences in the **annotation** to run BUSCO (this can be changed in the parameters). If you provide local FASTQ reads for an assembly, the pipeline will run Merqury. If you provide taxids in NCBI format, it will run the decontamination subworkflow.
 
 If running the pipeline on **local** files, point to the location these files using the **fasta** and/or **gxf** fields:
 
 ```csv title="samplesheet.csv"
-species,ncbi,fasta,gxf,fastq
-species_1,,/path/to/genome.fasta,/path/to/annotation.gxf,
-species_2,,/path/to/genome.fasta,/path/to/annotation.gxf,
+assembly,fasta,gxf
+species_1,/path/to/genome.fasta,/path/to/annotation.gxf
+species_2,/path/to/genome.fasta,/path/to/annotation.gxf
+species_3,/path/to/genome.fasta,/path/to/annotation.gxf
+```
+
+If running the pipeline using **ncbi accessions (GenBank and/or RefSeq)**, indicate the corresponding ID using the **ncbi** field:
+
+```csv title="samplesheet.csv"
+assembly,ncbi
+species_1,GCF_000000001.1
+species_2,GCF_000000002.1
+species_3,GCF_000000003.1
+```
+
+<!-- If running with **Merqury**, you must point to the location of fastq files using the **fastq** field:
+
+```csv title="samplesheet.csv"
+species,fasta,gxf,fastq
+species_1,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq
+species_2,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq
+species_3,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq
+```
+-->
+
+This is what the complete samplesheet would look like if using local files:
+
+```csv title="samplesheet.csv"
+assembly,fasta,gxf,fastq,taxid
+species_1,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq,1234
+species_2,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq,1245
+species_3,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq,4321
+```
+
+This is what the complete samplesheet would look like if using NCBI accessions:
+
+```csv title="samplesheet.csv"
+assembly,ncbi,fastq,taxid
+species_1,GCF_000000001.1,/path/to/reads.fastq,1234
+species_2,GCF_000000002.1,/path/to/reads.fastq,1245
+species_3,GCF_000000003.1,/path/to/reads.fastq,4321
+```
+
+You can mix different input types in the same samplesheet. If a specific field doesn’t apply to a row, leave it empty, as shown below. The pipeline will automatically detect the input type for each assembly entry and run accordingly:
+
+```csv title="samplesheet.csv"
+assmbly,ncbi,fasta,gxf,fastq,taxid
+species_1,,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq,1234
+species_2,,/path/to/genome.fasta,/path/to/annotation.gxf,,4321
 species_3,,/path/to/genome.fasta,/path/to/annotation.gxf,
-```
-
-If running the pipeline using **ncbi acessions (GenBank and/or RefSeq)**, indicate the corresponding ID using the **ncbi** field:
-
-```csv title="samplesheet.csv"
-species,ncbi,fasta,gxf,fastq
-species_1,GCF_000000001.1,,,
-species_2,GCF_000000002.1,,,
-species_3,GCF_000000003.1,,,
-```
-
-If running with **Merqury**, you must point to the location of fastq files using the **fastq** field:
-
-```csv title="samplesheet.csv"
-species,ncbi,fasta,gxf,fastq
-species_1,,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq
-species_2,,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq
-species_3,,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq
-```
-
-You can mix different different input types in the same samplesheet. The pipeline will detect the input type for each species and run accordingly:
-
-```csv title="samplesheet.csv"
-species,ncbi,fasta,gxf,fastq
-species_1,,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq
-species_2,,/path/to/genome.fasta,/path/to/annotation.gxf,
-species_3,,/path/to/genome.fasta,/path/to/annotation.gxf,
-species_4,,/path/to/genome.fasta,,/path/to/reads.fastq
+species_4,,/path/to/genome.fasta,,/path/to/reads.fastq,1245
 species_5,,/path/to/genome.fasta,,
 species_6,,/path/to/genome.fassta,,
 species_7,GCF_000000007.1,,,/path/to/reads.fastq
 species_8,GCF_000000008.1,,,
 species_9,GCA_000000009.1,,,/path/to/reads.fastq
-species_10,GCA_000000010.1,,,
+species_10,GCA_000000010.1,,,,1324
 ```
 
-As for now, the pipeline doesn't support SRA accession for **Merqury**. We will consider this option  the future.
+As for now, the pipeline doesn't support SRA accession for **Merqury** reads. We will consider this option  the future.
 
 | Column    | Description                                                                                                                                                                            |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `species`  | Species name or custom sample name. Spaces in sample names are automatically converted to underscores (`_`) (not sure if this is an option right now). |
+| `assembly`  | Species name or custom sample name. Spaces in sample names are automatically converted to underscores (`_`) (not sure if this is an option right now). |
 | `ncbi` | ncbi acession. Can be GenBank (starts with "GCA") or RefSeq (starts with "GCF").                                                             |
 | `fasta` | Full path to the genome fasta file. Can be compressed or uncompressed.                                                             |
 | `gxf` | Full path to the genome annotation gff/gtf file. Can be compressed or uncompressed.                                                             |
 | `fastq` | Full path to FastQ file for long reads (e.g. PacBio or ONT). File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
+| `taxid` | Species taxid for decontamination screening, must be a valid NCBI taxid (numeric string without spaces).                                                             |
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
@@ -103,7 +123,7 @@ Do not use `-c <file>` to specify parameters as this will result in errors. Cust
 The above pipeline run specified with a params file in yaml format:
 
 ```bash
-nextflow run ecoflow/genomeqc -profile docker -params-file params.yaml
+nextflow run nf-core/genomeqc -profile docker -params-file params.yaml
 ```
 
 with `params.yaml` containing:
@@ -125,7 +145,7 @@ This is the minimal run. The pipeline will run on genome only mode if these inpu
 1. Path to **fasta** OR
 2. **ncbi** GenaBank accession.
 
-The pipeline will produce a MultiQC report.
+The pipeline will produce a tree plot summary alonside a MultiQC report with quality statistics.
 
 #### Genome and annotation
 
@@ -135,11 +155,23 @@ The pipeline will run on genome and annotation mode if these inputs are provided
 2. Path to **gxf** OR
 3. **ncbi** RefSeq accession.
 
-The pipeline will produce a tree plot summary alonside a MultiQC report.
+The pipeline will produce a tree plot summary alonside a MultiQC report with quality statistics.
 
-### Running with Merqury
+### Running Merqury
 
 Users can also run the pipeline using Merqury by supplying the path to sequencing reads under the **fastq** field. Merqury needs both **fasta** and **fastq** to run. Refer the [GitHub page](https://github.com/marbl/merqury) for more information on Merqury.
+
+### Running the Decontamination subworkflow
+
+If, in the samplesheet, a NCBI taxid is provided for an assembly, and a path pointing to the FCS-GX database or a manifest to download and build it (check the Parameters tab in this page), the pipeline will run the decontamination subworkflow.
+
+The decontamination subsworkflow consists of three modules:
+  - [FCS-GX](https://github.com/ncbi/fcs/wiki/FCS-GX-quickstart): Detection and removal of foreign organisms contamination. Requires the FCS-GX database.
+  - [FCS-adaptor](https://github.com/ncbi/fcs/wiki/FCS-adaptor-quickstart): Detection and removal of adaptor and vector contamination.
+  - [Tiara](https://ibe-uw.github.io/tiara/): For DNA sequence classification in two stages:
+    1. The sequences are classified to either archaea, bacteria, prokarya, eukarya, organelle or unknown.
+    2. The sequences labeled as organelle in the first stage are classified to either mitochondria, plastid or unknown.
+
 
 ### Running tests
 

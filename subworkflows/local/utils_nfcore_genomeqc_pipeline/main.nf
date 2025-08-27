@@ -161,7 +161,7 @@ def validateInputSamplesheet(input) {
     } else if ( meta && fasta ) { // At least fasta file is necessary if local files (genome only mode is the minimum run)
         return [ meta, fasta, gff, fastq ]
     } else {
-        error("You are running genomeqc on default mode. Please check input samplesheet -> Incorrent samplesheet format")
+        error("You are running genomeqc on default mode. Please check input samplesheet -> Incorrect samplesheet format")
     }
 }
 //

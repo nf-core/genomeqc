@@ -24,6 +24,11 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - [AGAT sp_statistics](#agat-sp_statistics) - Gene statistics
   - [AGAT sp_keep_longest_isoform](#agat-sp_keep_longest_isoform) - Filter longest isoform from GXF file
   - [Gene overlaps](#gene-overlaps) - Find overlapping genes (sense and antisense)
+- [Decontamination](#decontamination):
+  - [FCS-GX](#fcs-gx) - Foreign genome contamination screening
+  - [FCS-adaptor](#fcs-adaptor) - Adaptor and vector contamination screening
+  - [FCS-adaptor clean genome](#fcs-adaptor-clean-genome) Removal of contamination from assembly
+  - [Tiara](#tiara) - Sequence classification (domain and organelle level)
 - [GffRead](#gffread) - Extract longest isoform from FASTA file
 - [BUSCO](#busco) - Genome completeness based on single copy markers
 - [Orthofinder](#orthofinder) - Phylogenetic orthology inference
@@ -35,11 +40,78 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 
 pigz is used to uncompress `.gz` input files, as some nf-core/genomeqc modules require uncompressed files as input. -->
 
+### Decontamination
+
+#### FCS-GX
+
+[FCS-GX](https://github.com/ncbi/fcs/wiki/FCS-GX-quickstart) is a module in NCBI’s FCS (Foreign Contamination Screening) toolkit designed to detect contaminant sequences of foreign organisms from genome assemblies.
+
+It generates a report with assembly sequence classifications, contamination summaries, and cleaning recommendations.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `decontamination/fcs-gx`
+  - `<assembly>_<taxid>.fsc_gx_report.txt`: Summary report with sequence classification and cleaning recommendations.
+  - `<assembly>_<taxid>.taxonomy.rpt`: Detailed breakdown of sequence classification.
+
+</details>
+
+#### FCS-Adaptor
+
+[FCS-Adaptor](https://github.com/ncbi/fcs/wiki/FCS-adaptor-quickstart#clean-the-genome) is part of the NCBI's FCS toolkit. It’s specifically designed to detect adaptor and vector contamination that sometimes remain in genome assemblies.
+
+It generates a report with a list of sequences flagged as adaptor or vector matches, cleaning recommendations, and the cleaned genome assembly.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `decontamination/fcs-adaptor`
+  - `<assembly>.cleaned_sequences.fa.gz`: Genome assembly with contaminant regions removed.
+  - `<assembly>.fsc_adaptor_report.txt`: Summary report with flagged sequences and cleaning recommendations.
+
+</details>
+
+:::note
+We recommend ignoring the cleaned genome assembly output by this module, as the vector and adapter removal is done by the **FCS-GX clean genome** module (see below).
+:::
+
+#### FCS-GX clean genome
+
+[FCS-GX clean genome]() is based on a command of the NCBI's FCS toolkit which applies the recommended cleaning actions to the genome assembly based on the screening results.
+
+It outputs a cleaned version of the genome assembly based on the recommended actions from **FCS-GX** and **FCS-Adaptor**, with the contaminant sequences removed and sequences with local contaminants trimmed.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `decontamination/cleaned_genome`
+  - `<assembly>.cleaned.fasta`: Genome assembly with contaminant sequences removed and contaminant regions trimmed.
+  - `<assembly>.contaminants.fasta`: Sequences classified as contaminants.
+
+</details>
+
+#### Tiara
+
+[Tiara](https://ibe-uw.github.io/tiara/) is a deep learning–based classifier designed to identify eukaryotic, archaeal, and bacterial sequences, as well as organelle genomes.
+
+It outputs a report with each sequence of the genome assembly labelled as Eukarya, Archea, Bacteria, organelle or unknown.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `decontamination/tiara`
+  - `<assembly>.txt
+  `: Report with sequence classifications.
+  - `log_<assembly>.txt`: Log file with classification statistics and model information.
+
+</details>
+
 ### NCBI genome download
 
-[NCBI genome download](https://github.com/kblin/ncbi-genome-download) is a tool for downloading assemlbies from the NCBI FTP site.
+[NCBI genome download](https://github.com/kblin/ncbi-genome-download) is a tool for downloading assemblies from the NCBI FTP site.
 
-It inputs RefSeq IDs and donwloads the respective assembly and annotation in FASTA and GFF formats. If local files are provided, this step is skipped.
+It inputs RefSeq IDs and downloads the respective assembly and annotation in FASTA and GFF formats. If local files are provided, this step is skipped.
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -62,7 +134,7 @@ It generates a report in different formats, as well as an HTML file with in inte
 <summary>Output files</summary>
 
 - `quast/<species_name>/`
-  - `icarus.html`: Contig viewr in HTML format
+  - `icarus.html`: Contig viewer in HTML format
   - `report.html`: Assembly stats in HTML format
   - `report.pdf`: Assembly stats in tsv format
   - `report.tsv`: Assembly QC as HTML report
@@ -75,9 +147,14 @@ It generates a report in different formats, as well as an HTML file with in inte
 
 It will use a known telomeric repeat as input string, and will find occurrences of these sequence in windows across the genome.
 
+<details markdown="1">
+<summary>Output files</summary>
+
 - `tidk/`
   - `<species_name>.tsv`: Report with the number of repeats found in different number of windows
   - `<species_name>.svg`: Plot with the repeat distribution
+
+</details>
 
 To run nf-core/genomeqc with tidk, the flag `--run_tidk` must be provided.
 

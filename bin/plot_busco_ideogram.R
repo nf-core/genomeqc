@@ -26,7 +26,7 @@ karyotype <- read.table(opt$karyotype, header = TRUE, stringsAsFactors = FALSE)
 
 # Process BUSCO mappings
 busco_mappings$Type <- busco_mappings$Status
-busco_mappings$Shape <- "circle" 
+busco_mappings$Shape <- "circle"
 
 # Change status to color
 busco_mappings$Status <- gsub("Complete", '2dacd6', busco_mappings$Status)
@@ -35,6 +35,13 @@ busco_mappings$Status <- gsub("Fragmented", 'ff0000', busco_mappings$Status)  # 
 colnames(busco_mappings)[1] <- "color"
 
 busco_mappings <- busco_mappings[, c("Type", "Shape", "Chr", "Start", "End", "color")]
+
+# Extract number of complete (single-copy?) BUSCOs per sequence
+busco_per_chr_table <- table(busco_mappings$Chr[busco_mappings$Type == "Complete"])
+busco_per_chr <- as.data.frame(busco_per_chr_table)
+colnames(busco_per_chr) <- c("Chr", "Complete_BUSCOs")
+
+write.csv(busco_per_chr, paste0(opt$prefix, ".csv"), row.names = FALSE)
 
 head(busco_mappings)
 

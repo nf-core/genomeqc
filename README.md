@@ -37,6 +37,10 @@ For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#intr
    2. **BUSCO Ideogram**: Plots the location of markers on the assembly.
    3. [tidk](https://github.com/tolkit/telomeric-identifier) (optional): Indetfies and visualises telomeric repeats.
    3. [QUAST](https://github.com/ablab/quast): Computes contiguity and integrity statistics: N50, N90, GC%, number of sequences.
+   4. Contamination screening:
+      - [FCS-GX](https://github.com/ncbi/fcs/wiki/FCS-GX-quickstart): Detection and removal of foreign organisms contamination.
+      - [FCS-adaptor](https://github.com/ncbi/fcs/wiki/FCS-adaptor-quickstart): Detection and removal of adaptor and vector contamination.
+      - [Tiara](https://ibe-uw.github.io/tiara/): DNA sequence classification.
 3. Summary with [MultiQC](http://multiqc.info).
 
 **1. Genome and Annotation:**
@@ -45,10 +49,14 @@ For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#intr
    1. [BUSCO](https://busco.ezlab.org/): Evaluates genome completeness based on **single copy markers**.
    2. **BUSCO Ideogram**: Plots the location of markers on the assembly.
    3. [Merqury](https://github.com/marbl/merqury) (optional): Evaluates genome completeness based on sequencing reads.
-   4. [tidk](https://github.com/tolkit/telomeric-identifier) (optional): Indetifies and visualises telomeric repeats.
+   4. [tidk](https://github.com/tolkit/telomeric-identifier) (optional): Identifies and visualises telomeric repeats.
    5. [QUAST](https://github.com/ablab/quast): Computes contiguity and integrity statistics: N50, N90, GC%, number of sequences.
-   6. More options...
-3. Describes annotation : 
+   6. Contamination screening:
+      - [FCS-GX](https://github.com/ncbi/fcs/wiki/FCS-GX-quickstart): Detection and removal of foreign organisms contamination.
+      - [FCS-adaptor](https://github.com/ncbi/fcs/wiki/FCS-adaptor-quickstart): Detection and removal of adaptor and vector contamination.
+      - [Tiara](https://ibe-uw.github.io/tiara/): DNA sequence classification.
+   7. More options...
+3. Describes annotation :
    1. [AGAT](https://agat.readthedocs.io/en/latest/): Number of genes, features, length...
    2. **Gene Overlaps**: Finds the number of overlapping genes.
    3. More options...
@@ -75,10 +83,10 @@ First, prepare an input **samplesheet** in **csv format** (e.g. `samplesheet.csv
 Simply point out to your local genome assembly and annotation (in FASTA and GFF format, respectively) using the `fasta` and `gff` fields:
 
 ```csv
-species,refseq,fasta,gff,fastq
-species_1,,/path/to/genome.fasta,/path/to/annotation.gff3,
-species_2,,/path/to/genome.fasta,/path/to/annotation.gff3,
-species_3,,/path/to/genome.fasta,/path/to/annotation.gff3,
+assembly,fasta,gxf
+species_1,/path/to/genome.fasta,/path/to/annotation.gff3
+species_2,/path/to/genome.fasta,/path/to/annotation.gff3
+species_3,/path/to/genome.fasta,/path/to/annotation.gff3
 ```
 
 ### 2. ncbi accessions
@@ -86,10 +94,10 @@ species_3,,/path/to/genome.fasta,/path/to/annotation.gff3,
 Additionally, you can run the pipeline using providing ncbi accessions (RefSeq or GenBank, depeding on the mode you wish to run) in the `ncbi` field:
 
 ```csv
-species,refseq,fasta,gff,fastq
-species_1,GCF_000000001.1,,,
-species_2,GCF_000000002.1,,,
-species_3,GCF_000000003.1,,,
+assembly,ncbi
+species_1,GCF_000000001.1
+species_2,GCF_000000002.1
+species_3,GCF_000000003.1
 ```
 
 ### Run the pipeline

@@ -11,6 +11,7 @@ process GENOME_ONLY_BUSCO_IDEOGRAM {
     output:
     tuple val(meta), path("*.svg"), emit: svg
     tuple val(meta), path("*.png"), emit: png
+    tuple val(meta), path("*.csv"), emit: busco_mappings
     path "versions.yml"           , emit: versions
 
     script:
