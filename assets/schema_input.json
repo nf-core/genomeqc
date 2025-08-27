@@ -7,13 +7,13 @@
     "items": {
         "type": "object",
         "properties": {
-            "species": {
+            "assembly": {
                 "type": "string",
-                "errorMessage": "Species name must be provided and cannot contain spaces",
+                "errorMessage": "Assembly name must be provided and cannot contain spaces",
                 "pattern": "^\\S+$",
                 "meta": ["id"]
             },
-            "refseq": {
+            "ncbi": {
                 "type": "string",
                 "pattern": "^GC[AF]_[0-9]{9}\\.[0-9]+$",
                 "errorMessage": "NCBI assembly accession number. Should start with GCA_ (RefSeq) or GFC_ (GenBank), followed by 9 digits and the version number, and cannot contain spaces"
@@ -24,7 +24,7 @@
                 "pattern": "^\\S+\\.(fa|fasta|fna)(\\.gz)?$",
                 "errorMessage": "FASTA file with genome assembly, GZIP-compressed or uncompressed, cannot contain spaces and must have extension '.fa', '.fa.gz', '.fna', '.fna.gz', '.fasta' or '.fasta.gz'"
             },
-            "gff": {
+            "gxf": {
                 "type": "string",
                 "format": "file-path",
                 "pattern": "^\\S+\\.(gff3?|gtf)(\\.gz)?$",
@@ -43,6 +43,20 @@
                 "errorMessage": "Species taxid for decontamination screening, must be a valid NCBI taxid (numeric string without spaces)"
             }
         },
-        "required": ["species"]
+        "required": ["assembly"],
+        "anyOf": [
+            {
+                "required": ["fasta"],
+                "not": {
+                    "required": ["ncbi"]
+                }
+            },
+            {
+                "required": ["ncbi"],
+                "not": {
+                    "required": ["fasta"]
+                }
+            }
+        ]
     }
 }

@@ -21,7 +21,7 @@ The pipeline can be run using NCBI accessions (RefSeq or GenBank) or local files
 If running the pipeline on **local** files, point to the location these files using the **fasta** and/or **gxf** fields:
 
 ```csv title="samplesheet.csv"
-species,fasta,gxf
+assembly,fasta,gxf
 species_1,/path/to/genome.fasta,/path/to/annotation.gxf
 species_2,/path/to/genome.fasta,/path/to/annotation.gxf
 species_3,/path/to/genome.fasta,/path/to/annotation.gxf
@@ -30,7 +30,7 @@ species_3,/path/to/genome.fasta,/path/to/annotation.gxf
 If running the pipeline using **ncbi accessions (GenBank and/or RefSeq)**, indicate the corresponding ID using the **ncbi** field:
 
 ```csv title="samplesheet.csv"
-species,ncbi
+assembly,ncbi
 species_1,GCF_000000001.1
 species_2,GCF_000000002.1
 species_3,GCF_000000003.1
@@ -46,28 +46,28 @@ species_3,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq
 ```
 -->
 
-This is what the complete samplesheet would look like if using NCBI accessions:
+This is what the complete samplesheet would look like if using local files:
 
 ```csv title="samplesheet.csv"
-species,fasta,gxf,fastq,taxid
+assembly,fasta,gxf,fastq,taxid
 species_1,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq,1234
 species_2,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq,1245
 species_3,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq,4321
 ```
 
-This is what the complete samplesheet would look like if using local files:
+This is what the complete samplesheet would look like if using NCBI accessions:
 
 ```csv title="samplesheet.csv"
-species,ncbi,fastq,taxid
+assembly,ncbi,fastq,taxid
 species_1,GCF_000000001.1,/path/to/reads.fastq,1234
 species_2,GCF_000000002.1,/path/to/reads.fastq,1245
 species_3,GCF_000000003.1,/path/to/reads.fastq,4321
 ```
 
-You can mix different input types in the same samplesheet. If a specific field doesn’t apply to a row, leave it empty (as shown below). The pipeline will automatically detect the input type for each species and run accordingly:
+You can mix different input types in the same samplesheet. If a specific field doesn’t apply to a row, leave it empty, as shown below. The pipeline will automatically detect the input type for each assembly entry and run accordingly:
 
 ```csv title="samplesheet.csv"
-species,ncbi,fasta,gxf,fastq,taxid
+assmbly,ncbi,fasta,gxf,fastq,taxid
 species_1,,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq,1234
 species_2,,/path/to/genome.fasta,/path/to/annotation.gxf,,4321
 species_3,,/path/to/genome.fasta,/path/to/annotation.gxf,
@@ -80,11 +80,11 @@ species_9,GCA_000000009.1,,,/path/to/reads.fastq
 species_10,GCA_000000010.1,,,,1324
 ```
 
-As for now, the pipeline doesn't support SRA accession for **Merqury**. We will consider this option  the future.
+As for now, the pipeline doesn't support SRA accession for **Merqury** reads. We will consider this option  the future.
 
 | Column    | Description                                                                                                                                                                            |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `species`  | Species name or custom sample name. Spaces in sample names are automatically converted to underscores (`_`) (not sure if this is an option right now). |
+| `assembly`  | Species name or custom sample name. Spaces in sample names are automatically converted to underscores (`_`) (not sure if this is an option right now). |
 | `ncbi` | ncbi acession. Can be GenBank (starts with "GCA") or RefSeq (starts with "GCF").                                                             |
 | `fasta` | Full path to the genome fasta file. Can be compressed or uncompressed.                                                             |
 | `gxf` | Full path to the genome annotation gff/gtf file. Can be compressed or uncompressed.                                                             |
@@ -123,7 +123,7 @@ Do not use `-c <file>` to specify parameters as this will result in errors. Cust
 The above pipeline run specified with a params file in yaml format:
 
 ```bash
-nextflow run ecoflow/genomeqc -profile docker -params-file params.yaml
+nextflow run nf-core/genomeqc -profile docker -params-file params.yaml
 ```
 
 with `params.yaml` containing:

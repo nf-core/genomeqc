@@ -83,10 +83,10 @@ First, prepare an input **samplesheet** in **csv format** (e.g. `samplesheet.csv
 Simply point out to your local genome assembly and annotation (in FASTA and GFF format, respectively) using the `fasta` and `gff` fields:
 
 ```csv
-species,refseq,fasta,gff,fastq
-species_1,,/path/to/genome.fasta,/path/to/annotation.gff3,
-species_2,,/path/to/genome.fasta,/path/to/annotation.gff3,
-species_3,,/path/to/genome.fasta,/path/to/annotation.gff3,
+assembly,fasta,gxf
+species_1,/path/to/genome.fasta,/path/to/annotation.gff3
+species_2,/path/to/genome.fasta,/path/to/annotation.gff3
+species_3,/path/to/genome.fasta,/path/to/annotation.gff3
 ```
 
 ### 2. ncbi accessions
@@ -94,10 +94,10 @@ species_3,,/path/to/genome.fasta,/path/to/annotation.gff3,
 Additionally, you can run the pipeline using providing ncbi accessions (RefSeq or GenBank, depeding on the mode you wish to run) in the `ncbi` field:
 
 ```csv
-species,refseq,fasta,gff,fastq
-species_1,GCF_000000001.1,,,
-species_2,GCF_000000002.1,,,
-species_3,GCF_000000003.1,,,
+assembly,ncbi
+species_1,GCF_000000001.1
+species_2,GCF_000000002.1
+species_3,GCF_000000003.1
 ```
 
 ### Run the pipeline
