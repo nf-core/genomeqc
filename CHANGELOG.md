@@ -9,6 +9,8 @@ Initial release of nf-core/genomeqc, created with the [nf-core](https://nf-co.re
 
 ### `Added`
 
+- Pipeine test added for default, and working snapshot
+
 ### `Fixed`
 
 ### `Dependencies`
