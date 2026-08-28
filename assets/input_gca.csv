@@ -1,4 +1,4 @@
-species,ncbi,fasta,gff,fastq,taxid
+assembly,ncbi,fasta,gff,fastq,taxid
 Mycoplasmoides_genitalium,GCA_000027325.1,,,,
 Mycoplasmoides_pneumoniae,GCA_000733995.1,,,,
 Mycoplasmoides_gallisepticum,GCA_900476085.1,,,

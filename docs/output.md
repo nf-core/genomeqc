@@ -30,7 +30,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - [BUSCO seqs above threshold](#busco-seqs-above-threshold) - Count sequences with more than n complete BUSCOs.
 - [TE annotation](#te-annotation) (optional) - Transposable element identification and masking.
 - [Orthofinder](#orthofinder) - Phylogenetic orthology inference.
-- [Ortho seq count](#ortho-seq-count) - Map orthologous genes onto sequences across species.
+- [Ortho seq count](#ortho-seq-count) - Map orthologous genes onto sequences across assemblies.
 - [Tree summary](#tree-summary) - Phylogenetic summary plot.
 - [Shiny app](#shiny-app) - Dynamic tree summary plot adjuster.
 - [MultiQC](#multiqc) - Aggregate report describing results and QC from the whole pipeline.
@@ -135,7 +135,7 @@ It generates a report in different formats, as well as an HTML file with in inte
 <details markdown="1">
 <summary>Output files</summary>
 
-- `quast/<species_name>/`
+- `quast/<assembly_name>/`
   - `icarus.html`: Contig viewer in HTML format
   - `report.html`: Assembly stats in HTML format
   - `report.pdf`: Assembly stats in PDF format
@@ -152,18 +152,18 @@ It will use a known telomeric repeat as input string, and will find occurrences 
 <details markdown="1">
 <summary>Output files</summary>
 
-- `tidk/<species_name>/explore/`
-  - `<species_name>.tidk.explore.tsv`: k-mer frequency table used to identify the candidate telomeric repeat.
-- `tidk/<species_name>/search/aposteriori/`
-  - `<species_name>.tsv`: Repeat counts per window across the genome (a posteriori repeat identified by `tidk explore`).
-  - `<species_name>.bedgraph`: Same data in bedgraph format.
-- `tidk/<species_name>/search/apriori/<repeat>/` _(only when `--repeat` is provided)_
-  - `<species_name>.tsv`: Repeat counts per window for the supplied a priori repeat string.
-  - `<species_name>.bedgraph`: Same data in bedgraph format.
-- `tidk/<species_name>/plot/aposteriori/`
-  - `<species_name>.svg`: Plot of the a posteriori telomeric repeat distribution across the genome.
-- `tidk/<species_name>/plot/apriori/<repeat>/` _(only when `--repeat` is provided)_
-  - `<species_name>.svg`: Plot of the a priori telomeric repeat distribution across the genome.
+- `tidk/<assembly_name>/explore/`
+  - `<assembly_name>.tidk.explore.tsv`: k-mer frequency table used to identify the candidate telomeric repeat.
+- `tidk/<assembly_name>/search/aposteriori/`
+  - `<assembly_name>.tsv`: Repeat counts per window across the genome (a posteriori repeat identified by `tidk explore`).
+  - `<assembly_name>.bedgraph`: Same data in bedgraph format.
+- `tidk/<assembly_name>/search/apriori/<repeat>/` _(only when `--repeat` is provided)_
+  - `<assembly_name>.tsv`: Repeat counts per window for the supplied a priori repeat string.
+  - `<assembly_name>.bedgraph`: Same data in bedgraph format.
+- `tidk/<assembly_name>/plot/aposteriori/`
+  - `<assembly_name>.svg`: Plot of the a posteriori telomeric repeat distribution across the genome.
+- `tidk/<assembly_name>/plot/apriori/<repeat>/` _(only when `--repeat` is provided)_
+  - `<assembly_name>.svg`: Plot of the a priori telomeric repeat distribution across the genome.
 
 </details>
 
@@ -178,7 +178,7 @@ It generates a histogram relating k-mer counts in the read set to their associat
 <details markdown="1">
 <summary>Output files</summary>
 
-- `merqury/<species_name>/`
+- `merqury/<assembly_name>/`
   - `<assembly>.completeness.stats`: Assembly completeness statistics.
   - `<assembly>.qv`: Assembly quality value (QV) score.
   - `<assembly>.*.qv`: Per-scaffold quality value scores.
@@ -199,10 +199,10 @@ The annotation file is validated and standardised before being processed downstr
 <details markdown="1">
 <summary>Output files</summary>
 
-- `validated_gff/agat/<species_name>/`
-  - `<species_name>.agat.gff`: Validated and standardised annotation file (AGAT, default).
-- `validated_gff/gffread/<species_name>/`
-  - `<species_name>.gff3`: Validated and standardised annotation file (GffRead, only if `--val_tool gffread` is used).
+- `validated_gff/agat/<assembly_name>/`
+  - `<assembly_name>.agat.gff`: Validated and standardised annotation file (AGAT, default).
+- `validated_gff/gffread/<assembly_name>/`
+  - `<assembly_name>.gff3`: Validated and standardised annotation file (GffRead, only if `--val_tool gffread` is used).
 
 </details>
 
@@ -219,8 +219,8 @@ This directory is only saved if `--save_validated_annotation` is set.
 <details markdown="1">
 <summary>Output files</summary>
 
-- `agat/<species_name>/stats/`
-  - `<species_name>.stats.txt`: Gene annotation statistics report.
+- `agat/<assembly_name>/stats/`
+  - `<assembly_name>.stats.txt`: Gene annotation statistics report.
 
 </details>
 
@@ -231,8 +231,8 @@ This directory is only saved if `--save_validated_annotation` is set.
 <details markdown="1">
 <summary>Output files</summary>
 
-- `agat/<species_name>/longest_isoform/`
-  - `<species_name>.longest.g*f`: GXF file with the longest isoform per gene.
+- `agat/<assembly_name>/longest_isoform/`
+  - `<assembly_name>.longest.g*f`: GXF file with the longest isoform per gene.
 
 </details>
 
@@ -248,7 +248,7 @@ It outputs a brief report with information about the number of reads, the number
 <summary>Output files</summary>
 
 - `gene_overlaps/`
-  - `<species_name>.counts.tsv`: Summary counts of same_strand and opposite_strand overlapping genes.
+  - `<assembly_name>.counts.tsv`: Summary counts of same_strand and opposite_strand overlapping genes.
 
 </details>
 
@@ -260,7 +260,7 @@ It outputs a brief report with information about the number of reads, the number
 <summary>Output files</summary>
 
 - `gffread/`
-  - `<species_name>.longest.fasta`: Report in tsv format
+  - `<assembly_name>.longest.fasta`: Report in tsv format
 
 </details>
 
@@ -275,13 +275,13 @@ It outputs a report with completness stats, a summarized table with these stats,
 <details markdown="1">
 <summary>Output files</summary>
 
-- `busco/genome/<species_name>/stats/` (genome completeness) or `busco/protein/<species_name>/stats/` (annotation completeness, genome and annotation mode only)
-  - `short_summary.specific.<busco_db>.<species_name>.txt`: Per-run BUSCO completeness report.
-  - `<species_name>-<busco_db>-busco.batch_summary.txt`: Summarised completeness report.
-- `busco/genome/<species_name>/ideogram/` _(genome only mode)_
-  - `<species_name>_<lineage>.png`: Ideogram with the location of single-copy markers across sequences.
-- `busco/protein/<species_name>/ideogram/` _(genome and annotation mode)_
-  - `<species_name>.png`: Ideogram with the location of single-copy markers across sequences.
+- `busco/genome/<assembly_name>/stats/` (genome completeness) or `busco/protein/<assembly_name>/stats/` (annotation completeness, genome and annotation mode only)
+  - `short_summary.specific.<busco_db>.<assembly_name>.txt`: Per-run BUSCO completeness report.
+  - `<assembly_name>-<busco_db>-busco.batch_summary.txt`: Summarised completeness report.
+- `busco/genome/<assembly_name>/ideogram/` _(genome only mode)_
+  - `<assembly_name>_<lineage>.png`: Ideogram with the location of single-copy markers across sequences.
+- `busco/protein/<assembly_name>/ideogram/` _(genome and annotation mode)_
+  - `<assembly_name>.png`: Ideogram with the location of single-copy markers across sequences.
 
 </details>
 
@@ -289,13 +289,13 @@ It outputs a report with completness stats, a summarized table with these stats,
 
 ### BUSCO seqs above threshold
 
-**BUSCO seqs above threshold** is a local module that counts, per species, the number of sequences (chromosomes/scaffolds/contigs) containing more than `--min_buscos` complete single-copy BUSCOs. Since single-copy BUSCOs are expected to be spread fairly evenly across the genome, this count should also be close to the species' chromosome number in a well-assembled genome — a much higher count suggests the BUSCO gene content is scattered across more, smaller fragments than the real karyotype, a sign of assembly fragmentation.
+**BUSCO seqs above threshold** is a local module that counts, per assembly, the number of sequences (chromosomes/scaffolds/contigs) containing more than `--min_buscos` complete single-copy BUSCOs. Since single-copy BUSCOs are expected to be spread fairly evenly across the genome, this count should also be close to the assembly's chromosome number in a well-assembled genome — a much higher count suggests the BUSCO gene content is scattered across more, smaller fragments than the real karyotype, a sign of assembly fragmentation.
 
 <details markdown="1">
 <summary>Output files</summary>
 
 - `busco/genome/min_number_buscos/` (genome only mode) or `busco/protein/min_number_buscos/` (genome and annotation mode)
-  - `n_seqs_above_x_buscos.tsv`: Number of sequences with Complete BUSCOs above the threshold, for every species run in that mode.
+  - `n_seqs_above_x_buscos.tsv`: Number of sequences with Complete BUSCOs above the threshold, for every assembly run in that mode.
 
 </details>
 
@@ -310,8 +310,8 @@ TE annotation is optional and is enabled with `--te hite` or `--te repeatmasker`
 <details markdown="1">
 <summary>Output files</summary>
 
-- `hite/<species_name>/`
-  - `<species_name>_hite_results/` directory containing all HiTE output files, including the masked genome and identified TE families.
+- `hite/<assembly_name>/`
+  - `<assembly_name>_hite_results/` directory containing all HiTE output files, including the masked genome and identified TE families.
 
 </details>
 
@@ -330,11 +330,11 @@ With `--run_repeatmodeler`, [RepeatModeler](https://github.com/Dfam-consortium/R
 <details markdown="1">
 <summary>Output files</summary>
 
-- `repeatmasker/<species_name>/`
-  - `<species_name>.masked` – soft-masked genome in FASTA format.
-  - `<species_name>.out` – detailed table of repeat positions and classifications.
-  - `<species_name>.tbl` – summary table of repeat annotation results.
-  - `<species_name>.gff` – repeat annotations in GFF format (if produced).
+- `repeatmasker/<assembly_name>/`
+  - `<assembly_name>.masked` – soft-masked genome in FASTA format.
+  - `<assembly_name>.out` – detailed table of repeat positions and classifications.
+  - `<assembly_name>.tbl` – summary table of repeat annotation results.
+  - `<assembly_name>.gff` – repeat annotations in GFF format (if produced).
 
 </details>
 
@@ -363,14 +363,14 @@ This directory will only be present if `--save_orthofinder_results` flag is set.
 
 ### Ortho seq count
 
-**Ortho seq count** is a local module that maps Orthofinder's orthogroup genes onto the sequences (chromosomes/scaffolds/contigs) they are located on, then counts how often sequences pair up as orthologous across species. In a well-assembled genome, this count should be close to the true chromosome number — a much higher count points to a fragmented assembly.
+**Ortho seq count** is a local module that maps Orthofinder's orthogroup genes onto the sequences (chromosomes/scaffolds/contigs) they are located on, then counts how often sequences pair up as orthologous across assemblies. In a well-assembled genome, this count should be close to the true chromosome number — a much higher count points to a fragmented assembly.
 
 <details markdown="1">
 <summary>Output files</summary>
 
 - `ortho_seq_count/`
-  - `species_ortho_seq_count.tsv`: Per-species summary of orthologous sequence mappings.
-  - `pairwise_ortho_seq_count.tsv`: Pairwise sequence co-occurrence counts across species.
+  - `species_ortho_seq_count.tsv`: Per-assembly summary of orthologous sequence mappings.
+  - `pairwise_ortho_seq_count.tsv`: Pairwise sequence co-occurrence counts across assemblies.
   - `debug_gene_mapping.txt`: Per-gene mapping used to build the summaries above.
 
 </details>
@@ -381,7 +381,7 @@ This directory will only be present if `--save_orthofinder_results` flag is set.
 
 The idea of the tree summary is to give some phylogenetic context to the quality stats, which might help users when evaluating the integrity of the assemblies.
 
-The layout is set with `--tree_style`: a conventional left-to-right tree (`roundrect`, `ellipse` or `rectangular`), or `circular`, which draws the tree as a fan with each summary statistic as a concentric ring and a numbered species key. In the circular layout, quality metrics (sequence count, N50, BUSCO completeness/duplication, FCS-GX contamination) are scored against `--quality_preset` thresholds (overridable per-metric with `--quality_thresholds`) and drawn as a colour-blind-safe Good/Warn/Poor traffic light on the outer rings, while descriptive metrics (e.g. genome size, gene number) use a neutral grey ramp on the inner rings; a key showing the swatches and their thresholds is drawn alongside the plot. `--show_ring_values` additionally prints each value on its ring.
+The layout is set with `--tree_style`: a conventional left-to-right tree (`roundrect`, `ellipse` or `rectangular`), or `circular`, which draws the tree as a fan with each summary statistic as a concentric ring and a numbered assembly key. In the circular layout, quality metrics (sequence count, N50, BUSCO completeness/duplication, FCS-GX contamination) are scored against `--quality_preset` thresholds (overridable per-metric with `--quality_thresholds`) and drawn as a colour-blind-safe Good/Warn/Poor traffic light on the outer rings, while descriptive metrics (e.g. genome size, gene number) use a neutral grey ramp on the inner rings; a key showing the swatches and their thresholds is drawn alongside the plot. `--show_ring_values` additionally prints each value on its ring.
 
 If [TE annotation](#te-annotation) was run (`--te hite` or `--te repeatmasker`), each genome also gets a **TE** panel: a 100%-stacked horizontal bar showing the proportion of the genome made up of each repeat category (SINE, LINE, LTR, Penelope, DNA, Rolling Circle, Unclassified, Other, and non-repetitive sequence), coloured left-to-right in the same order as the legend. The panel is omitted entirely when TE annotation wasn't run.
 

@@ -7,9 +7,9 @@
     "items": {
         "type": "object",
         "properties": {
-            "species": {
+            "assembly": {
                 "type": "string",
-                "errorMessage": "Species name must be provided and cannot contain spaces",
+                "errorMessage": "Assembly name must be provided and cannot contain spaces",
                 "pattern": "^\\S+$",
                 "meta": ["id"]
             },
@@ -42,6 +42,6 @@
                 "errorMessage": "Species taxid for decontamination screening, must be a valid NCBI taxid (numeric string without spaces)"
             }
         },
-        "required": ["species"]
+        "required": ["assembly"]
     }
 }

@@ -16,80 +16,80 @@ Before running the pipeline, you will need to create a samplesheet with informat
 --input '[path to samplesheet file]'
 ```
 
-The pipeline can be run using NCBI accessions (RefSeq or GenBank) or local files. It needs at least a **genome** (GenBank accession or local file in FASTA format) per species to run. If annotations (RefSeq accession or local file in GTF/GFF format) are added, the pipeline will run on both **genomes and annotations**. If you provide local FASTQ reads for an assembly, the pipeline will run Merqury to evaluate completness (see [Running Merqury](#running-merqury)). If you provide taxids in NCBI format and an FCS-GX database, it will run the decontamination subworkflow (see [Running the Decontamination subworkflow](#running-the-decontamination-subworkflow)).
+The pipeline can be run using NCBI accessions (RefSeq or GenBank) or local files. It needs at least a **genome** (GenBank accession or local file in FASTA format) per assembly to run. If annotations (RefSeq accession or local file in GTF/GFF format) are added, the pipeline will run on both **genomes and annotations**. If you provide local FASTQ reads for an assembly, the pipeline will run Merqury to evaluate completness (see [Running Merqury](#running-merqury)). If you provide taxids in NCBI format and an FCS-GX database, it will run the decontamination subworkflow (see [Running the Decontamination subworkflow](#running-the-decontamination-subworkflow)).
 
 If running the pipeline using **local** files, point to the location these files using the `fasta` and/or `gff` fields:
 
 ```csv title="samplesheet.csv"
-species,fasta,gff
-species_1,/path/to/genome1.fasta,/path/to/annotation1.gxf
-species_2,/path/to/genome2.fasta,/path/to/annotation2.gxf
-species_3,/path/to/genome3.fasta,/path/to/annotation3.gxf
+assembly,fasta,gff
+assembly_1,/path/to/genome1.fasta,/path/to/annotation1.gxf
+assembly_2,/path/to/genome2.fasta,/path/to/annotation2.gxf
+assembly_3,/path/to/genome3.fasta,/path/to/annotation3.gxf
 ```
 
 If running the pipeline using **ncbi accessions (GenBank and/or RefSeq)**, indicate the corresponding ID using the `ncbi` field:
 
 ```csv title="samplesheet.csv"
-species,ncbi
-species_1,GCF_000000001.1
-species_2,GCF_000000002.1
-species_3,GCF_000000003.1
+assembly,ncbi
+assembly_1,GCF_000000001.1
+assembly_2,GCF_000000002.1
+assembly_3,GCF_000000003.1
 ```
 
 <!-- If running with **Merqury**, you must point to the location of fastq files using the **fastq** field:
 
 ```csv title="samplesheet.csv"
-species,fasta,gxf,fastq
-species_1,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq
-species_2,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq
-species_3,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq
+assembly,fasta,gxf,fastq
+assembly_1,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq
+assembly_2,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq
+assembly_3,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq
 ```
 -->
 
 This is what the complete samplesheet would look like if using NCBI accessions, and adding FASTQ paths and tax IDs:
 
 ```csv title="samplesheet.csv"
-species,fasta,gff,fastq,taxid
-species_1,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq,1234
-species_2,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq,1245
-species_3,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq,4321
+assembly,fasta,gff,fastq,taxid
+assembly_1,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq,1234
+assembly_2,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq,1245
+assembly_3,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq,4321
 ```
 
 This is what the complete samplesheet would look like if using local files, and adding FASTQ paths and tax IDs:
 
 ```csv title="samplesheet.csv"
-species,ncbi,fastq,taxid
-species_1,GCF_000000001.1,/path/to/reads.fastq,1234
-species_2,GCF_000000002.1,/path/to/reads.fastq,1245
-species_3,GCF_000000003.1,/path/to/reads.fastq,4321
+assembly,ncbi,fastq,taxid
+assembly_1,GCF_000000001.1,/path/to/reads.fastq,1234
+assembly_2,GCF_000000002.1,/path/to/reads.fastq,1245
+assembly_3,GCF_000000003.1,/path/to/reads.fastq,4321
 ```
 
 You can mix different input types in the same samplesheet. If a specific field doesn’t apply to a row, leave it empty (as shown below). The pipeline will automatically detect the input type for each row and run the appropiate subworkflow:
 
 ```csv title="samplesheet.csv"
-species,ncbi,fasta,gff,fastq,taxid
-species_1,,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq,1234
-species_2,,/path/to/genome.fasta,/path/to/annotation.gxf,,4321
-species_3,,/path/to/genome.fasta,/path/to/annotation.gxf,
-species_4,,/path/to/genome.fasta,,/path/to/reads.fastq,1245
-species_5,,/path/to/genome.fasta,,
-species_6,,/path/to/genome.fassta,,
-species_7,GCF_000000007.1,,,/path/to/reads.fastq
-species_8,GCF_000000008.1,,,
-species_9,GCA_000000009.1,,,/path/to/reads.fastq
-species_10,GCA_000000010.1,,,,1324
+assembly,ncbi,fasta,gff,fastq,taxid
+assembly_1,,/path/to/genome.fasta,/path/to/annotation.gxf,/path/to/reads.fastq,1234
+assembly_2,,/path/to/genome.fasta,/path/to/annotation.gxf,,4321
+assembly_3,,/path/to/genome.fasta,/path/to/annotation.gxf,
+assembly_4,,/path/to/genome.fasta,,/path/to/reads.fastq,1245
+assembly_5,,/path/to/genome.fasta,,
+assembly_6,,/path/to/genome.fassta,,
+assembly_7,GCF_000000007.1,,,/path/to/reads.fastq
+assembly_8,GCF_000000008.1,,,
+assembly_9,GCA_000000009.1,,,/path/to/reads.fastq
+assembly_10,GCA_000000010.1,,,,1324
 ```
 
 As for now, the pipeline doesn't support SRA accession for **Merqury**. We will consider this option the future.
 
-| Column    | Description                                                                                                                         |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `species` | Species name or custom sample name. Spaces in sample names are automatically converted to underscores (`_`).                        |
-| `ncbi`    | ncbi acession. Can be GenBank (starts with `GCA`) or RefSeq (starts with `GCF`).                                                    |
-| `fasta`   | Full path to the genome FASTA file. Can be compressed or uncompressed.                                                              |
-| `gff`     | Full path to the genome annotation GFF/GTF file. Can be compressed or uncompressed.                                                 |
-| `fastq`   | Full path to FASTQ file for long reads (e.g. PacBio or ONT). File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz". |
-| `taxid`   | Species taxid for decontamination screening, must be a valid NCBI taxid (numeric string without spaces).                            |
+| Column     | Description                                                                                                                         |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `assembly` | Assembly name or custom sample name. Spaces in sample names are automatically converted to underscores (`_`).                       |
+| `ncbi`     | ncbi acession. Can be GenBank (starts with `GCA`) or RefSeq (starts with `GCF`).                                                    |
+| `fasta`    | Full path to the genome FASTA file. Can be compressed or uncompressed.                                                              |
+| `gff`      | Full path to the genome annotation GFF/GTF file. Can be compressed or uncompressed.                                                 |
+| `fastq`    | Full path to FASTQ file for long reads (e.g. PacBio or ONT). File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz". |
+| `taxid`    | Species taxid for decontamination screening, must be a valid NCBI taxid (numeric string without spaces).                            |
 
 An [example samplesheet](./assets/samplesheet.csv) is provided with the pipeline.
 

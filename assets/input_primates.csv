@@ -1,4 +1,4 @@
-species,ncbi,fasta,gff,fastq,taxid
+assembly,ncbi,fasta,gff,fastq,taxid
 Homo_sapiens,GCF_000001405.40,,,,9606
 Pan_troglodytes,GCF_028858775.2,,,,9598
 Pan_paniscus,GCF_029289425.2,,,,9597

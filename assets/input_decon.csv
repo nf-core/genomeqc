@@ -1,2 +1,2 @@
-species,ncbi,fasta,gff,fastq,taxid
+assembly,ncbi,fasta,gff,fastq,taxid
 test_combo,,https://zenodo.org/records/10932013/files/FCS_combo_test.fa,,,4932

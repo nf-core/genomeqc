@@ -213,7 +213,7 @@
                     "type": "string",
                     "default": "roundrect",
                     "description": "Tree layout style for the tree summary plot.",
-                    "help_text": "'roundrect' draws rounded branches (default), 'ellipse' draws curved branches with node points, 'rectangular' reproduces the legacy look with dotted leader lines, and 'circular' draws a fan tree with each summary statistic as a concentric coloured ring and a numbered species key. In circular mode the same stats as the default layout are available (sequence number, genome size, N50, gene number, genome and protein BUSCO completeness, FCS-GX contamination, etc.), each toggled independently via --skip_stats.",
+                    "help_text": "'roundrect' draws rounded branches (default), 'ellipse' draws curved branches with node points, 'rectangular' reproduces the legacy look with dotted leader lines, and 'circular' draws a fan tree with each summary statistic as a concentric coloured ring and a numbered assembly key. In circular mode the same stats as the default layout are available (sequence number, genome size, N50, gene number, genome and protein BUSCO completeness, FCS-GX contamination, etc.), each toggled independently via --skip_stats.",
                     "enum": ["roundrect", "ellipse", "rectangular", "circular"]
                 },
                 "circular_rings": {

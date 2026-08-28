@@ -1,4 +1,4 @@
-species,ncbi,fasta,gff,fastq,taxid
+assembly,ncbi,fasta,gff,fastq,taxid
 species_1,,/path/to/genome1.fasta,/path/to/annotation1.gff,/path/to/reads1.fastq,1234
 species_2,GCF_000000002.1,,,,4321
 species_3,,/path/to/genome3.fasta,,,
