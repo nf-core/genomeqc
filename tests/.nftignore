@@ -25,7 +25,7 @@ quast/**/report.pdf
 # debug_gene_mapping.txt's content isn't repeatable (order-dependent on GFF processing), so it's excluded rather than snapshotted.
 ortho_seq_count/debug_gene_mapping.txt
 **/*.pdf
-agat/Mycoplasmoides_gallisepticum/Mycoplasmoides_gallisepticum.stats.txt
+agat/Mycoplasmoides_gallisepticum/stats/Mycoplasmoides_gallisepticum.stats.txt
 **/tree.nw
 **/tree_plot.*
 **/*.xlsx
