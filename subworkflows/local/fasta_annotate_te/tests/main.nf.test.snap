@@ -1,0 +1,310 @@
+{
+    "sarscov2_genome-repeatmasker-prestaged_famdb": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.masked"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.tbl"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.gff"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "te_table"
+                    },
+                    "te_table.tsv:md5,594187a40e0b2ca1d5e078fd9aa8a77f"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "famdb.fa"
+                ]
+            ]
+        ],
+        "timestamp": "2026-08-10T22:44:31.968079",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    },
+    "tiny_genome-hite": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.tbl"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "te_table"
+                    },
+                    "te_table.tsv:md5,2ee0b5099545d848608f506451fb5414"
+                ]
+            ]
+        ],
+        "timestamp": "2026-08-10T22:44:12.766878",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    },
+    "sarscov2_genome-repeatmasker-download-stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.masked:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.out:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.tbl:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "3": [
+                    [
+                        "test.tbl:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "4": [
+                    [
+                        {
+                            "id": "te_table"
+                        },
+                        "te_table.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "5": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.gff:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "6": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "famdb.fa:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "gff": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.gff:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "masked": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.masked:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "out": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.out:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "repeat_library": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "famdb.fa:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "tbl": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.tbl:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "tbl_collected": [
+                    [
+                        "test.tbl:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "tbl_tsv": [
+                    [
+                        {
+                            "id": "te_table"
+                        },
+                        "te_table.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-18T13:40:57.210886",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    },
+    "sarscov2_genome-repeatmasker-stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.masked:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.out:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.tbl:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "3": [
+                    [
+                        "test.tbl:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "4": [
+                    [
+                        {
+                            "id": "te_table"
+                        },
+                        "te_table.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "5": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.gff:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "6": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "famdb.fa:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "gff": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.gff:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "masked": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.masked:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "out": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.out:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "repeat_library": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "famdb.fa:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "tbl": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.tbl:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "tbl_collected": [
+                    [
+                        "test.tbl:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "tbl_tsv": [
+                    [
+                        {
+                            "id": "te_table"
+                        },
+                        "te_table.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-10T22:44:43.549891",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    }
+}

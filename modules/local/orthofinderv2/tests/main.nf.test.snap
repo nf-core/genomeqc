@@ -1,0 +1,210 @@
+{
+    "orthofinderv2 - sarscov2 - candidatus_portiera_aleyrodidarum - proteome": {
+        "content": [
+            [
+                "SpeciesTree_rooted.txt:md5,4d5ea525feebe479fca0c0768271ba81",
+                "Statistics_PerSpecies.tsv:md5,984b5011a34d54527fe17896bfa36a2d"
+            ],
+            [
+                "Number of species\t2",
+                "Number of genes\t270",
+                "Number of genes in orthogroups\t40",
+                "Number of unassigned genes\t230",
+                "Percentage of genes in orthogroups\t14.8",
+                "Percentage of unassigned genes\t85.2",
+                "Number of orthogroups\t16",
+                "Number of species-specific orthogroups\t16",
+                "Number of genes in species-specific orthogroups\t40",
+                "Percentage of genes in species-specific orthogroups\t14.8",
+                "Mean orthogroup size\t2.5",
+                "Median orthogroup size\t2.0",
+                "G50 (assigned genes)\t3",
+                "G50 (all genes)\t1",
+                "O50 (assigned genes)\t6",
+                "O50 (all genes)\t111",
+                "Number of orthogroups with all species present\t0",
+                "Number of single-copy orthogroups\t0",
+                "Orthogroups file\tOrthogroups.tsv",
+                "Unassigned genes file\tOrthogroups_UnassignedGenes.tsv",
+                "Per-species statistics\tStatistics_PerSpecies.tsv",
+                "Overall statistics\tStatistics_Overall.tsv",
+                "Orthogroups shared between species\tOrthogroups_SpeciesOverlaps.tsv",
+                "",
+                "Average number of genes per-species in orthogroup\tNumber of orthogroups\tPercentage of orthogroups\tNumber of genes\tPercentage of genes",
+                "<1\t0\t0.0\t0\t0.0",
+                "'1\t14\t87.5\t32\t80.0",
+                "'2\t2\t12.5\t8\t20.0",
+                "'3\t0\t0.0\t0\t0.0",
+                "'4\t0\t0.0\t0\t0.0",
+                "'5\t0\t0.0\t0\t0.0",
+                "'6\t0\t0.0\t0\t0.0",
+                "'7\t0\t0.0\t0\t0.0",
+                "'8\t0\t0.0\t0\t0.0",
+                "'9\t0\t0.0\t0\t0.0",
+                "'10\t0\t0.0\t0\t0.0",
+                "11-15\t0\t0.0\t0\t0.0",
+                "16-20\t0\t0.0\t0\t0.0",
+                "21-50\t0\t0.0\t0\t0.0",
+                "51-100\t0\t0.0\t0\t0.0",
+                "101-150\t0\t0.0\t0\t0.0",
+                "151-200\t0\t0.0\t0\t0.0",
+                "201-500\t0\t0.0\t0\t0.0",
+                "501-1000\t0\t0.0\t0\t0.0",
+                "'1001+\t0\t0.0\t0\t0.0",
+                "",
+                "Number of species in orthogroup\tNumber of orthogroups",
+                "1\t16",
+                "2\t0"
+            ],
+            {
+                "versions_orthofinder": [
+                    [
+                        "ORTHOFINDERV2",
+                        "orthofinder",
+                        "2.5.5"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-08T08:32:16.811438",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    },
+    "orthofinderv2 - sarscov2 - candidatus_portiera_aleyrodidarum - proteome - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        [
+                            [
+                                
+                            ],
+                            [
+                                
+                            ],
+                            [
+                                
+                            ],
+                            "Log.txt:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            [
+                                
+                            ],
+                            [
+                                "Orthogroups.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                            ],
+                            [
+                                
+                            ],
+                            [
+                                "N0.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                            ],
+                            [
+                                
+                            ],
+                            [
+                                
+                            ],
+                            [
+                                
+                            ],
+                            [
+                                
+                            ],
+                            [
+                                "SpeciesTree_rooted_node_labels.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                            ],
+                            [
+                                
+                            ]
+                        ]
+                    ]
+                ],
+                "1": [
+                    "N0.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "2": [
+                    "SpeciesTree_rooted_node_labels.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "3": [
+                    [
+                        "ORTHOFINDERV2",
+                        "orthofinder",
+                        "2.5.5"
+                    ]
+                ],
+                "orthofinder": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        [
+                            [
+                                
+                            ],
+                            [
+                                
+                            ],
+                            [
+                                
+                            ],
+                            "Log.txt:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            [
+                                
+                            ],
+                            [
+                                "Orthogroups.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                            ],
+                            [
+                                
+                            ],
+                            [
+                                "N0.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                            ],
+                            [
+                                
+                            ],
+                            [
+                                
+                            ],
+                            [
+                                
+                            ],
+                            [
+                                
+                            ],
+                            [
+                                "SpeciesTree_rooted_node_labels.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                            ],
+                            [
+                                
+                            ]
+                        ]
+                    ]
+                ],
+                "orthologues": [
+                    "N0.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "speciestree": [
+                    "SpeciesTree_rooted_node_labels.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "versions_orthofinder": [
+                    [
+                        "ORTHOFINDERV2",
+                        "orthofinder",
+                        "2.5.5"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-07T09:42:46.386917",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}

@@ -1,0 +1,61 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "input_preparation"
+description: |
+  Prepares genome, annotation and read inputs for the rest of the pipeline. RefSeq/GenBank
+  accessions are fetched with ncbigenomedownload; local files are used as-is. Gzip-compressed
+  fasta/gxf files (whether provided locally or downloaded) are decompressed with pigz. Local
+  and downloaded inputs are combined into a single synced channel, and a channel of samples
+  requiring decontamination (those with a taxid) is derived. Optionally downloads the
+  requested BUSCO lineage dataset.
+keywords:
+  - genomics
+  - input
+  - ncbi
+  - genome download
+  - busco
+components:
+  - ncbigenomedownload
+  - pigz/uncompress
+  - busco/download
+input:
+  - ch_ncbi:
+      type: file
+      description: |
+        Samples to fetch from NCBI
+        Structure: [ val(meta), val(refseq), val(fastq) ]; fastq is optional (may be null)
+  - ch_local:
+      type: file
+      description: |
+        Samples provided as local files
+        Structure: [ val(meta), val(fasta), val(gxf), val(fastq) ]; gxf and fastq are
+        optional (may be null)
+output:
+  - fasta:
+      type: file
+      description: |
+        Decompressed genome assembly, from either local input or NCBI download
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - input:
+      type: file
+      description: |
+        Decompressed genome, annotation (if provided) and reads (if provided)
+        Structure: [ val(meta), path(fasta), path(gxf), path(fastq) ]; gxf and fastq are
+        null when not provided
+      pattern: "*.{fa,fasta}"
+  - input_decon:
+      type: file
+      description: |
+        Decompressed genome assembly for samples requiring decontamination (only samples
+        with meta.taxid set)
+        Structure: [ val(meta), path(fasta) ]; e.g. meta = [ id:'sample1', taxid:9606 ]
+      pattern: "*.{fa,fasta}"
+  - busco_db:
+      type: file
+      description: |
+        Path to the downloaded BUSCO lineage dataset, the user-supplied
+        `params.busco_lineages_path`, or `[]` when BUSCO auto-lineage selection is used
+authors:
+  - "@FernandoDuarteF"
+maintainers:
+  - "@FernandoDuarteF"

@@ -1,0 +1,131 @@
+nextflow_process {
+
+    name "Test Process TREESUMMARY"
+    script "../main.nf"
+    process "TREESUMMARY"
+
+    tag "modules"
+    tag "modules_local"
+    tag "treesummary"
+
+    test("treesummary - genome_anno - two species") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test', mode:'genome_anno' ], // meta map
+                    file("\${baseDir}/modules/local/treesummary/tests/ofresults", checkIfExists: true)
+                ]
+                input[1] = [
+                    [ id:'busco_geno' ],
+                    [
+                        file("\${baseDir}/modules/local/treesummary/tests/speciesA-genome-busco.batch_summary_modified.txt", checkIfExists: true),
+                        file("\${baseDir}/modules/local/treesummary/tests/speciesB-genome-busco.batch_summary_modified.txt", checkIfExists: true)
+                    ]
+                ]
+                input[2] = [
+                    [ id:'busco_prot' ],
+                    [
+                        file("\${baseDir}/modules/local/treesummary/tests/speciesA-proteins-busco.batch_summary_modified.txt", checkIfExists: true),
+                        file("\${baseDir}/modules/local/treesummary/tests/speciesB-proteins-busco.batch_summary_modified.txt", checkIfExists: true)
+                    ]
+                ]
+                input[3] = [
+                    [ id:'te' ],
+                    file("\${baseDir}/modules/local/treesummary/tests/te_summary.tsv", checkIfExists: true)
+                ]
+                input[4] = [
+                    [ id:'fcs' ],
+                    file("\${baseDir}/modules/local/treesummary/tests/fcs_summary.tsv", checkIfExists: true)
+                ]
+                input[5] = [
+                    file("\${baseDir}/modules/local/treesummary/tests/speciesA.quast.tsv", checkIfExists: true),
+                    file("\${baseDir}/modules/local/treesummary/tests/speciesB.quast.tsv", checkIfExists: true),
+                    file("\${baseDir}/modules/local/treesummary/tests/test.counts.tsv", checkIfExists: true),
+                    file("\${baseDir}/modules/local/treesummary/tests/n_seqs_above_x_buscos.tsv", checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            // PDF/SVG figures aren't byte-stable across environments, so only checked for existence.
+            def table_names = process.out.tables[0][1].collect { new File(it).name }.sort()
+            def table_path = { name -> process.out.tables[0][1].find { new File(it).name == name } }
+            assertAll(
+                { assert process.success },
+                { assert process.out.figure[0].size() > 0 },
+                { assert process.out.figure_svg[0].size() > 0 },
+                { assert path(process.out.tree[0][1]).exists() },
+                { assert table_names.contains('gene_stats.tsv') },
+                { assert table_names.contains('Busco_combined_geno.tsv') },
+                { assert table_names.contains('Busco_combined_prot.tsv') },
+                { assert table_names.contains('Quast_to_plot.tsv') },
+                { assert table_names.contains('n_seqs_above_x_buscos_output.tsv') },
+                { assert table_names.contains('te_table_output.tsv') },
+                { assert table_names.contains('fcs_table_output.tsv') },
+                // species_ortho_seq_count.tsv never reaches this process (see genome_and_annotation.nf).
+                { assert !table_names.contains('species_ortho_seq_count_output.tsv') },
+                { assert snapshot(
+                    path(table_path('gene_stats.tsv')),
+                    path(table_path('Busco_combined_geno.tsv')),
+                    path(table_path('Busco_combined_prot.tsv')),
+                    path(table_path('Quast_to_plot.tsv')),
+                    process.out.findAll { key, val -> key.startsWith('versions') }
+                    ).match() }
+            )
+        }
+    }
+
+    test("treesummary - genome_anno - two species - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test', mode:'genome_anno' ], // meta map
+                    file("\${baseDir}/modules/local/treesummary/tests/ofresults", checkIfExists: true)
+                ]
+                input[1] = [
+                    [ id:'busco_geno' ],
+                    [
+                        file("\${baseDir}/modules/local/treesummary/tests/speciesA-genome-busco.batch_summary_modified.txt", checkIfExists: true),
+                        file("\${baseDir}/modules/local/treesummary/tests/speciesB-genome-busco.batch_summary_modified.txt", checkIfExists: true)
+                    ]
+                ]
+                input[2] = [
+                    [ id:'busco_prot' ],
+                    [
+                        file("\${baseDir}/modules/local/treesummary/tests/speciesA-proteins-busco.batch_summary_modified.txt", checkIfExists: true),
+                        file("\${baseDir}/modules/local/treesummary/tests/speciesB-proteins-busco.batch_summary_modified.txt", checkIfExists: true)
+                    ]
+                ]
+                input[3] = [
+                    [ id:'te' ],
+                    file("\${baseDir}/modules/local/treesummary/tests/te_summary.tsv", checkIfExists: true)
+                ]
+                input[4] = [
+                    [ id:'fcs' ],
+                    file("\${baseDir}/modules/local/treesummary/tests/fcs_summary.tsv", checkIfExists: true)
+                ]
+                input[5] = [
+                    file("\${baseDir}/modules/local/treesummary/tests/speciesA.quast.tsv", checkIfExists: true),
+                    file("\${baseDir}/modules/local/treesummary/tests/speciesB.quast.tsv", checkIfExists: true),
+                    file("\${baseDir}/modules/local/treesummary/tests/test.counts.tsv", checkIfExists: true),
+                    file("\${baseDir}/modules/local/treesummary/tests/n_seqs_above_x_buscos.tsv", checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

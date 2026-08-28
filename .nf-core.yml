@@ -1,0 +1,17 @@
+lint:
+  schema_params: false # TEMP: nf-core/tools crashes comparing the RM_db array default (https://github.com/nf-core/tools/issues/4367, fix pending in https://github.com/nf-core/tools/pull/4392) - re-enable once that's released
+  files_unchanged:
+    - assets/nf-core-genomeqc_logo_light.png
+    - docs/images/nf-core-genomeqc_logo_light.png
+    - docs/images/nf-core-genomeqc_logo_dark.png
+nf_core_version: 4.1.0
+repository_type: pipeline
+template:
+  author: Chris Wyatt, Fernando Duarte
+  description: A pipeline to compare multiple genomes and annotations
+  force: false
+  is_nfcore: true
+  name: genomeqc
+  org: nf-core
+  outdir: .
+  version: 1.0.0

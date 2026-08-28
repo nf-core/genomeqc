@@ -1,0 +1,70 @@
+name: "busco_seqs"
+description: Counts, per species, the number of sequences with more Complete
+  BUSCOs than a threshold
+keywords:
+  - busco
+  - completeness
+  - ideogram
+tools:
+  - "ortho_seqs":
+      description: "In-house script that counts, per input table, how many sequences
+        have a Complete_BUSCOs count above a threshold. Consumes the per-sequence BUSCO
+        table produced by plot_busco_ideogram.R."
+      homepage: "https://github.com/nf-core/genomeqc"
+      documentation: "https://github.com/nf-core/genomeqc"
+      licence:
+        - "MIT"
+      identifier: ""
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. [ id:'test' ]
+    - tables:
+        type: file
+        description: Per-sequence BUSCO CSV table(s) with a "Complete_BUSCOs"
+          column, as produced by plot_busco_ideogram.R
+        pattern: "*.csv"
+        ontologies:
+          - edam: http://edamontology.org/format_3752
+output:
+  table:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test' ]
+      - "*.tsv":
+          type: file
+          description: TSV of the number of sequences above the Complete_BUSCOs
+            threshold, per input table
+          pattern: "*.tsv"
+          ontologies:
+            - edam: http://edamontology.org/format_3475
+  versions_python:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - python3 --version | sed "s/Python //g":
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - python3 --version | sed "s/Python //g":
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@FernandoDuarteF"
+  - "@chriswyatt1"
+maintainers:
+  - "@chriswyatt1"

@@ -1,0 +1,279 @@
+{
+    "sarscov2-local_fasta_gxf_fastq": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "taxid": "2697049"
+                    },
+                    "genome.fasta:md5,6e9fe4042a72f2345f644f239272b7e6"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "taxid": "2697049"
+                    },
+                    "genome.fasta:md5,6e9fe4042a72f2345f644f239272b7e6",
+                    "genome.gff3:md5,357435a81a9981a0128e840ebe11051e",
+                    "/nf-core/test-datasets/modules/data/genomics/sarscov2/illumina/fastq/test_1.fastq.gz"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "taxid": "2697049"
+                    },
+                    "genome.fasta:md5,6e9fe4042a72f2345f644f239272b7e6"
+                ]
+            ],
+            [
+                "file_versions.tsv:md5,dadbe48e909083f816eab8efb874bc34",
+                [
+                    [
+                        "ancestral:md5,44d23bcb7f5aa6f46dfa145f55f64e90",
+                        "ancestral_variants:md5,ef07df04e70f2dd17b5c66f0694ad520",
+                        "dataset.cfg:md5,7a33d5047263fb3fd89c882926c74f5b",
+                        [
+                            "1009041at2.hmm:md5,c5298835587bf9297e0a492a93fa34fa",
+                            "1024388at2.hmm:md5,53bfb1db46d403cc7aa896a6349ecdd0",
+                            "1036075at2.hmm:md5,b2aae1bc12b10c794f1ab2601f83f3c2",
+                            "1043239at2.hmm:md5,43c23ae1ae39c23f040820246d364248",
+                            "1049662at2.hmm:md5,3937dbf735d0c51b43a8099a714f7f4f",
+                            "1054741at2.hmm:md5,d30a9d6e94623734fc8bb3570bcfcbdc",
+                            "1069591at2.hmm:md5,195dfcfcff0839d0b70944afcd3d7701",
+                            "1074831at2.hmm:md5,b91c687fc22836d075511d2fbb4f8ebe",
+                            "1080436at2.hmm:md5,707aadf0b8e7f90178e65dc8779c2820",
+                            "1093223at2.hmm:md5,7fe2f60cec04bad5cc9d9651ef1ed16c",
+                            "1132353at2.hmm:md5,2fa03c8cd3478cdfc33fd1820fc76968",
+                            "1151822at2.hmm:md5,16172d094a9b13b0ada5e10e7e438faf",
+                            "1166299at2.hmm:md5,705c860a97a5244571891453a6bc78ef",
+                            "1211060at2.hmm:md5,af173b51f2ee63c6f0441cefa5d8931f",
+                            "1257362at2.hmm:md5,302cb49141bd154e466cdc2aa4324773",
+                            "1266295at2.hmm:md5,77d9ffeaa9112db922da461eea1eca71",
+                            "1270636at2.hmm:md5,3d750f06d75848769227a6d7a6ab072a",
+                            "1272633at2.hmm:md5,9d532480c31d988c79c859572affcc60",
+                            "1346419at2.hmm:md5,9999c1401cf1ecdfed70c09d5378dda4",
+                            "1395197at2.hmm:md5,b1e2773743738e251f422f0848842960",
+                            "1398618at2.hmm:md5,faf05049b3305e9f235c6d2b2c07f207",
+                            "1419877at2.hmm:md5,b1aac4071e1dce2a6eea753786be08fe",
+                            "143460at2.hmm:md5,ca4fc6b9a31d1209ce5a142221cc6d73",
+                            "1456375at2.hmm:md5,c71cb6b307ecf5da5f1f22c19ae1c737",
+                            "1470978at2.hmm:md5,48298773803609c85bd2621b1d7b4193",
+                            "1490892at2.hmm:md5,111522dbaa6d8a5b37dfcda670846019",
+                            "1491686at2.hmm:md5,27b3b939ac9e03b1e16c8b1d59ecdf9e",
+                            "1497415at2.hmm:md5,4b501ea3227457679a8498feb2ce5ece",
+                            "1502854at2.hmm:md5,451f2271fdb7bc62477b4c07b19ff65b",
+                            "1504821at2.hmm:md5,e8bc35df3e8e10c860e7f4cf463b776a",
+                            "1505038at2.hmm:md5,334f1fa62fc34366f96679b2d8bebab4",
+                            "1540940at2.hmm:md5,6b32a6519c906f771b6224a788a4bf83",
+                            "1567535at2.hmm:md5,3edaf8114a38c05adf6bf63af207566d",
+                            "1572673at2.hmm:md5,e8599b0d5ac6b8c75f39f1c06f37d18c",
+                            "1574817at2.hmm:md5,571d07e69dd3a70ae344ccc687a9c670",
+                            "1590629at2.hmm:md5,d01fc91b22468d35fc4c4ca58c2c3d60",
+                            "1592033at2.hmm:md5,3ec9f2556275054ed2817b79b19d8a43",
+                            "1595498at2.hmm:md5,010a9229408212325f2a93297bcf453c",
+                            "1623045at2.hmm:md5,407769addaa096c6f1b30e23cf65cd1d",
+                            "1661836at2.hmm:md5,d108b25c4b0e67f3e134a52d2a17287b",
+                            "1666043at2.hmm:md5,91cb81e03a0b92de26295e0738ae6a92",
+                            "1671455at2.hmm:md5,6864ee1dd2494c87473e8015b667d217",
+                            "1674344at2.hmm:md5,e5a4ce536373821c538cea732e410b6f",
+                            "1676462at2.hmm:md5,57259933f29594392a35fadd1e088a3b",
+                            "1692188at2.hmm:md5,100c4e14e23f1b23930431b9895c26a1",
+                            "1698718at2.hmm:md5,31509b76c2f366a5b8cfda013e3c96c9",
+                            "1701531at2.hmm:md5,41a4498b8d30b235fa89ddf28bd79840",
+                            "1702697at2.hmm:md5,08b4e518d00ef61c716c907a28a5ddc4",
+                            "1707228at2.hmm:md5,ca9eff0c9e2470523ca72dea05e9ccb2",
+                            "1713391at2.hmm:md5,de7d56123c6748e7b3df895ecafa7f01",
+                            "1720952at2.hmm:md5,02ed0596cd2758ee2015b4f4e6cd03c9",
+                            "1758685at2.hmm:md5,9d680ff43ec9e414b3cb1e382745b45b",
+                            "1760144at2.hmm:md5,84ecb91260a35daf74eea190a6e24141",
+                            "1766414at2.hmm:md5,a243ba3d596ba1cacd4ddd46e80b078d",
+                            "1772647at2.hmm:md5,2e702f089fd97794c66187aa1ddea784",
+                            "1776954at2.hmm:md5,a39430840892a4da33425856673e54d3",
+                            "1786618at2.hmm:md5,6fd6ab8d44b581e070e205e697ffadff",
+                            "1799923at2.hmm:md5,19b9d58d90669a7688a27851b12a9c6d",
+                            "182107at2.hmm:md5,b9c4fa1879b93c2d74c5b83f221cf24c",
+                            "1822215at2.hmm:md5,3dbf2959ecd80a285831bf1796bed24b",
+                            "1822695at2.hmm:md5,c709dbe9ee7dd5481985043bd13bd5d8",
+                            "1827295at2.hmm:md5,d59fe6c9f9cf3dda3e58c4921e0fcfce",
+                            "1827334at2.hmm:md5,3d97cbe03c95af20605fc5c0c108e0f0",
+                            "1830156at2.hmm:md5,bba0edf5f8f8efd837a2b4306f4869ef",
+                            "1838961at2.hmm:md5,c8187444b548a4d1857b3751e0848515",
+                            "1842956at2.hmm:md5,c8fdccf2bb98576201156067c9cb43bf",
+                            "1844275at2.hmm:md5,1ab78432dff8bffab2efab7a92ce5308",
+                            "1846503at2.hmm:md5,0dc9d03afee64cd70e094df338bbf5a8",
+                            "1874945at2.hmm:md5,978e346758242e03e7c05b3ffec904f2",
+                            "1890943at2.hmm:md5,4a9670ac0cfc1a1080f19d1d0481314d",
+                            "1893906at2.hmm:md5,e87090b760ecfa89d053f3a7a3eb1541",
+                            "1904463at2.hmm:md5,be2a02582773afe90720b261e3ae4462",
+                            "1906715at2.hmm:md5,58f242511a6933207485cc0f0596e05c",
+                            "1932144at2.hmm:md5,6eed45f2d0f5d623c39018ac0ff6e435",
+                            "1937072at2.hmm:md5,370d311ee09b6474a3a6f65d72543902",
+                            "1937493at2.hmm:md5,de435b0eedbaf3084ee97cb27075424f",
+                            "1940575at2.hmm:md5,fbacbb9fc9066487b1bd3b2adb5e1b8f",
+                            "1949059at2.hmm:md5,d1a05af40a15bad3e92830461ab59770",
+                            "1959318at2.hmm:md5,8daf5eca17e062b1e4d2bfee5a1a0531",
+                            "1963491at2.hmm:md5,b4d6a25ab961c538bd14bf3eccf68dac",
+                            "1971380at2.hmm:md5,f80c4bab82dc353f244e7cba481d1948",
+                            "1978865at2.hmm:md5,9c75295d2e839a2abaa3bc380f2e797b",
+                            "1990141at2.hmm:md5,580641b551a56f89d68e5bb2adb27e60",
+                            "1990650at2.hmm:md5,96f9126980ad497d97bb76e6644bfde9",
+                            "2005443at2.hmm:md5,1013f2177a4572e5674b9d4e9c3b822b",
+                            "2012682at2.hmm:md5,755fcb8353ec4a43ca14ad3785e5a03a",
+                            "2035880at2.hmm:md5,b8b4392c8db05c496d6a227601396a3e",
+                            "2040741at2.hmm:md5,332ee1d089c0b60c9b48306734d5de10",
+                            "2046660at2.hmm:md5,b2b302c3f0e5a15d2d60a56b288bb917",
+                            "2063644at2.hmm:md5,94ccc7d917810cee156fdcc1c75ea7d1",
+                            "2066663at2.hmm:md5,522af87a80ec8ac36a8e4c142e9a29eb",
+                            "2075502at2.hmm:md5,8461a52fd2de7548804b69f61fcb84ce",
+                            "219876at2.hmm:md5,7f5d1813517c5fe910766501a1fb4f1c",
+                            "223233at2.hmm:md5,219ae3102610d3d980fabd42af33a89d",
+                            "226836at2.hmm:md5,7d12206040c7608c6528e86ab9f3f1f4",
+                            "232152at2.hmm:md5,4aa760349b402b04d06908a0f35bf475",
+                            "26038at2.hmm:md5,c8f0e5fdd2489863a4d5505bdde96d39",
+                            "267682at2.hmm:md5,353899e4cabc82ace16efc7e6f07dc90",
+                            "353391at2.hmm:md5,b4efae4ca10321b1e94dba4b2f374d70",
+                            "384865at2.hmm:md5,05a169cbcb7dce7627af9fcc80335b0a",
+                            "402899at2.hmm:md5,ed29359bea9213c400f63f2fd1613255",
+                            "430176at2.hmm:md5,4b3774c425104112739cee46e7f9d615",
+                            "4421at2.hmm:md5,7a48f6f002fce2058ef7e46013a0752a",
+                            "462069at2.hmm:md5,67618eea22d5b8f51b2a1aebcc9c26bd",
+                            "469058at2.hmm:md5,f89dfc63758a2fd8f6f19fdab0f1f491",
+                            "504464at2.hmm:md5,11d0689354ac6ed159137d54217d6218",
+                            "505485at2.hmm:md5,8de48fd1871731f37e64693a37edb982",
+                            "533698at2.hmm:md5,69b2f806959b50a68efc7176c12d74bf",
+                            "662686at2.hmm:md5,5185b790632cc569935d5be75e30fefb",
+                            "665824at2.hmm:md5,acdcc74bc2849a80bb17b982868ebfe1",
+                            "761140at2.hmm:md5,7cee7ca9098bee73f284012f6e9882eb",
+                            "776861at2.hmm:md5,b0674fc40b4abb60a0cb4c4638d3f3f3",
+                            "837522at2.hmm:md5,b14e6d3ce456b6153d31b56c273851c9",
+                            "841869at2.hmm:md5,853efdc34974d4a8e1bb54a67dedafdc",
+                            "874197at2.hmm:md5,3e205a7bd43377ee447ae4a37aa3e881",
+                            "91428at2.hmm:md5,74464fecdfc8ebb5741ae7b58b226230",
+                            "923547at2.hmm:md5,1bf19a58d6470f775802f263ff6621ba",
+                            "932854at2.hmm:md5,01122df842330c8db68752689f0fbdb1",
+                            "932993at2.hmm:md5,787d887ffd8a11531bd3c6216d032201",
+                            "95696at2.hmm:md5,5025fe62fd6327ad77736087d12a98f2",
+                            "9601at2.hmm:md5,95410183ed2c3faca0b164186a1b8026",
+                            "961486at2.hmm:md5,3b268f8c45dfaa31eb0cb22477d73c1c",
+                            "981870at2.hmm:md5,b1df3ac0dd764bb6e0e49a5dbf7c798d",
+                            "984717at2.hmm:md5,489e218d52d2d0b47b8042820ee11ac6"
+                        ],
+                        [
+                            "ogs.id.info:md5,1ca22225d2f86e6e633e1a1a204d9a3a",
+                            "species.info:md5,ce4c2ce47d3d8503bda2a1c2866430ff"
+                        ],
+                        "lengths_cutoff:md5,19e7d86a63987906c6c6e6861f7526d0",
+                        "links_to_ODB10.txt:md5,4c2d02208a8cb03980853823ae8803cb",
+                        "refseq_db.faa.gz:md5,b0dd2e4f367d4fe194c3df3af5eae440",
+                        "refseq_db.faa.gz.md5:md5,7c4129b91e9ecb1aa3286d1293fa29ea",
+                        "scores_cutoff:md5,6c6fb593a83d5da8b2909d70a4f15df9"
+                    ]
+                ]
+            ]
+        ],
+        "timestamp": "2026-08-10T22:48:32.565599",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    },
+    "sarscov2-local_fasta_gxf_fastq-stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "taxid": "2697049"
+                        },
+                        "genome.fasta:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test",
+                            "taxid": "2697049"
+                        },
+                        "genome.fasta:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.gff3:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "/nf-core/test-datasets/modules/data/genomics/sarscov2/illumina/fastq/test_1.fastq.gz"
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "test",
+                            "taxid": "2697049"
+                        },
+                        "genome.fasta:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "3": [
+                    [
+                        
+                    ]
+                ],
+                "busco_db": [
+                    [
+                        
+                    ]
+                ],
+                "fasta": [
+                    [
+                        {
+                            "id": "test",
+                            "taxid": "2697049"
+                        },
+                        "genome.fasta:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "input": [
+                    [
+                        {
+                            "id": "test",
+                            "taxid": "2697049"
+                        },
+                        "genome.fasta:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "genome.gff3:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "/nf-core/test-datasets/modules/data/genomics/sarscov2/illumina/fastq/test_1.fastq.gz"
+                    ]
+                ],
+                "input_decon": [
+                    [
+                        {
+                            "id": "test",
+                            "taxid": "2697049"
+                        },
+                        "genome.fasta:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-10T22:51:19.312099",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    },
+    "bacteria-ncbi_refseq_accession": {
+        "content": [
+            [
+                
+            ],
+            [
+                
+            ]
+        ],
+        "timestamp": "2026-08-10T22:51:08.081186",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    }
+}

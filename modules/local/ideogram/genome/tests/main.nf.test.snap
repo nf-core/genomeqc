@@ -1,0 +1,122 @@
+{
+    "ideogram_genome - genome-mode busco table": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.csv:md5,d149209e0330a0ab9561de87bb2ee9e0"
+                ]
+            ],
+            {
+                "versions_r_base": [
+                    [
+                        "IDEOGRAM_GENOME",
+                        "r_base",
+                        "4.4.1"
+                    ]
+                ],
+                "versions_rideogram": [
+                    [
+                        "IDEOGRAM_GENOME",
+                        "r_rideogram",
+                        "0.2.2"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-20T14:16:38.10659",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    },
+    "ideogram_genome - genome-mode busco table - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.svg:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.png:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.csv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "3": [
+                    [
+                        "IDEOGRAM_GENOME",
+                        "r_base",
+                        "4.4.1"
+                    ]
+                ],
+                "4": [
+                    [
+                        "IDEOGRAM_GENOME",
+                        "r_rideogram",
+                        "0.2.2"
+                    ]
+                ],
+                "busco_mappings": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.csv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "png": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.png:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "svg": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.svg:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions_r_base": [
+                    [
+                        "IDEOGRAM_GENOME",
+                        "r_base",
+                        "4.4.1"
+                    ]
+                ],
+                "versions_rideogram": [
+                    [
+                        "IDEOGRAM_GENOME",
+                        "r_rideogram",
+                        "0.2.2"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-20T14:16:49.529504",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    }
+}

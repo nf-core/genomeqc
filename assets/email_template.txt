@@ -1,10 +1,18 @@
+----------------------------------------------------
+                                        ,--./,-.
+        ___     __   __   __   ___     /,-._.--~\\
+  |\\ | |__  __ /  ` /  \\ |__) |__         }  {
+  | \\| |       \\__, \\__/ |  \\ |___     \\`-._,-`-,
+                                        `._,._,'
+  nf-core/genomeqc ${version}
+----------------------------------------------------
 Run Name: $runName
 
 <% if (success){
-    out << "## ecoflow/genomeqc execution completed successfully! ##"
+    out << "## nf-core/genomeqc execution completed successfully! ##"
 } else {
     out << """####################################################
-## ecoflow/genomeqc execution completed unsuccessfully! ##
+## nf-core/genomeqc execution completed unsuccessfully! ##
 ####################################################
 The exit status of the task that caused the workflow execution to fail was: $exitStatus.
 The full error message was:
@@ -27,5 +35,5 @@ Pipeline Configuration:
 <% out << summary.collect{ k,v -> " - $k: $v" }.join("\n") %>
 
 --
-ecoflow/genomeqc
-https://github.com/ecoflow/genomeqc
+nf-core/genomeqc
+https://github.com/nf-core/genomeqc

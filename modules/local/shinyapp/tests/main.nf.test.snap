@@ -1,0 +1,112 @@
+{
+    "shinyapp - tables and tree - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "shiny_app.sh:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        "shiny_app.sh:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    [
+                        "SHINYAPP",
+                        "cat",
+                        "8.32"
+                    ]
+                ],
+                "shiny_app": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "shiny_app.sh:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "shiny_app_files": [
+                    [
+                        "shiny_app.sh:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions_shiny": [
+                    [
+                        "SHINYAPP",
+                        "cat",
+                        "8.32"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-20T14:30:38.068346",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    },
+    "shinyapp - tables and tree": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "shiny_app.sh:md5,22a40a6c11369dc37bbdc4a400b1c366"
+                    ]
+                ],
+                "1": [
+                    [
+                        "shiny_app.R:md5,c78db1dd5db79e88a5e9ceaa0fa9638a",
+                        "shiny_app.sh:md5,22a40a6c11369dc37bbdc4a400b1c366",
+                        "test.tsv:md5,f7b71340c1bc3467eac0921c5dd1db44",
+                        "tree.nw:md5,ff8e67b1d74ea48c5012812b6e39f066",
+                        "tree_functions.R:md5,89ee160ed862cf9511fd1469fde36e37"
+                    ]
+                ],
+                "2": [
+                    [
+                        "SHINYAPP",
+                        "cat",
+                        "8.32"
+                    ]
+                ],
+                "shiny_app": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "shiny_app.sh:md5,22a40a6c11369dc37bbdc4a400b1c366"
+                    ]
+                ],
+                "shiny_app_files": [
+                    [
+                        "shiny_app.R:md5,c78db1dd5db79e88a5e9ceaa0fa9638a",
+                        "shiny_app.sh:md5,22a40a6c11369dc37bbdc4a400b1c366",
+                        "test.tsv:md5,f7b71340c1bc3467eac0921c5dd1db44",
+                        "tree.nw:md5,ff8e67b1d74ea48c5012812b6e39f066",
+                        "tree_functions.R:md5,89ee160ed862cf9511fd1469fde36e37"
+                    ]
+                ],
+                "versions_shiny": [
+                    [
+                        "SHINYAPP",
+                        "cat",
+                        "8.32"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-20T14:30:28.228426",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    }
+}

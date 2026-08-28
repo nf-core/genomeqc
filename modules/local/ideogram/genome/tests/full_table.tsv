@@ -1,0 +1,6 @@
+# BUSCO version is: 5.7.1
+# The lineage dataset is: bacteria_odb10
+# Busco id	Status	Sequence	Gene Start	Gene End	Strand	Score	Length	OrthoDB url	Description
+BUSCOID1	Complete	chr1	100	500	+	123.4	400	https://www.orthodb.org/v10?query=BUSCOID1	desc one
+BUSCOID2	Duplicated	chr1	600	900	-	99.1	300	https://www.orthodb.org/v10?query=BUSCOID2	desc two
+BUSCOID3	Missing	NA	NA	NA	NA	NA	NA	https://www.orthodb.org/v10?query=BUSCOID3	desc three

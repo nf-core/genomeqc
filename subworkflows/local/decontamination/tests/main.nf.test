@@ -1,0 +1,79 @@
+nextflow_workflow {
+
+    name "Test Workflow DECONTAMINATION"
+    script "../main.nf"
+    workflow "DECONTAMINATION"
+    config './nextflow.config'
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "subworkflows/decontamination"
+    tag "decontamination"
+    tag "fcs/fcsadaptor"
+    tag "fcsgx/cleangenome"
+    tag "fcsgx/fetchdb"
+    tag "fcsgx/rungx"
+    tag "tiara/tiara"
+
+    test("fcsgx_combo_test-fasta") {
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [ id:'test', taxid:'2697049' ], // taxid for SARS-CoV-2
+                        file('https://zenodo.org/records/10932013/files/FCS_combo_test.fa', checkIfExists: true)
+                    ]
+                )
+                input[1] = []
+                input[2] = []
+                input[3] = file('https://ftp.ncbi.nlm.nih.gov/genomes/TOOLS/FCS/database/test-only/test-only.manifest', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                // fcs_gx_report's first line embeds a "run-date" timestamp (see the fcsgx/rungx
+                // module's own test, which skips the same line for the same reason), so only
+                // the deterministic column header + classification rows are snapshotted.
+                { assert snapshot(
+                    workflow.out.fcs_gx_report.collect { meta, report -> [ meta, path(report).readLines()[1..-1] ] },
+                    workflow.out.adaptor_report,
+                    workflow.out.tiara_raw,
+                    workflow.out.tiara_cleaned
+                ).match() }
+            )
+        }
+    }
+
+    test("fcsgx_combo_test-fasta-stub") {
+
+        options '-stub'
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [ id:'test', taxid:'2697049' ],
+                        file('https://zenodo.org/records/10932013/files/FCS_combo_test.fa', checkIfExists: true)
+                    ]
+                )
+                input[1] = []
+                input[2] = []
+                input[3] = file('https://ftp.ncbi.nlm.nih.gov/genomes/TOOLS/FCS/database/test-only/test-only.manifest', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+}

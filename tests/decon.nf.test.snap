@@ -1,0 +1,159 @@
+{
+    "-profile test_decon": {
+        "content": [
+            {
+                "BUSCO_DOWNLOAD": {
+                    "busco": "6.1.0"
+                },
+                "BUSCO_GENOME": {
+                    "busco": "6.1.0"
+                },
+                "BUSCO_SEQS_GENOME": {
+                    "python": "3.13.5"
+                },
+                "FCSGX_CLEANADAPTOR": {
+                    "fcsgx": "0.5.5"
+                },
+                "FCSGX_CLEANGENOME": {
+                    "fcsgx": "0.5.5"
+                },
+                "FCSGX_FETCHDB": {
+                    "fcsgx": "0.5.5"
+                },
+                "FCSGX_RUNGX": {
+                    "fcsgx": "0.5.5"
+                },
+                "FCS_FCSADAPTOR": {
+                    "fcsadaptor": "0.5.0"
+                },
+                "GAWK": {
+                    "gawk": "5.3.1"
+                },
+                "IDEOGRAM_GENOME": {
+                    "r_base": "4.4.1",
+                    "r_rideogram": "0.2.2"
+                },
+                "QUAST": {
+                    "quast": "5.3.0"
+                },
+                "REPORT_EXCEL": {
+                    "python": "3.9.5"
+                },
+                "REPORT_HTML": {
+                    "python": "3.9.5"
+                },
+                "TABLE_FCSGX": {
+                    "python": "3.9.5"
+                },
+                "TIARA_CLEANED": {
+                    "tiara": "1.0.3"
+                },
+                "TIARA_RAW": {
+                    "tiara": "1.0.3"
+                },
+                "Workflow": {
+                    "nf-core/genomeqc": "v1.0.0"
+                }
+            },
+            [
+                "busco",
+                "busco/genome",
+                "busco/genome/min_number_buscos",
+                "busco/genome/min_number_buscos/n_seqs_above_x_buscos.tsv",
+                "busco/genome/test_combo",
+                "busco/genome/test_combo/ideogram",
+                "busco/genome/test_combo/ideogram/test_combo.csv",
+                "busco/genome/test_combo/ideogram/test_combo.png",
+                "busco/genome/test_combo/ideogram/test_combo.svg",
+                "busco/genome/test_combo/stats",
+                "busco/genome/test_combo/stats/short_summary.specific.saccharomycetes_odb10.FCS_combo_test.fa.txt",
+                "busco/genome/test_combo/stats/test_combo-saccharomycetes_odb10-genome-busco.batch_summary.txt",
+                "decontamination",
+                "decontamination/fcs-adaptor",
+                "decontamination/fcs-adaptor/test_combo.cleaned_sequences.fa.gz",
+                "decontamination/fcs-adaptor/test_combo.fcs_adaptor.log",
+                "decontamination/fcs-adaptor/test_combo.fcs_adaptor_report.txt",
+                "decontamination/fcs-adaptor/test_combo.pipeline_args.yaml",
+                "decontamination/fcs-adaptor/test_combo.skipped_trims.jsonl",
+                "decontamination/fcs-gx",
+                "decontamination/fcs-gx/test_combo.fcs_gx_report.txt",
+                "decontamination/fcs-gx/test_combo.summary.txt",
+                "decontamination/fcs-gx/test_combo.taxonomy.rpt",
+                "decontamination/tiara",
+                "decontamination/tiara/cleaned",
+                "decontamination/tiara/cleaned/log_test_combo.txt",
+                "decontamination/tiara/cleaned/test_combo.txt",
+                "decontamination/tiara/raw",
+                "decontamination/tiara/raw/log_test_combo.txt",
+                "decontamination/tiara/raw/test_combo.txt",
+                "fcsgx",
+                "fcsgx/fcs_table.tsv",
+                "multiqc",
+                "multiqc/multiqc_data",
+                "multiqc/multiqc_data/llms-full.txt",
+                "multiqc/multiqc_data/multiqc.log",
+                "multiqc/multiqc_data/multiqc.parquet",
+                "multiqc/multiqc_data/multiqc_citations.txt",
+                "multiqc/multiqc_data/multiqc_data.json",
+                "multiqc/multiqc_data/multiqc_software_versions.txt",
+                "multiqc/multiqc_data/multiqc_sources.txt",
+                "multiqc/multiqc_report.html",
+                "pipeline_info",
+                "pipeline_info/nf_core_genomeqc_software_mqc_versions.yml",
+                "quast",
+                "quast/test_combo",
+                "quast/test_combo/test_combo.quast",
+                "quast/test_combo/test_combo.quast/basic_stats",
+                "quast/test_combo/test_combo.quast/basic_stats/FCS_combo_test_GC_content_plot.pdf",
+                "quast/test_combo/test_combo.quast/basic_stats/GC_content_plot.pdf",
+                "quast/test_combo/test_combo.quast/basic_stats/Nx_plot.pdf",
+                "quast/test_combo/test_combo.quast/basic_stats/cumulative_plot.pdf",
+                "quast/test_combo/test_combo.quast/icarus.html",
+                "quast/test_combo/test_combo.quast/icarus_viewers",
+                "quast/test_combo/test_combo.quast/icarus_viewers/contig_size_viewer.html",
+                "quast/test_combo/test_combo.quast/quast.log",
+                "quast/test_combo/test_combo.quast/report.html",
+                "quast/test_combo/test_combo.quast/report.pdf",
+                "quast/test_combo/test_combo.quast/report.tex",
+                "quast/test_combo/test_combo.quast/report.tsv",
+                "quast/test_combo/test_combo.quast/report.txt",
+                "quast/test_combo/test_combo.quast/transposed_report.tex",
+                "quast/test_combo/test_combo.quast/transposed_report.tsv",
+                "quast/test_combo/test_combo.quast/transposed_report.txt",
+                "report",
+                "report/excel",
+                "report/excel/genomeqc_tables.xlsx",
+                "report/html",
+                "report/html/genomeqc_report.html"
+            ],
+            [
+                "n_seqs_above_x_buscos.tsv:md5,03c5dc5de87832b79b8ffd74115cba16",
+                "test_combo.csv:md5,70aabb7d81f49be0a3de55f194559c66",
+                "test_combo.svg:md5,c063e011a3d979fb9e7e2f66acbf618d",
+                "test_combo-saccharomycetes_odb10-genome-busco.batch_summary.txt:md5,ec11d02a56d4dc8f5b8da2964d98cee7",
+                "test_combo.cleaned_sequences.fa.gz:md5,8bb6543658a05f9b52510aabcf4468a5",
+                "test_combo.fcs_adaptor_report.txt:md5,ba2ca11c57c95c1721aa7116fda3443d",
+                "test_combo.pipeline_args.yaml:md5,c74c11278f84a32f07df038a37055f0f",
+                "test_combo.skipped_trims.jsonl:md5,1457da5a27c12474ef918af5026bfcee",
+                "log_test_combo.txt:md5,269f0bece801a6cc59840db158c136a4",
+                "test_combo.txt:md5,87d002ce5a02d01aa291991c643240e3",
+                "log_test_combo.txt:md5,269f0bece801a6cc59840db158c136a4",
+                "test_combo.txt:md5,87d002ce5a02d01aa291991c643240e3",
+                "fcs_table.tsv:md5,34d21b35dc9291426b2727f3f95e8588",
+                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
+                "report.tex:md5,f67df1006ebce48ec96cf926936aafda",
+                "report.tsv:md5,585ef4b09626e8a7b96e8bacbb25043f",
+                "report.txt:md5,104d2152b890b3564f29ac9d7710e64a",
+                "transposed_report.tex:md5,e0bd37f316b12f10666d683524b53ee8",
+                "transposed_report.tsv:md5,0ca78567ee303bdc91635600a10ddd54",
+                "transposed_report.txt:md5,d1e7f37b4b9c4d9bf1da408ed433b2a1"
+            ],
+            "#seq_id\tstart_pos\tend_pos\tseq_len\taction\tdiv\tagg_cont_cov\ttop_tax_name\nseq_00238\t1\t1000\t1000\tEXCLUDE\tprok:CFB group bacteria\t87\tBacteroides cutis\nseq_00289\t1\t1000\t1000\tEXCLUDE\tprok:CFB group bacteria\t88\tBacteroides gallinaceum"
+        ],
+        "meta": {
+            "nf-test": "0.9.3",
+            "nextflow": "26.04.6"
+        },
+        "timestamp": "2026-08-17T00:39:06.220448"
+    }
+}

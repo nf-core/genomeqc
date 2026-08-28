@@ -1,0 +1,23 @@
+==================================================
+file name: test_species.fasta
+sequences:             1
+total length:    1000000 bp  (1000000 bp excl N/X-runs)
+GC level:         32.10 %
+bases masked:      120000 bp ( 12.00 %)
+==================================================
+               number of      length   percentage
+               elements*    occupied  of sequence
+--------------------------------------------------
+SINEs:                12        1234 bp    2.00 %
+LINEs:                34        5678 bp    3.00 %
+LTR elements:         56        7890 bp    1.50 %
+DNA transposons:      10        1000 bp    1.00 %
+Rolling-circles:       2         200 bp    0.50 %
+Unclassified:          5         500 bp    1.00 %
+Total interspersed repeats:    16502 bp    9.00 %
+
+Small RNA:              1         100 bp    0.50 %
+Satellites:              0           0 bp    0.00 %
+Simple repeats:         20        2000 bp    1.00 %
+Low complexity:         15        1500 bp    1.00 %
+==================================================

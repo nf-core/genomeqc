@@ -1,0 +1,121 @@
+name: "ideogram_genomeannotation"
+description: Plots a chromosome ideogram of annotated BUSCO (protein-mode) gene
+  locations, matched against the genome annotation GFF
+keywords:
+  - busco
+  - ideogram
+  - annotation
+  - rideogram
+tools:
+  - "genomeannotationbuscoideogram":
+      description: "In-house step that builds a chromosome karyotype from the genome
+        FASTA, matches protein-mode BUSCO hits back onto genomic coordinates via the
+        annotation GFF, and renders an RIdeogram plot of their locations."
+      homepage: "https://github.com/nf-core/genomeqc"
+      documentation: "https://github.com/nf-core/genomeqc"
+      licence:
+        - "MIT"
+      identifier: ""
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. [ id:'test', lineage:'bacteria_odb10' ]
+    - busco_full_table:
+        type: file
+        description: Protein-mode BUSCO full_table.tsv (no genomic coordinate
+          columns; gene IDs are matched via the GFF)
+        pattern: "full_table.tsv"
+        ontologies:
+          - edam: http://edamontology.org/format_3475
+    - genome:
+        type: file
+        description: Genome FASTA, used to build the chromosome karyotype
+        pattern: "*.{fa,fasta,fna}"
+        ontologies: []
+    - gff:
+        type: file
+        description: Genome annotation GFF, used to map BUSCO protein hits back
+          onto genomic coordinates
+        pattern: "*.{gff,gff3}"
+        ontologies: []
+output:
+  svg:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test', lineage:'bacteria_odb10' ]
+      - "*.svg":
+          type: file
+          description: SVG chromosome ideogram of annotated BUSCO gene locations
+          pattern: "*.svg"
+          ontologies: []
+  png:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test', lineage:'bacteria_odb10' ]
+      - "*.png":
+          type: file
+          description: PNG chromosome ideogram of annotated BUSCO gene locations
+          pattern: "*.png"
+          ontologies: []
+  busco_mappings:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test', lineage:'bacteria_odb10' ]
+      - "*.csv":
+          type: file
+          description: Per-chromosome count of Complete BUSCOs
+          pattern: "*.csv"
+          ontologies:
+            - edam: http://edamontology.org/format_3752
+  versions_r_base:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - r_base:
+          type: string
+          description: The name of the tool
+      - Rscript -e "cat(as.character(getRversion()))":
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_rideogram:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - r_rideogram:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''RIdeogram'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - r_base:
+          type: string
+          description: The name of the tool
+      - Rscript -e "cat(as.character(getRversion()))":
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - r_rideogram:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''RIdeogram'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@FernandoDuarteF"
+maintainers:
+  - "@chriswyatt1"

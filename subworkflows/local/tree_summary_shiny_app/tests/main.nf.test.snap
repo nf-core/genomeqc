@@ -1,0 +1,44 @@
+{
+    "two_species-genome_anno-and-genome_only": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "orthofinder",
+                        "mode": "genome_anno"
+                    },
+                    [
+                        "Busco_combined_geno.tsv",
+                        "Busco_combined_prot.tsv",
+                        "Quast_to_plot.tsv",
+                        "fcs_table_output.tsv",
+                        "gene_stats.tsv",
+                        "n_seqs_above_x_buscos_output.tsv",
+                        "te_table_output.tsv"
+                    ]
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "orthofinder",
+                        "mode": "genome"
+                    },
+                    [
+                        "Busco_combined_geno.tsv",
+                        "Quast_to_plot.tsv",
+                        "fcs_table_output.tsv",
+                        "gene_stats.tsv",
+                        "n_seqs_above_x_buscos_output.tsv",
+                        "te_table_output.tsv"
+                    ]
+                ]
+            ]
+        ],
+        "timestamp": "2026-08-13T11:38:33.867466",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    }
+}

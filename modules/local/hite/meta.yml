@@ -1,0 +1,153 @@
+name: "hite"
+description: Runs HiTE to detect and classify transposable elements in a genome
+  assembly
+keywords:
+  - transposable elements
+  - repeat annotation
+  - hite
+tools:
+  - "hite":
+      description: "HiTE is a fast and accurate dynamic boundary adjustment approach
+        for full-length Transposable Element (TE) detection and annotation in genome
+        assemblies."
+      homepage: "https://github.com/CSU-KangHu/HiTE"
+      documentation: "https://github.com/CSU-KangHu/HiTE"
+      tool_dev_url: "https://github.com/CSU-KangHu/HiTE"
+      doi: "10.1186/s13059-024-03288-6"
+      licence:
+        - "GPL v3"
+      identifier: biotools:hite
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. [ id:'test' ]
+    - fasta:
+        type: file
+        description: Genome assembly FASTA (gzipped or uncompressed)
+        pattern: "*.{fa,fasta,fna}{.gz,}"
+        ontologies: []
+output:
+  hite_results:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test' ]
+      - "*_hite_results":
+          type: directory
+          description: Full HiTE results directory
+  tbl:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test' ]
+      - "*_hite_results/*.tbl":
+          type: file
+          description: RepeatMasker-style .tbl repeat-composition summary (empty
+            if HiTE found no TEs)
+          pattern: "*.tbl"
+          ontologies: []
+  versions_python:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - 'python --version | cut -f 2 -d " "':
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_hite:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - hite:
+          type: string
+          description: The name of the tool
+      - "3.3.3":
+          type: string
+          description: The expression to obtain the version of the tool
+  versions_repeatmasker:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - repeatmasker:
+          type: string
+          description: The name of the tool
+      - 'RepeatMasker | grep version | cut -f 3 -d " "':
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_repeatmodeler:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - repeatmodeler:
+          type: string
+          description: The name of the tool
+      - 'RepeatModeler | grep /opt/conda/envs/HiTE/share/RepeatModeler/RepeatModeler | cut -f 3 -d " "':
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_ltrpipeline:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - ltrpipeline:
+          type: string
+          description: The name of the tool
+      - "LTRPipeline -version":
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@chriswyatt1"
+maintainers:
+  - "@chriswyatt1"
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - 'python --version | cut -f 2 -d " "':
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - hite:
+          type: string
+          description: The name of the tool
+      - "3.3.3":
+          type: string
+          description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - repeatmasker:
+          type: string
+          description: The name of the tool
+      - 'RepeatMasker | grep version | cut -f 3 -d " "':
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - repeatmodeler:
+          type: string
+          description: The name of the tool
+      - 'RepeatModeler | grep /opt/conda/envs/HiTE/share/RepeatModeler/RepeatModeler | cut -f 3 -d " "':
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - ltrpipeline:
+          type: string
+          description: The name of the tool
+      - "LTRPipeline -version":
+          type: eval
+          description: The expression to obtain the version of the tool

@@ -1,0 +1,77 @@
+nextflow_workflow {
+
+    name "Test Workflow TREE_SUMMARY_SHINY_APP"
+    script "../main.nf"
+    workflow "TREE_SUMMARY_SHINY_APP"
+    config './nextflow.config'
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "subworkflows/tree_summary_shiny_app"
+    tag "tree_summary_shiny_app"
+    tag "treesummary"
+    tag "shiny_app"
+
+    // Reuses the treesummary/shiny_app module test fixtures instead of duplicating them.
+    test("two_species-genome_anno-and-genome_only") {
+
+        when {
+            params {
+                outdir = "results"
+            }
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [ [ id:'speciesA' ], file("\${baseDir}/modules/local/treesummary/tests/speciesA-genome-busco.batch_summary_modified.txt", checkIfExists: true) ],
+                    [ [ id:'speciesB' ], file("\${baseDir}/modules/local/treesummary/tests/speciesB-genome-busco.batch_summary_modified.txt", checkIfExists: true) ]
+                )
+                input[1] = Channel.of(
+                    [ [ id:'speciesA' ], file("\${baseDir}/modules/local/treesummary/tests/speciesA-proteins-busco.batch_summary_modified.txt", checkIfExists: true) ],
+                    [ [ id:'speciesB' ], file("\${baseDir}/modules/local/treesummary/tests/speciesB-proteins-busco.batch_summary_modified.txt", checkIfExists: true) ]
+                )
+                input[2] = Channel.of(
+                    [ [ id:'speciesA' ], file("\${baseDir}/modules/local/treesummary/tests/speciesA-genome-busco.batch_summary_modified.txt", checkIfExists: true) ],
+                    [ [ id:'speciesB' ], file("\${baseDir}/modules/local/treesummary/tests/speciesB-genome-busco.batch_summary_modified.txt", checkIfExists: true) ]
+                )
+                input[3] = Channel.of([
+                    file("\${baseDir}/modules/local/treesummary/tests/speciesA.quast.tsv", checkIfExists: true),
+                    file("\${baseDir}/modules/local/treesummary/tests/speciesB.quast.tsv", checkIfExists: true),
+                    file("\${baseDir}/modules/local/treesummary/tests/test.counts.tsv", checkIfExists: true),
+                    file("\${baseDir}/modules/local/treesummary/tests/n_seqs_above_x_buscos.tsv", checkIfExists: true)
+                ])
+                input[4] = Channel.of([
+                    file("\${baseDir}/modules/local/treesummary/tests/speciesA.quast.tsv", checkIfExists: true),
+                    file("\${baseDir}/modules/local/treesummary/tests/speciesB.quast.tsv", checkIfExists: true),
+                    file("\${baseDir}/modules/local/treesummary/tests/n_seqs_above_x_buscos.tsv", checkIfExists: true)
+                ])
+                input[5] = Channel.of(
+                    [ [ id:'orthofinder', mode:'genome_anno' ], file("\${baseDir}/modules/local/treesummary/tests/ofresults", checkIfExists: true) ]
+                )
+                input[6] = Channel.of(
+                    [ [ id:'orthofinder', mode:'genome' ], file("\${baseDir}/modules/local/treesummary/tests/ofresults", checkIfExists: true) ]
+                )
+                input[7] = Channel.of(
+                    [ [ id:'te' ], file("\${baseDir}/modules/local/treesummary/tests/te_summary.tsv", checkIfExists: true) ]
+                )
+                input[8] = Channel.of(
+                    [ [ id:'fcs' ], file("\${baseDir}/modules/local/treesummary/tests/fcs_summary.tsv", checkIfExists: true) ]
+                )
+                input[9] = false
+                input[10] = 'docker'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert path(workflow.out.geno_anno_tree[0][1]).exists() },
+                { assert path(workflow.out.geno_tree[0][1]).exists() },
+                { assert snapshot(
+                    workflow.out.geno_anno_tables.collect { meta, tables -> [ meta, tables.collect { file(it).name }.sort() ] },
+                    workflow.out.geno_tables.collect { meta, tables -> [ meta, tables.collect { file(it).name }.sort() ] }
+                ).match() }
+            )
+        }
+    }
+}

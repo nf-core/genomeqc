@@ -1,0 +1,298 @@
+{
+    "treesummary - genome_anno - two species - stub": {
+        "content": [
+            {
+                "0": [
+                    "tree_plot.pdf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "1": [
+                    "tree_plot.svg:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "10": [
+                    [
+                        "TREESUMMARY",
+                        "dplyr",
+                        "1.1.4"
+                    ]
+                ],
+                "11": [
+                    [
+                        "TREESUMMARY",
+                        "tidyr",
+                        "1.3.2"
+                    ]
+                ],
+                "12": [
+                    [
+                        "TREESUMMARY",
+                        "scatterpie",
+                        "0.2.6"
+                    ]
+                ],
+                "13": [
+                    [
+                        "TREESUMMARY",
+                        "scales",
+                        "1.4.0"
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "test",
+                            "mode": "genome_anno"
+                        },
+                        [
+                            "fcs_table_output.tsv:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "n_seqs_above_x_buscos_output.tsv:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "species_ortho_seq_count_output.tsv:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "te_table_output.tsv:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "test.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ]
+                    ]
+                ],
+                "3": [
+                    [
+                        {
+                            "id": "test",
+                            "mode": "genome_anno"
+                        },
+                        "tree.nw:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "4": [
+                    [
+                        "TREESUMMARY",
+                        "r_base",
+                        "4.5.2"
+                    ]
+                ],
+                "5": [
+                    [
+                        "TREESUMMARY",
+                        "python",
+                        "3.13.11"
+                    ]
+                ],
+                "6": [
+                    [
+                        "TREESUMMARY",
+                        "ggtree",
+                        "4.0.4"
+                    ]
+                ],
+                "7": [
+                    [
+                        "TREESUMMARY",
+                        "ggplot2",
+                        "4.0.1"
+                    ]
+                ],
+                "8": [
+                    [
+                        "TREESUMMARY",
+                        "patchwork",
+                        "1.3.2"
+                    ]
+                ],
+                "9": [
+                    [
+                        "TREESUMMARY",
+                        "argparse",
+                        "2.3.1"
+                    ]
+                ],
+                "figure": [
+                    "tree_plot.pdf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "figure_svg": [
+                    "tree_plot.svg:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "tables": [
+                    [
+                        {
+                            "id": "test",
+                            "mode": "genome_anno"
+                        },
+                        [
+                            "fcs_table_output.tsv:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "n_seqs_above_x_buscos_output.tsv:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "species_ortho_seq_count_output.tsv:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "te_table_output.tsv:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "test.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ]
+                    ]
+                ],
+                "tree": [
+                    [
+                        {
+                            "id": "test",
+                            "mode": "genome_anno"
+                        },
+                        "tree.nw:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions_argparse": [
+                    [
+                        "TREESUMMARY",
+                        "argparse",
+                        "2.3.1"
+                    ]
+                ],
+                "versions_dplyr": [
+                    [
+                        "TREESUMMARY",
+                        "dplyr",
+                        "1.1.4"
+                    ]
+                ],
+                "versions_ggplot2": [
+                    [
+                        "TREESUMMARY",
+                        "ggplot2",
+                        "4.0.1"
+                    ]
+                ],
+                "versions_ggtree": [
+                    [
+                        "TREESUMMARY",
+                        "ggtree",
+                        "4.0.4"
+                    ]
+                ],
+                "versions_patchwork": [
+                    [
+                        "TREESUMMARY",
+                        "patchwork",
+                        "1.3.2"
+                    ]
+                ],
+                "versions_python": [
+                    [
+                        "TREESUMMARY",
+                        "python",
+                        "3.13.11"
+                    ]
+                ],
+                "versions_r_base": [
+                    [
+                        "TREESUMMARY",
+                        "r_base",
+                        "4.5.2"
+                    ]
+                ],
+                "versions_scales": [
+                    [
+                        "TREESUMMARY",
+                        "scales",
+                        "1.4.0"
+                    ]
+                ],
+                "versions_scatterpie": [
+                    [
+                        "TREESUMMARY",
+                        "scatterpie",
+                        "0.2.6"
+                    ]
+                ],
+                "versions_tidyr": [
+                    [
+                        "TREESUMMARY",
+                        "tidyr",
+                        "1.3.2"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-13T11:31:38.815318",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    },
+    "treesummary - genome_anno - two species": {
+        "content": [
+            "gene_stats.tsv:md5,74922931605a2d15ba57ab39cb419884",
+            "Busco_combined_geno.tsv:md5,8bd5eeda185018a3f71dde15e9f2637b",
+            "Busco_combined_prot.tsv:md5,a9835ba3926e58a20d9b2248b024ddd4",
+            "Quast_to_plot.tsv:md5,300d39b2f8add7de22f32ea283ffeb1b",
+            {
+                "versions_argparse": [
+                    [
+                        "TREESUMMARY",
+                        "argparse",
+                        "2.3.1"
+                    ]
+                ],
+                "versions_dplyr": [
+                    [
+                        "TREESUMMARY",
+                        "dplyr",
+                        "1.1.4"
+                    ]
+                ],
+                "versions_ggplot2": [
+                    [
+                        "TREESUMMARY",
+                        "ggplot2",
+                        "4.0.1"
+                    ]
+                ],
+                "versions_ggtree": [
+                    [
+                        "TREESUMMARY",
+                        "ggtree",
+                        "4.0.4"
+                    ]
+                ],
+                "versions_patchwork": [
+                    [
+                        "TREESUMMARY",
+                        "patchwork",
+                        "1.3.2"
+                    ]
+                ],
+                "versions_python": [
+                    [
+                        "TREESUMMARY",
+                        "python",
+                        "3.13.11"
+                    ]
+                ],
+                "versions_r_base": [
+                    [
+                        "TREESUMMARY",
+                        "r_base",
+                        "4.5.2"
+                    ]
+                ],
+                "versions_scales": [
+                    [
+                        "TREESUMMARY",
+                        "scales",
+                        "1.4.0"
+                    ]
+                ],
+                "versions_scatterpie": [
+                    [
+                        "TREESUMMARY",
+                        "scatterpie",
+                        "0.2.6"
+                    ]
+                ],
+                "versions_tidyr": [
+                    [
+                        "TREESUMMARY",
+                        "tidyr",
+                        "1.3.2"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-11T18:17:56.84966845",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    }
+}

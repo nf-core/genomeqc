@@ -1,0 +1,99 @@
+import groovy.io.FileType
+
+nextflow_process {
+
+    name "Test Process ORTHOFINDERV2"
+    script "../main.nf"
+    process "ORTHOFINDERV2"
+    config "./nextflow.config"
+
+    tag "modules"
+    tag "modules_local"
+    tag "orthofinderv2"
+
+    test("orthofinderv2 - sarscov2 - candidatus_portiera_aleyrodidarum - proteome") {
+
+        when {
+            process {
+                """
+                // Fixtures renamed to avoid colliding: both are 'proteome.fasta' upstream.
+                file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/proteome.fasta', checkIfExists: true)
+                    .copyTo("\${workDir}/sarscov2.fasta")
+                file(params.modules_testdata_base_path + 'genomics/prokaryotes/candidatus_portiera_aleyrodidarum/genome/proteome.fasta', checkIfExists: true)
+                    .copyTo("\${workDir}/candidatus_portiera_aleyrodidarum.fasta")
+
+                input[0] = [
+                    [ id:'test' ], // meta map
+                    [
+                        file("\${workDir}/sarscov2.fasta", checkIfExists: true),
+                        file("\${workDir}/candidatus_portiera_aleyrodidarum.fasta", checkIfExists: true)
+                    ]
+                ]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+
+            // Only known-stable summary files are snapshotted; others embed timestamps/ordering.
+            def all_files = []
+            file(process.out.orthofinder[0][1]).eachFileRecurse(FileType.FILES) { f -> all_files << f }
+
+            def stable_file_names = [
+                'Statistics_PerSpecies.tsv',
+                'SpeciesTree_rooted.txt'
+            ]
+            def stable_files = all_files.findAll { it.name in stable_file_names }
+
+            // Statistics_Overall.tsv embeds a "Date" line that changes daily, so snapshot
+            // its content with that line stripped instead of hashing the raw file.
+            def overall_stats_file = all_files.find { it.name == 'Statistics_Overall.tsv' }
+            def overall_stats_lines = overall_stats_file?.readLines()?.findAll { !it.startsWith('Date\t') }
+
+            assertAll(
+                { assert stable_files.size() == stable_file_names.size() },
+                { assert overall_stats_file != null },
+                { assert path(process.out.orthologues[0]).exists() },
+                { assert path(process.out.speciestree[0]).exists() },
+                { assert snapshot(
+                    stable_files.toSorted { it.name },
+                    overall_stats_lines,
+                    process.out.findAll { key, val -> key.startsWith('versions') }
+                    ).match() }
+            )
+        }
+    }
+
+    test("orthofinderv2 - sarscov2 - candidatus_portiera_aleyrodidarum - proteome - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                // Fixtures renamed to avoid colliding: both are 'proteome.fasta' upstream.
+                file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/proteome.fasta', checkIfExists: true)
+                    .copyTo("\${workDir}/sarscov2.fasta")
+                file(params.modules_testdata_base_path + 'genomics/prokaryotes/candidatus_portiera_aleyrodidarum/genome/proteome.fasta', checkIfExists: true)
+                    .copyTo("\${workDir}/candidatus_portiera_aleyrodidarum.fasta")
+
+                input[0] = [
+                    [ id:'test' ], // meta map
+                    [
+                        file("\${workDir}/sarscov2.fasta", checkIfExists: true),
+                        file("\${workDir}/candidatus_portiera_aleyrodidarum.fasta", checkIfExists: true)
+                    ]
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

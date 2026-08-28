@@ -1,0 +1,84 @@
+{
+    "repeatmasker_downloaddb - local file url - checksum ok - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_db.h5:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        "REPEATMASKER_DOWNLOADDB",
+                        "<curl>",
+                        "7.80.0"
+                    ]
+                ],
+                "h5": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_db.h5:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions": [
+                    [
+                        "REPEATMASKER_DOWNLOADDB",
+                        "<curl>",
+                        "7.80.0"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-20T14:14:17.835254",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    },
+    "repeatmasker_downloaddb - local file url - checksum ok": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_db.h5:md5,87649df71ddcf8c9908b6a7422079398"
+                    ]
+                ],
+                "1": [
+                    [
+                        "REPEATMASKER_DOWNLOADDB",
+                        "<curl>",
+                        "7.80.0"
+                    ]
+                ],
+                "h5": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_db.h5:md5,87649df71ddcf8c9908b6a7422079398"
+                    ]
+                ],
+                "versions": [
+                    [
+                        "REPEATMASKER_DOWNLOADDB",
+                        "<curl>",
+                        "7.80.0"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-20T14:14:07.725003",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    }
+}

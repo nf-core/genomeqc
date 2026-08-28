@@ -1,0 +1,124 @@
+{
+    "homo_sapiens-genome-fastq-stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.qv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.completeness.stats:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.spectra-cn.fl.png:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "3": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.spectra-asm.fl.png:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "4": [
+                    
+                ],
+                "ch_hapmers_blob_png": [
+                    
+                ],
+                "ch_merqury_qv": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.qv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "ch_merqury_spectra_asm_fl_png": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.spectra-asm.fl.png:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "ch_merqury_spectra_cn_fl_png": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.spectra-cn.fl.png:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "ch_merqury_stats": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.completeness.stats:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-10T18:23:56.046098",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    },
+    "homo_sapiens-genome-fastq": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.qv:md5,6e04952bc182221c8b9e242dc3298808"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.completeness.stats:md5,d923bf7c98342625d022b2c32be8dd3a"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.genome.spectra-cn.fl.png"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.spectra-asm.fl.png"
+                ]
+            ]
+        ],
+        "timestamp": "2026-08-10T18:23:36.212583",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    }
+}

@@ -1,0 +1,84 @@
+{
+    "table_te - single tbl": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.tsv:md5,d1a2ef89539d08810b84edc490a163fd"
+                    ]
+                ],
+                "1": [
+                    [
+                        "TABLE_TE",
+                        "python",
+                        "3.9.5"
+                    ]
+                ],
+                "table": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.tsv:md5,d1a2ef89539d08810b84edc490a163fd"
+                    ]
+                ],
+                "versions_python": [
+                    [
+                        "TABLE_TE",
+                        "python",
+                        "3.9.5"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-20T14:15:48.322848",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    },
+    "table_te - single tbl - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        "TABLE_TE",
+                        "python",
+                        "3.9.5"
+                    ]
+                ],
+                "table": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions_python": [
+                    [
+                        "TABLE_TE",
+                        "python",
+                        "3.9.5"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-20T14:15:58.105202",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    }
+}

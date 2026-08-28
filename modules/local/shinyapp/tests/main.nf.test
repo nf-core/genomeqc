@@ -1,0 +1,62 @@
+nextflow_process {
+
+    name "Test Process SHINYAPP"
+    script "../main.nf"
+    process "SHINYAPP"
+
+    tag "modules"
+    tag "modules_local"
+    tag "shinyapp"
+
+    test("shinyapp - tables and tree") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test' ], // meta map
+                    [ file("\${baseDir}/modules/local/shinyapp/tests/test.tsv", checkIfExists: true) ],
+                    file("\${baseDir}/modules/local/shinyapp/tests/tree.nw", checkIfExists: true)
+                ]
+                input[1] = file("\${baseDir}/bin/tree_functions.R", checkIfExists: true)
+                input[2] = file("\${baseDir}/bin/shiny_app.R", checkIfExists: true)
+                input[3] = 'docker'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    test("shinyapp - tables and tree - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test' ], // meta map
+                    [ file("\${baseDir}/modules/local/shinyapp/tests/test.tsv", checkIfExists: true) ],
+                    file("\${baseDir}/modules/local/shinyapp/tests/tree.nw", checkIfExists: true)
+                ]
+                input[1] = file("\${baseDir}/bin/tree_functions.R", checkIfExists: true)
+                input[2] = file("\${baseDir}/bin/shiny_app.R", checkIfExists: true)
+                input[3] = 'docker'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

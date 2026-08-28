@@ -1,0 +1,179 @@
+nextflow_workflow {
+
+    name "Test Workflow FASTA_ANNOTATE_TE"
+    script "../main.nf"
+    workflow "FASTA_ANNOTATE_TE"
+    config './nextflow.config'
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "subworkflows/fasta_annotate_te"
+    tag "fasta_annotate_te"
+    tag "hite"
+    tag "famdbpyembl"
+    tag "cdhit/cdhitest"
+    tag "repeatmasker/repeatmasker"
+    tag "table/te"
+
+    test("tiny_genome-hite") {
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [ id:'test' ],
+                        file("\${baseDir}/modules/local/hite/tests/test.fasta", checkIfExists: true)
+                    ]
+                )
+                input[1] = Channel.empty()
+                input[2] = Channel.empty()
+                input[3] = ''
+                input[4] = false
+                input[5] = 'linclust'
+                input[6] = 'hite'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.masked == [] },
+                { assert snapshot(
+                    workflow.out.tbl.collect { meta, tbl -> [ meta, file(tbl).name ] },
+                    workflow.out.tbl_tsv
+                ).match() }
+            )
+        }
+    }
+
+    // test.0.h5 is the synthetic famdb fixture from famdbpyembl's own tests (taxon 3
+    // carries one minimal repeat family, "TESTFAM1"), reused here instead of duplicating it.
+    // The genome is sarscov2 (not the HITE fixture): RepeatMasker always screens for simple
+    // repeats/low-complexity regions even without a custom-library hit, but the HITE fixture
+    // is short synthetic random sequence with none, which leaves REPEATMASKER_REPEATMASKER's
+    // `.masked` output file unwritten and its `mv` step failing.
+    test("sarscov2_genome-repeatmasker-prestaged_famdb") {
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [ id:'test' ],
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.fasta', checkIfExists: true)
+                    ]
+                )
+                input[1] = Channel.empty()
+                input[2] = Channel.of(
+                    [
+                        [ id:'famdb' ],
+                        file("\${baseDir}/modules/local/famdbpyembl/tests/test.0.h5", checkIfExists: true)
+                    ]
+                )
+                input[3] = '3'
+                input[4] = false
+                // 'linclust' (default) uses an amd64-only mmseqs2 build that SIGILLs under
+                // Docker emulation on Apple Silicon; 'cdhit' exercises the same clustering
+                // step with a container that runs natively on arm64.
+                input[5] = 'cdhit'
+                input[6] = 'repeatmasker'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(
+                    workflow.out.masked.collect { meta, f -> [ meta, file(f).name ] },
+                    workflow.out.tbl.collect { meta, f -> [ meta, file(f).name ] },
+                    workflow.out.gff.collect { meta, f -> [ meta, file(f).name ] },
+                    workflow.out.tbl_tsv,
+                    workflow.out.repeat_library.collect { meta, f -> [ meta, file(f).name ] }
+                ).match() }
+            )
+        }
+    }
+
+    test("sarscov2_genome-repeatmasker-stub") {
+
+        options '-stub'
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [ id:'test' ],
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.fasta', checkIfExists: true)
+                    ]
+                )
+                input[1] = Channel.empty()
+                input[2] = Channel.of(
+                    [
+                        [ id:'famdb' ],
+                        file("\${baseDir}/modules/local/famdbpyembl/tests/test.0.h5", checkIfExists: true)
+                    ]
+                )
+                input[3] = '3'
+                input[4] = false
+                // 'linclust' (default) uses an amd64-only mmseqs2 build that SIGILLs under
+                // Docker emulation on Apple Silicon; 'cdhit' exercises the same clustering
+                // step with a container that runs natively on arm64.
+                input[5] = 'cdhit'
+                input[6] = 'repeatmasker'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+
+    // Regression test for a dead `ch_rm_db = channel.empty()` reassignment that
+    // unconditionally discarded the take: parameter before REPEATMASKER_DOWNLOADDB ever ran,
+    // silently disabling --RM_download_db for every user regardless of its setting.
+    // No pre-staged famdb library is given here (input[2] = Channel.empty()), so the
+    // only way this test can produce a repeat library at all is via REPEATMASKER_DOWNLOADDB.
+    test("sarscov2_genome-repeatmasker-download-stub") {
+
+        options '-stub'
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [ id:'test' ],
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.fasta', checkIfExists: true)
+                    ]
+                )
+                input[1] = Channel.of(
+                    [
+                        [ id:'dfam39_full.0' ],
+                        'https://www.dfam.org/releases/Dfam_3.9/families/FamDB/dfam39_full.0.h5.gz'
+                    ]
+                )
+                input[2] = Channel.empty()
+                input[3] = '3'
+                input[4] = false
+                input[5] = 'cdhit'
+                input[6] = 'repeatmasker'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+}

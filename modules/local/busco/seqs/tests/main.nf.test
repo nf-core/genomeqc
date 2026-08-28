@@ -1,0 +1,55 @@
+nextflow_process {
+
+    name "Test Process BUSCO_SEQS"
+    script "../main.nf"
+    process "BUSCO_SEQS"
+
+    tag "modules"
+    tag "modules_local"
+    tag "busco"
+    tag "busco/seqs"
+
+    test("busco_seqs - single table") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test' ], // meta map
+                    file("\${baseDir}/modules/local/busco/seqs/tests/test_species.csv", checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    test("busco_seqs - single table - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test' ], // meta map
+                    file("\${baseDir}/modules/local/busco/seqs/tests/test_species.csv", checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

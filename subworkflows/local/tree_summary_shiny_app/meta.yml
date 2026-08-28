@@ -1,0 +1,92 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "tree_summary_shiny_app"
+description: |
+  Builds a per-run summary report (species tree plus QUAST/BUSCO/TE/orthology tables) and
+  packages it as a self-contained Shiny app. Runs once for genome+annotation mode and,
+  when BUSCO was not skipped, once more for genome-only mode. For each mode, per-sample
+  BUSCO batch summaries are collected into a single combined table, TREESUMMARY renders
+  the tree and summary tables from the OrthoFinder species tree, QUAST/gene-overlap/TE
+  inputs and the combined BUSCO tables, and SHINYAPP wraps the resulting tables and tree
+  into a launchable Shiny application.
+keywords:
+  - genomics
+  - reporting
+  - shiny
+  - tree
+  - busco
+  - quast
+components:
+  - treesummary
+  - shinyapp
+input:
+  - ch_geno_anno_busco_summary:
+      type: file
+      description: |
+        Per-sample BUSCO genome batch summaries for genome+annotation mode
+        Structure: [ val(meta), path(txt) ]
+  - ch_prot_anno_busco_summary:
+      type: file
+      description: |
+        Per-sample BUSCO protein batch summaries for genome+annotation mode
+        Structure: [ val(meta), path(txt) ]
+  - ch_geno_busco_summary:
+      type: file
+      description: |
+        Per-sample BUSCO genome batch summaries for genome-only mode
+        Structure: [ val(meta), path(txt) ]
+  - ch_tree_inputs_genome_anno:
+      type: file
+      description: |
+        QUAST, gene-overlap and orthologous-chromosome tables collected for
+        genome+annotation mode
+        Structure: [ path(tsv) ]
+  - ch_tree_inputs_genome:
+      type: file
+      description: |
+        QUAST and orthologous-chromosome tables collected for genome-only mode
+        Structure: [ path(tsv) ]
+  - ch_geno_anno_orthofinder:
+      type: directory
+      description: |
+        OrthoFinder results directory for genome+annotation mode, used to source the
+        species tree
+        Structure: [ val(meta), path(orthofinder_dir) ]
+  - ch_geno_orthofinder:
+      type: directory
+      description: |
+        OrthoFinder results directory for genome-only mode, used to source the species tree
+        Structure: [ val(meta), path(orthofinder_dir) ]
+  - ch_te_table:
+      type: file
+      description: |
+        Combined transposable-element summary table
+        Structure: [ val(meta), path(tsv) ]
+output:
+  - geno_anno_tables:
+      type: file
+      description: |
+        Summary tables for genome+annotation mode
+        Structure: [ val(meta), path(tsv) ]
+      pattern: "*.tsv"
+  - geno_anno_tree:
+      type: file
+      description: |
+        Species tree (Newick) for genome+annotation mode
+        Structure: [ val(meta), path(nw) ]
+      pattern: "tree.nw"
+  - geno_tables:
+      type: file
+      description: |
+        Summary tables for genome-only mode; empty channel if BUSCO was skipped
+        Structure: [ val(meta), path(tsv) ]
+      pattern: "*.tsv"
+  - geno_tree:
+      type: file
+      description: |
+        Species tree (Newick) for genome-only mode; empty channel if BUSCO was skipped
+        Structure: [ val(meta), path(nw) ]
+      pattern: "tree.nw"
+authors:
+  - "@FernandoDuarteF"
+maintainers:
+  - "@FernandoDuarteF"

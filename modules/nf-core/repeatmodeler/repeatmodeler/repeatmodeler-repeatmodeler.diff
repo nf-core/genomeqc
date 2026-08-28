@@ -1,0 +1,59 @@
+Changes in component 'nf-core/repeatmodeler/repeatmodeler'
+Changes in 'repeatmodeler/repeatmodeler/environment.yml':
+--- modules/nf-core/repeatmodeler/repeatmodeler/environment.yml
++++ modules/nf-core/repeatmodeler/repeatmodeler/environment.yml
+@@ -4,4 +4,4 @@
+   - conda-forge
+   - bioconda
+ dependencies:
+-  - bioconda::repeatmodeler=2.0.5
++  - bioconda::repeatmodeler=2.0.7
+
+'modules/nf-core/repeatmodeler/repeatmodeler/meta.yml' is unchanged
+Changes in 'repeatmodeler/repeatmodeler/main.nf':
+--- modules/nf-core/repeatmodeler/repeatmodeler/main.nf
++++ modules/nf-core/repeatmodeler/repeatmodeler/main.nf
+@@ -4,16 +4,16 @@
+ 
+     conda "${moduleDir}/environment.yml"
+     container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container ?
+-        'https://depot.galaxyproject.org/singularity/repeatmodeler:2.0.5--pl5321hdfd78af_0':
+-        'quay.io/biocontainers/repeatmodeler:2.0.5--pl5321hdfd78af_0' }"
++        'https://depot.galaxyproject.org/singularity/repeatmodeler:2.0.7--pl5321hdfd78af_0':
++        'biocontainers/repeatmodeler:2.0.7--pl5321hdfd78af_0' }"
+ 
+     input:
+     tuple val(meta), path(db)
+ 
+     output:
+-    tuple val(meta), path("*.fa") , emit: fasta
+-    tuple val(meta), path("*.stk"), emit: stk
+-    tuple val(meta), path("*.log"), emit: log
++    tuple val(meta), path("*.fa") , emit: fasta, optional: true
++    tuple val(meta), path("*.stk"), emit: stk, optional: true
++    tuple val(meta), path("*.log"), emit: log, optional: true
+     path "versions.yml"           , emit: versions
+ 
+     when:
+@@ -28,10 +28,13 @@
+         -database $db_name \\
+         $args \\
+         -threads $task.cpus
+-
+-    mv ${db_name}-families.fa   ${prefix}.fa
+-    mv ${db_name}-families.stk  ${prefix}.stk
+-    mv ${db_name}-rmod.log      ${prefix}.log
++    
++    if [ -f "${db_name}-families.fa" ]
++    then
++      mv ${db_name}-families.fa   ${prefix}.fa
++      mv ${db_name}-families.stk  ${prefix}.stk
++      mv ${db_name}-rmod.log      ${prefix}.log
++    fi
+ 
+     cat <<-END_VERSIONS > versions.yml
+     "${task.process}":
+
+'modules/nf-core/repeatmodeler/repeatmodeler/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/repeatmodeler/repeatmodeler/tests/main.nf.test' is unchanged
+************************************************************

@@ -1,0 +1,58 @@
+nextflow_process {
+
+    name "Test Process GENEOVERLAPS"
+    script "../main.nf"
+    process "GENEOVERLAPS"
+
+    tag "modules"
+    tag "modules_local"
+    tag "geneoverlaps"
+
+    test("geneoverlaps - overlapping and non-overlapping genes") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test' ], // meta map
+                    file("\${baseDir}/modules/local/geneoverlaps/tests/test.gff", checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(
+                    process.out.overlap_detailed_summary,
+                    process.out.overlap_counts,
+                    process.out.findAll { key, val -> key.startsWith('versions') }
+                    ).match() }
+            )
+        }
+    }
+
+    test("geneoverlaps - overlapping and non-overlapping genes - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test' ], // meta map
+                    file("\${baseDir}/modules/local/geneoverlaps/tests/test.gff", checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

@@ -1,0 +1,56 @@
+nextflow_process {
+
+    name "Test Process MMSEQS_EASYLINCLUST"
+    script "../main.nf"
+    process "MMSEQS_EASYLINCLUST"
+    config "./nextflow.config"
+
+    tag "modules"
+    tag "modules_local"
+    tag "mmseqs"
+    tag "mmseqs/easylinclust"
+
+    test("mmseqs_easylinclust - sarscov2 - proteome") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test' ], // meta map
+                    file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/proteome.fasta', checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    test("mmseqs_easylinclust - sarscov2 - proteome - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test' ], // meta map
+                    file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/proteome.fasta', checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

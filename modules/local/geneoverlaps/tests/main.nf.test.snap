@@ -1,0 +1,114 @@
+{
+    "geneoverlaps - overlapping and non-overlapping genes - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.summary.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.counts.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    [
+                        "GENEOVERLAPS",
+                        "r_base",
+                        "4.3.3"
+                    ]
+                ],
+                "3": [
+                    [
+                        "GENEOVERLAPS",
+                        "genomicranges",
+                        "1.54.1"
+                    ]
+                ],
+                "overlap_counts": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.counts.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "overlap_detailed_summary": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.summary.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions_genomicranges": [
+                    [
+                        "GENEOVERLAPS",
+                        "genomicranges",
+                        "1.54.1"
+                    ]
+                ],
+                "versions_r_base": [
+                    [
+                        "GENEOVERLAPS",
+                        "r_base",
+                        "4.3.3"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-07T11:37:26.954396",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    },
+    "geneoverlaps - overlapping and non-overlapping genes": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.summary.tsv:md5,07ae089f3c576fdf8b1e2933a7e9fb03"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.counts.tsv:md5,9678f1fc0ba17d2ed82641c3d780ce79"
+                ]
+            ],
+            {
+                "versions_genomicranges": [
+                    [
+                        "GENEOVERLAPS",
+                        "genomicranges",
+                        "1.54.1"
+                    ]
+                ],
+                "versions_r_base": [
+                    [
+                        "GENEOVERLAPS",
+                        "r_base",
+                        "4.3.3"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-11T18:01:20.848556958",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
+        }
+    }
+}

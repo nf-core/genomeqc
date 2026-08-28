@@ -1,0 +1,119 @@
+{
+    "hite - tiny genome - zero TEs found - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        [
+                            "test.tbl:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ]
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.tbl:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    [
+                        "HITE",
+                        "python",
+                        "3.9.19"
+                    ]
+                ],
+                "3": [
+                    [
+                        "HITE",
+                        "hite",
+                        "3.3.3"
+                    ]
+                ],
+                "4": [
+                    [
+                        "HITE",
+                        "repeatmasker",
+                        "4.1.1"
+                    ]
+                ],
+                "5": [
+                    [
+                        "HITE",
+                        "repeatmodeler",
+                        "2.0.1"
+                    ]
+                ],
+                "6": [
+                    [
+                        "HITE",
+                        "ltrpipeline",
+                        "2.0.1"
+                    ]
+                ],
+                "hite_results": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        [
+                            "test.tbl:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ]
+                    ]
+                ],
+                "tbl": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.tbl:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions_hite": [
+                    [
+                        "HITE",
+                        "hite",
+                        "3.3.3"
+                    ]
+                ],
+                "versions_ltrpipeline": [
+                    [
+                        "HITE",
+                        "ltrpipeline",
+                        "2.0.1"
+                    ]
+                ],
+                "versions_python": [
+                    [
+                        "HITE",
+                        "python",
+                        "3.9.19"
+                    ]
+                ],
+                "versions_repeatmasker": [
+                    [
+                        "HITE",
+                        "repeatmasker",
+                        "4.1.1"
+                    ]
+                ],
+                "versions_repeatmodeler": [
+                    [
+                        "HITE",
+                        "repeatmodeler",
+                        "2.0.1"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-10T22:41:42.897848",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    }
+}

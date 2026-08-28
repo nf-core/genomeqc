@@ -1,0 +1,97 @@
+nextflow_workflow {
+
+    name "Test Workflow GENOME_ONLY"
+    script "../main.nf"
+    workflow "GENOME_ONLY"
+    config './nextflow.config'
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "subworkflows/genome_only"
+    tag "genome_only"
+    tag "quast"
+    tag "busco/busco"
+    tag "ideogram/genome"
+    tag "busco/tsvtogff"
+    tag "gawk"
+
+    // A single genome never reaches the >=3-genome threshold for OrthoFinder, so that
+    // branch (and orthologous_chromosomes downstream of it) is exercised by the stub test
+    // only; this real run covers QUAST, BUSCO, the ideogram plot and BUSCO->GFF conversion.
+    test("bacteroides_fragilis-single_genome") {
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [ id:'test' ],
+                        file(params.modules_testdata_base_path + 'genomics/prokaryotes/bacteroides_fragilis/genome/genome.fna.gz', checkIfExists: true)
+                    ]
+                )
+                input[1] = []
+                input[2] = false
+                input[3] = 'bacteria_odb10'
+                input[4] = null
+                input[5] = null
+                input[6] = 'v3'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.orthofinder == [] },
+                { assert snapshot(
+                    workflow.out.quast_tsv,
+                    workflow.out.busco_short_summaries.collect { meta, txt -> [ meta, file(txt).name ] },
+                    workflow.out.buscos_per_seqs.flatten().collect { table -> file(table).name },
+                    workflow.out.busco_batch_summaries
+                ).match() }
+            )
+        }
+    }
+
+    test("bacteroides_fragilis-single_genome-stub") {
+
+        options '-stub'
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [ id:'test' ],
+                        file(params.modules_testdata_base_path + 'genomics/prokaryotes/bacteroides_fragilis/genome/genome.fna.gz', checkIfExists: true)
+                    ]
+                )
+                input[1] = []
+                input[2] = false
+                input[3] = 'bacteria_odb10'
+                input[4] = null
+                input[5] = null
+                input[6] = 'v3'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                // tree_data is built by mix()-ing QUAST's and GAWK's outputs, which does not
+                // guarantee element order, so it's sorted before snapshotting instead of
+                // relying on raw workflow.out order.
+                { assert snapshot(
+                    workflow.out.orthofinder,
+                    workflow.out.tree_data.collect { files -> files.collect { file(it).name }.sort() },
+                    workflow.out.quast_results,
+                    workflow.out.busco_short_summaries,
+                    workflow.out.buscos_per_seqs,
+                    workflow.out.busco_batch_summaries,
+                    workflow.out.quast_tsv
+                ).match() }
+            )
+        }
+    }
+}

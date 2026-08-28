@@ -1,0 +1,59 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "utils_nfcore_genomeqc_pipeline"
+description: |
+  Subworkflow with functionality specific to the nf-core/genomeqc pipeline. Provides
+  PIPELINE_INITIALISATION, which prints the version/parameter summary, validates
+  parameters and config, and builds the samplesheet channel from `params.input`; and
+  PIPELINE_COMPLETION, which sends the completion email/summary and registers the
+  `onComplete`/`onError` handlers. Also hosts the pipeline's parameter-validation,
+  samplesheet-validation and MultiQC-methods-description helper functions.
+keywords:
+  - genomics
+  - utility
+  - pipeline
+  - initialise
+  - completion
+components: []
+input:
+  - version:
+      type: boolean
+      description: Display version and exit
+  - validate_params:
+      type: boolean
+      description: Whether to validate parameters against the schema at runtime
+  - monochrome_logs:
+      type: boolean
+      description: Do not use coloured log outputs
+  - nextflow_cli_args:
+      type: list
+      description: List of positional Nextflow CLI arguments
+  - outdir:
+      type: string
+      description: The output directory where the results will be saved
+  - input:
+      type: string
+      description: Path to input samplesheet
+  - help:
+      type: boolean
+      description: Display help message and exit
+  - help_full:
+      type: boolean
+      description: Show the full help message
+  - show_hidden:
+      type: boolean
+      description: Show hidden parameters in the help message
+output:
+  - samplesheet:
+      type: file
+      description: |
+        Channel of samplesheet rows read from `params.input`
+        Structure: [ val(meta), val(ncbi), val(fasta), val(gxf), val(fastq) ]
+  - versions:
+      type: file
+      description: |
+        File containing software versions
+        Structure: [ path(versions.yml) ]
+authors:
+  - "@chriswyatt1"
+maintainers:
+  - "@chriswyatt1"

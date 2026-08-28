@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "decontamination"
+description: |
+  Screens a genome assembly for contamination and classifies its sequences. FCS-adaptor
+  detects and removes adaptor contamination; the cleaned genome is then screened against
+  an FCS-GX database (either a pre-staged local database or one fetched from a manifest
+  URL) and cleaned of foreign organism contamination. Tiara classifies sequences by
+  domain both before adaptor/GX cleaning (raw) and after (cleaned).
+keywords:
+  - genomics
+  - decontamination
+  - contamination
+  - fcs-gx
+  - fcs-adaptor
+  - tiara
+components:
+  - fcs/fcsadaptor
+  - fcsgx/cleangenome
+  - fcsgx/fetchdb
+  - fcsgx/rungx
+  - tiara/tiara
+input:
+  - ch_fasta:
+      type: file
+      description: |
+        Input assembly
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - ch_ramdisk:
+      type: string
+      description: |
+        Optional RAM-disk path used to stage the FCS-GX database for faster access.
+        Empty/falsy to read the database directly from disk.
+  - ch_gxdb_local:
+      type: file
+      description: |
+        Path to a pre-staged local FCS-GX database. `[]` if the database should instead
+        be fetched via `ch_gxdb_manifest`.
+  - ch_gxdb_manifest:
+      type: string
+      description: |
+        Manifest URL used to fetch the FCS-GX database when no local database is
+        provided. `[]` if a local database is used instead.
+output:
+  - fcs_gx_report:
+      type: file
+      description: |
+        FCS-GX contamination action report
+        Structure: [ val(meta), path(txt) ]
+      pattern: "*.fcs_gx_report.txt"
+  - adaptor_report:
+      type: file
+      description: |
+        FCS-adaptor contamination report
+        Structure: [ val(meta), path(txt) ]
+      pattern: "*.fcs_adaptor_report.txt"
+  - tiara_raw:
+      type: file
+      description: |
+        Tiara sequence classifications for the input (pre-cleaning) genome
+        Structure: [ val(meta), path(txt) ]
+      pattern: "*.txt"
+  - tiara_cleaned:
+      type: file
+      description: |
+        Tiara sequence classifications for the FCS-GX-cleaned genome
+        Structure: [ val(meta), path(txt) ]
+      pattern: "*.txt"
+authors:
+  - "@FernandoDuarteF"
+  - "@chriswyatt1"
+maintainers:
+  - "@FernandoDuarteF"
+  - "@chriswyatt1"

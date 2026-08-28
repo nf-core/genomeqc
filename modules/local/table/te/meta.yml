@@ -1,0 +1,67 @@
+name: "table_te"
+description: Parses RepeatMasker .tbl repeat-composition summaries into a
+  combined per-species TE-composition TSV
+keywords:
+  - repeatmasker
+  - transposable elements
+  - repeat
+  - tbl
+tools:
+  - "te_tbl_2_table":
+      description: "In-house parser that converts one or more RepeatMasker .tbl repeat-composition
+        summaries into a combined TSV suitable for pie-chart plotting in the tree summary."
+      homepage: "https://github.com/nf-core/genomeqc"
+      documentation: "https://github.com/nf-core/genomeqc"
+      licence:
+        - "MIT"
+      identifier: ""
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. [ id:'test' ]
+    - tables:
+        type: file
+        description: One or more RepeatMasker .tbl repeat-composition summary
+          files
+        pattern: "*.tbl"
+        ontologies: []
+output:
+  table:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test' ]
+      - "*.tsv":
+          type: file
+          description: Combined TE-composition summary TSV
+          pattern: "*.tsv"
+          ontologies:
+            - edam: http://edamontology.org/format_3475
+  versions_python:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - 'python3 --version | sed "s/Python //g"':
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@FernandoDuarteF"
+maintainers:
+  - "@chriswyatt1"
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - 'python3 --version | sed "s/Python //g"':
+          type: eval
+          description: The expression to obtain the version of the tool

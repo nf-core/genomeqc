@@ -1,0 +1,4 @@
+##gff-version 3
+chrX	test	gene	10	20	.	+	.	ID=geneA
+chrY	test	gene	30	40	.	+	.	ID=geneB
+chrX	test	gene	50	60	.	+	.	ID=geneC
