@@ -21,15 +21,15 @@
         {
             "@id": "./",
             "@type": "Dataset",
-            "creativeWorkStatus": "Stable",
-            "datePublished": "2026-07-24T12:35:45+00:00",
-            "description": "<h1>\n  <picture>\n    <source media=\"(prefers-color-scheme: dark)\" srcset=\"docs/images/nf-core-genomeqc_logo_dark.png\">\n    <img alt=\"nf-core/genomeqc\" src=\"docs/images/nf-core-genomeqc_logo_light.png\">\n  </picture>\n</h1>\n\n[![Open in GitHub Codespaces](https://img.shields.io/badge/Open_In_GitHub_Codespaces-black?labelColor=grey&logo=github)](https://github.com/codespaces/new/nf-core/genomeqc)\n[![GitHub Actions CI Status](https://github.com/nf-core/genomeqc/actions/workflows/nf-test.yml/badge.svg)](https://github.com/nf-core/genomeqc/actions/workflows/nf-test.yml)\n[![GitHub Actions Linting Status](https://github.com/nf-core/genomeqc/actions/workflows/linting.yml/badge.svg)](https://github.com/nf-core/genomeqc/actions/workflows/linting.yml)[![AWS CI](https://img.shields.io/badge/CI%20tests-full%20size-FF9900?labelColor=000000&logo=Amazon%20AWS)](https://nf-co.re/genomeqc/results)[![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXXX-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.XXXXXXX)\n[![nf-test](https://img.shields.io/badge/unit_tests-nf--test-337ab7.svg)](https://www.nf-test.com)\n\n[![Nextflow](https://img.shields.io/badge/version-%E2%89%A525.10.4-green?style=flat&logo=nextflow&logoColor=white&color=%230DC09D&link=https%3A%2F%2Fnextflow.io)](https://www.nextflow.io/)\n[![nf-core template version](https://img.shields.io/badge/nf--core_template-4.0.3-green?style=flat&logo=nfcore&logoColor=white&color=%2324B064&link=https%3A%2F%2Fnf-co.re)](https://github.com/nf-core/tools/releases/tag/4.0.3)\n[![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)\n[![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)\n[![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)\n[![Launch on Seqera Platform](https://img.shields.io/badge/Launch%20%F0%9F%9A%80-Seqera%20Platform-%234256e7)](https://cloud.seqera.io/launch?pipeline=https://github.com/nf-core/genomeqc)\n\n[![Get help on Slack](http://img.shields.io/badge/slack-nf--core%20%23genomeqc-4A154B?labelColor=000000&logo=slack)](https://nfcore.slack.com/channels/genomeqc)[![Follow on Bluesky](https://img.shields.io/badge/bluesky-%40nf__core-1185fe?labelColor=000000&logo=bluesky)](https://bsky.app/profile/nf-co.re)[![Follow on Mastodon](https://img.shields.io/badge/mastodon-nf__core-6364ff?labelColor=FFFFFF&logo=mastodon)](https://mstdn.science/@nf_core)[![Watch on YouTube](http://img.shields.io/badge/youtube-nf--core-FF0000?labelColor=000000&logo=youtube)](https://www.youtube.com/c/nf-core)\n\n## Introduction\n\n**nf-core/genomeqc** is a bioinformatics pipeline that compares the quality of multiple genomes, along with their annotations.\n\nThe pipeline takes a list of genomes and annotations (from local files or ncbi accessions), and runs commonly used tools to assess their quality.\n\n<picture>\n   <source media=\"(prefers-color-scheme: dark)\" srcset=\"docs/images/nf-core-genomeqc_metro_map_v3_logo_dark.png\">\n   <img alt=\"nf-core/genomeqc\" src=\"docs/images/nf-core-genomeqc_metro_map_v3.png\">\n</picture>\n\n1. Downloads the genome and gene annotation files from NCBI: [NCBI genome download](https://github.com/kblin/ncbi-genome-download) - Or **provide your own genomes and annotations**.\n2. Describes genome assembly:\n   1. [BUSCO](https://busco.ezlab.org/): Evaluates genome/proteome completeness based on **single copy markers**.\n   2. **BUSCO Ideogram**: Plots the location of BUSCO markers on the assembly.\n   3. [Merqury](https://github.com/marbl/merqury) (optional): Evaluates genome completeness based on sequencing reads.\n   4. [tidk](https://github.com/tolkit/telomeric-identifier) (optional): Identifies and visualises telomeric repeats.\n   5. [QUAST](https://github.com/ablab/quast): Computes contiguity and integrity statistics: N50, N90, GC%, number of sequences.\n   6. Contamination screening:\n      - [FCS-GX](https://github.com/ncbi/fcs/wiki/FCS-GX-quickstart): Detection and removal of foreign organisms contamination.\n      - [FCS-adaptor](https://github.com/ncbi/fcs/wiki/FCS-adaptor-quickstart): Detection and removal of adaptor and vector contamination.\n      - [Tiara](https://ibe-uw.github.io/tiara/): DNA sequence classification.\n   7. TE annotation (optional, `--te`):\n      - [`--te hite`](https://github.com/BioinformaticsToolsmith/HiTE): Fast, alignment-free TE identification and masking.\n      - `--te repeatmasker`: Curated TE masking using [DFAM famdb](https://www.dfam.org) + [RepeatMasker](https://www.repeatmasker.org). Add `--run_repeatmodeler` to also build a de novo library with [RepeatModeler](https://www.repeatmasker.org/RepeatModeler/) (slow \u2014 24\u201348 h per genome). The repeat library is dereplicated using [MMseqs2](https://github.com/soedinglab/MMseqs2) `easy-linclust` by default; use `--te_clusterer` to switch tools and `--te_cluster_identity`/`--te_cluster_coverage` to tune thresholds. RepeatMasker runs in rush mode (`-qq`) by default; use `--repeatmasker_speed` to adjust.\n3. Describes annotation:\n   1. [AGAT](https://agat.readthedocs.io/en/latest/): Number of genes, features, length...\n   2. **Gene Overlaps**: Finds the number of overlapping genes.\n4. Extracts longest protein isoform: [GffRead](https://github.com/gpertea/gffread).\n5. Finds orthologous genes: [Orthofinder](https://github.com/davidemms/OrthoFinder).\n6. Plots an orthology-based - if annotation is given - or BUSCO marker-based - if no annotation is given - phylogenetic tree with summary statistics: **Tree Summary**. Selectable `--tree_style`: a conventional left-to-right tree, or a **circular** layout with the summary statistics drawn as concentric rings and quality metrics scored as a colour-blind-safe Good/Warn/Poor traffic light.\n7. Summary with **HTML and excel** custom reports.\n8. Summary with [MultiQC](http://multiqc.info).\n\nThe pipeline outputs an executable that launches a shiny app with the tree plot and the summary statistics. The parameters of the plot can be modified, and summary statistics can be added or removed in real time. Once the plot has been adjusted, it can be saved as png/svg. The tree plot needs **at least three assemblies to be plotted**, and it servers as a quick overview of the quality of all assemblies.\n\nIf **no annotation** is given as input, the pipeline will ignore the steps **involving gene statistics**.\n\n> [!WARNING]\n> We strongly suggest users to specify the lineage using the `--busco_lineage` parameter, as setting the lineage to `auto` (default value) might cause problems with `BUSCO` during the lineage determination step.\n\n> [!NOTE]\n> `BUSCO Ideogram` will only plot those chromosomes -or scaffolds- that contain at least one single copy marker.\n\n## Usage\n\n> [!NOTE]\n> If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/get_started/environment_setup/overview) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/get_started/run-your-first-pipeline) with `-profile test` before running the workflow on actual data.\n\nFirst, prepare an input **samplesheet** in **csv format** (e.g. `samplesheet.csv`). You can prepare your sampplesheet using:\n\n### 1. Local files\n\nSimply point out to your local genome assembly and annotation (in FASTA and GFF format, respectively) using the `fasta` and `gff` fields:\n\n```csv\nspecies,fasta,gff\nspecies_1,/path/to/genome1.fasta,/path/to/annotation1.gff3\nspecies_2,/path/to/genome2.fasta,/path/to/annotation2.gff3\nspecies_3,/path/to/genome3.fasta,/path/to/annotation3.gff3\n```\n\n### 2. ncbi accessions\n\nAdditionally, you can run the pipeline providing ncbi accessions (RefSeq or GenBank, depeding on the mode you wish to run) in the `ncbi` field:\n\n```csv\nspecies,ncbi\nspecies_1,GCF_000000001.1\nspecies_2,GCF_000000002.1\nspecies_3,GCF_000000003.1\n```\n\n### 3. Both\n\nYou can combine both input types in the same samplesheet:\n\n```csv\nspecies,ncbi,fasta,gff\nspecies_1,GCF_000000001.1\nspecies_2,,/path/to/genome2.fasta,/path/to/annotation2.gff3\nspecies_3,GCF_000000003.1\nspecies_4,,/path/to/genome4.fasta,/path/to/annotation4.gff3\n```\n\n### Run the pipeline\n\nRun the pipeline using:\n\n```bash\nnextflow run nf-core/genomeqc \\\n   -profile <docker/singularity/.../institute> \\\n   --input samplesheet.csv \\\n   --outdir <OUTDIR>\n```\n\nYou can run the pipeline using a test profile and docker:\n\n```bash\nnextflow run nf-core/genomeqc -profile test,docker --outdir ./results\n```\n\n> [!WARNING]\n> Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_; see [docs](https://nf-co.re/docs/running/run-pipelines#using-parameter-files).\n\nFor more details and further functionality, please refer to the [usage documentation](https://nf-co.re/genomeqc/usage) and the [parameter documentation](https://nf-co.re/genomeqc/parameters).\n\n## Pipeline output\n\nTo see the results of an example test run with a full size dataset refer to the [results](https://nf-co.re/genomeqc/results) tab on the nf-core website pipeline page.\nFor more details about the output files and reports, please refer to the\n[output documentation](https://nf-co.re/genomeqc/output).\n\n## Credits\n\nnf-core/genomeqc was originally written by [Chris Wyatt](https://github.com/chriswyatt1) and [Fernando Duarte](https://github.com/FernandoDuarteF) at the University College London.\n\nWe thank the following people for their extensive assistance in the development of this pipeline:\n\n- [Mahesh Binzer-Panchal](https://github.com/mahesh-panchal) ([National Bioinformatics Infrastructure Sweden](https://nbis.se/))\n- [Usman Rashid](https://github.com/GallVp) ([The New Zealand Institute for Plant and Food Research](https://www.plantandfood.com/en-nz/))\n- [Lauren Huet](https://github.com/LaurenHuet) ([Schmidt Ocean Institute](https://schmidtocean.org/))\n- [Stephen Turner](https://github.com/stephenturner/) ([Colossal Biosciences](https://colossal.com/))\n- [Felipe Perez Cobos](https://github.com/fperezcobos) ([Institute of Agrifood Research and Technology](https://www.irta.cat/en/))\n- [Simon Murray](https://github.com/SimonDMurray) ([Nextflow Ambassador](https://www.nextflow.io/our_ambassadors.html))\n\n## Contributions and Support\n\nIf you would like to contribute to this pipeline, please see the [contributing guidelines](docs/CONTRIBUTING.md).\n\nFor further information or help, don't hesitate to get in touch on the [Slack `#genomeqc` channel](https://nfcore.slack.com/channels/genomeqc) (you can join with [this invite](https://nf-co.re/join/slack)).\n\n## Citations\n\nIf you use nf-core/genomeqc for your analysis, please cite it using the following doi: https://doi.org/10.48546/WORKFLOWHUB.WORKFLOW.2181.1, until the paper is accepted in a peer reviwed journal.\n\nAn extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.\n\nYou can cite the `nf-core` publication as follows:\n\n> **The nf-core framework for community-curated bioinformatics pipelines.**\n>\n> Philip Ewels, Alexander Peltzer, Sven Fillinger, Harshil Patel, Johannes Alneberg, Andreas Wilm, Maxime Ulysse Garcia, Paolo Di Tommaso & Sven Nahnsen.\n>\n> _Nat Biotechnol._ 2020 Feb 13. doi: [10.1038/s41587-020-0439-x](https://dx.doi.org/10.1038/s41587-020-0439-x).\n",
+            "creativeWorkStatus": "InProgress",
+            "datePublished": "2026-09-10T13:28:50+00:00",
+            "description": "<h1>\n  <picture>\n    <source media=\"(prefers-color-scheme: dark)\" srcset=\"docs/images/nf-core-genomeqc_logo_dark.png\">\n    <img alt=\"nf-core/genomeqc\" src=\"docs/images/nf-core-genomeqc_logo_light.png\">\n  </picture>\n</h1>\n\n[![Open in GitHub Codespaces](https://img.shields.io/badge/Open_In_GitHub_Codespaces-black?labelColor=grey&logo=github)](https://github.com/codespaces/new/nf-core/genomeqc)\n[![GitHub Actions CI Status](https://github.com/nf-core/genomeqc/actions/workflows/nf-test.yml/badge.svg)](https://github.com/nf-core/genomeqc/actions/workflows/nf-test.yml)\n[![GitHub Actions Linting Status](https://github.com/nf-core/genomeqc/actions/workflows/linting.yml/badge.svg)](https://github.com/nf-core/genomeqc/actions/workflows/linting.yml)[![AWS CI](https://img.shields.io/badge/CI%20tests-full%20size-FF9900?labelColor=000000&logo=Amazon%20AWS)](https://nf-co.re/genomeqc/results)[![Cite with Zenodo](https://img.shields.io/badge/DOI-10.64898%2F2026.08.20.745971-1073c8%3FlabelColor%3D000000)](https://doi.org/10.64898/2026.08.20.745971)\n[![nf-test](https://img.shields.io/badge/unit_tests-nf--test-337ab7.svg)](https://www.nf-test.com)\n\n[![Nextflow](https://img.shields.io/badge/version-%E2%89%A525.10.4-green?style=flat&logo=nextflow&logoColor=white&color=%230DC09D&link=https%3A%2F%2Fnextflow.io)](https://www.nextflow.io/)\n[![nf-core template version](https://img.shields.io/badge/nf--core_template-4.0.3-green?style=flat&logo=nfcore&logoColor=white&color=%2324B064&link=https%3A%2F%2Fnf-co.re)](https://github.com/nf-core/tools/releases/tag/4.0.3)\n[![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)\n[![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)\n[![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)\n[![Launch on Seqera Platform](https://img.shields.io/badge/Launch%20%F0%9F%9A%80-Seqera%20Platform-%234256e7)](https://cloud.seqera.io/launch?pipeline=https://github.com/nf-core/genomeqc)\n\n[![Get help on Slack](http://img.shields.io/badge/slack-nf--core%20%23genomeqc-4A154B?labelColor=000000&logo=slack)](https://nfcore.slack.com/channels/genomeqc)[![Follow on Bluesky](https://img.shields.io/badge/bluesky-%40nf__core-1185fe?labelColor=000000&logo=bluesky)](https://bsky.app/profile/nf-co.re)[![Follow on Mastodon](https://img.shields.io/badge/mastodon-nf__core-6364ff?labelColor=FFFFFF&logo=mastodon)](https://mstdn.science/@nf_core)[![Watch on YouTube](http://img.shields.io/badge/youtube-nf--core-FF0000?labelColor=000000&logo=youtube)](https://www.youtube.com/c/nf-core)\n\n## Introduction\n\n**nf-core/genomeqc** is a bioinformatics pipeline that compares the quality of multiple genomes, along with their annotations.\n\nThe pipeline takes a list of genomes and annotations (from local files or ncbi accessions), and runs commonly used tools to assess their quality.\n\n<picture>\n   <source media=\"(prefers-color-scheme: dark)\" srcset=\"docs/images/nf-core-genomeqc_metro_map_v4_logo_dark.png\">\n   <img alt=\"nf-core/genomeqc\" src=\"docs/images/nf-core-genomeqc_metro_map_v4.png\">\n</picture>\n\n1. Downloads the genome and gene annotation files from NCBI: [NCBI genome download](https://github.com/kblin/ncbi-genome-download) - Or **provide your own genomes and annotations**.\n2. Describes genome assembly:\n   1. [BUSCO](https://busco.ezlab.org/): Evaluates genome/proteome completeness based on **single copy markers**.\n   2. **BUSCO Ideogram**: Plots the location of BUSCO markers on the assembly.\n   3. [Merqury](https://github.com/marbl/merqury) (optional): Evaluates genome completeness based on sequencing reads.\n   4. [tidk](https://github.com/tolkit/telomeric-identifier) (optional): Identifies and visualises telomeric repeats.\n   5. [QUAST](https://github.com/ablab/quast): Computes contiguity and integrity statistics: N50, N90, GC%, number of sequences.\n   6. Contamination screening:\n      - [FCS-GX](https://github.com/ncbi/fcs/wiki/FCS-GX-quickstart): Detection and removal of foreign organisms contamination.\n      - [FCS-adaptor](https://github.com/ncbi/fcs/wiki/FCS-adaptor-quickstart): Detection and removal of adaptor and vector contamination.\n      - [Tiara](https://ibe-uw.github.io/tiara/): DNA sequence classification.\n   7. TE annotation (optional, `--te`):\n      - [`--te hite`](https://github.com/BioinformaticsToolsmith/HiTE): Fast, alignment-free TE identification and masking.\n      - `--te repeatmasker`: Curated TE masking using [DFAM famdb](https://www.dfam.org) + [RepeatMasker](https://www.repeatmasker.org). Add `--run_repeatmodeler` to also build a de novo library with [RepeatModeler](https://www.repeatmasker.org/RepeatModeler/) (slow \u2014 24\u201348 h per genome). The repeat library is dereplicated using [MMseqs2](https://github.com/soedinglab/MMseqs2) `easy-linclust` by default; use `--te_clusterer` to switch tools and `--te_cluster_identity`/`--te_cluster_coverage` to tune thresholds. RepeatMasker runs in rush mode (`-qq`) by default; use `--repeatmasker_speed` to adjust.\n3. Describes annotation:\n   1. [AGAT](https://agat.readthedocs.io/en/latest/): Number of genes, features, length...\n   2. **Gene Overlaps**: Finds the number of overlapping genes.\n4. Extracts longest protein isoform: [GffRead](https://github.com/gpertea/gffread).\n5. Finds orthologous genes: [Orthofinder](https://github.com/davidemms/OrthoFinder).\n6. Plots an orthology-based - if annotation is given - or BUSCO marker-based - if no annotation is given - phylogenetic tree with summary statistics: **Tree Summary**. Selectable `--tree_style`: a conventional left-to-right tree, or a **circular** layout with the summary statistics drawn as concentric rings and quality metrics scored as a colour-blind-safe Good/Warn/Poor traffic light.\n7. Summary with **HTML and excel** custom reports.\n8. Summary with [MultiQC](http://multiqc.info).\n\nThe pipeline outputs an executable that launches a shiny app with the tree plot and the summary statistics. The parameters of the plot can be modified, and summary statistics can be added or removed in real time. Once the plot has been adjusted, it can be saved as png/svg. The tree plot needs **at least three assemblies to be plotted**, and it servers as a quick overview of the quality of all assemblies.\n\nIf **no annotation** is given as input, the pipeline will ignore the steps **involving gene statistics**.\n\n> [!WARNING]\n> We strongly suggest users to specify the lineage using the `--busco_lineage` parameter, as setting the lineage to `auto` (default value) might cause problems with `BUSCO` during the lineage determination step.\n\n> [!NOTE]\n> `BUSCO Ideogram` will only plot those chromosomes -or scaffolds- that contain at least one single copy marker.\n\n## Usage\n\n> [!NOTE]\n> If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/get_started/environment_setup/overview) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/get_started/run-your-first-pipeline) with `-profile test` before running the workflow on actual data.\n\nFirst, prepare an input **samplesheet** in **csv format** (e.g. `samplesheet.csv`). You can prepare your sampplesheet using:\n\n### 1. Local files\n\nSimply point out to your local genome assembly and annotation (in FASTA and GFF format, respectively) using the `fasta` and `gff` fields:\n\n```csv\nassembly,fasta,gff\nassembly_1,/path/to/genome1.fasta,/path/to/annotation1.gff3\nassembly_2,/path/to/genome2.fasta,/path/to/annotation2.gff3\nassembly_3,/path/to/genome3.fasta,/path/to/annotation3.gff3\n```\n\n### 2. ncbi accessions\n\nAdditionally, you can run the pipeline providing ncbi accessions (RefSeq or GenBank, depeding on the mode you wish to run) in the `ncbi` field:\n\n```csv\nassembly,ncbi\nassembly_1,GCF_000000001.1\nassembly_2,GCF_000000002.1\nassembly_3,GCF_000000003.1\n```\n\n### 3. Both\n\nYou can combine both input types in the same samplesheet:\n\n```csv\nassembly,ncbi,fasta,gff\nassembly_1,GCF_000000001.1\nassembly_2,,/path/to/genome2.fasta,/path/to/annotation2.gff3\nassembly_3,GCF_000000003.1\nassembly_4,,/path/to/genome4.fasta,/path/to/annotation4.gff3\n```\n\n### Run the pipeline\n\nRun the pipeline using:\n\n```bash\nnextflow run nf-core/genomeqc \\\n   -profile <docker/singularity/.../institute> \\\n   --input samplesheet.csv \\\n   --outdir <OUTDIR>\n```\n\nYou can run the pipeline using a test profile and docker:\n\n```bash\nnextflow run nf-core/genomeqc -profile test,docker --outdir ./results\n```\n\n> [!WARNING]\n> Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_; see [docs](https://nf-co.re/docs/running/run-pipelines#using-parameter-files).\n\nFor more details and further functionality, please refer to the [usage documentation](https://nf-co.re/genomeqc/usage) and the [parameter documentation](https://nf-co.re/genomeqc/parameters).\n\n## Pipeline output\n\nTo see the results of an example test run with a full size dataset refer to the [results](https://nf-co.re/genomeqc/results) tab on the nf-core website pipeline page.\nFor more details about the output files and reports, please refer to the\n[output documentation](https://nf-co.re/genomeqc/output).\n\n## Credits\n\nnf-core/genomeqc was originally written by [Chris Wyatt](https://github.com/chriswyatt1) and [Fernando Duarte](https://github.com/FernandoDuarteF) at the University College London.\n\nWe thank the following people for their extensive assistance in the development of this pipeline:\n\n- [Mahesh Binzer-Panchal](https://github.com/mahesh-panchal) ([National Bioinformatics Infrastructure Sweden](https://nbis.se/))\n- [Usman Rashid](https://github.com/GallVp) ([The New Zealand Institute for Plant and Food Research](https://www.plantandfood.com/en-nz/))\n- [Lauren Huet](https://github.com/LaurenHuet) ([Schmidt Ocean Institute](https://schmidtocean.org/))\n- [Stephen Turner](https://github.com/stephenturner/) ([Colossal Biosciences](https://colossal.com/))\n- [Felipe Perez Cobos](https://github.com/fperezcobos) ([Institute of Agrifood Research and Technology](https://www.irta.cat/en/))\n- [Simon Murray](https://github.com/SimonDMurray) ([Nextflow Ambassador](https://www.nextflow.io/our_ambassadors.html))\n\n## Contributions and Support\n\nIf you would like to contribute to this pipeline, please see the [contributing guidelines](docs/CONTRIBUTING.md).\n\nFor further information or help, don't hesitate to get in touch on the [Slack `#genomeqc` channel](https://nfcore.slack.com/channels/genomeqc) (you can join with [this invite](https://nf-co.re/join/slack)).\n\n## Citations\n\nIf you use genomeqc for your analysis, please cite our preprint: https://doi.org/10.64898/2026.08.20.745971, until the paper is accepted in a peer reviewed journal.\n\nYou can cite the genomeqc zenodo record for a specific version using the following DOI: [10.5281/zenodo.22226848](https://doi.org/10.5281/zenodo.22226848).\n\nAn extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.\n\nYou can cite the `nf-core` publication as follows:\n\n> **The nf-core framework for community-curated bioinformatics pipelines.**\n>\n> Philip Ewels, Alexander Peltzer, Sven Fillinger, Harshil Patel, Johannes Alneberg, Andreas Wilm, Maxime Ulysse Garcia, Paolo Di Tommaso & Sven Nahnsen.\n>\n> _Nat Biotechnol._ 2020 Feb 13. doi: [10.1038/s41587-020-0439-x](https://dx.doi.org/10.1038/s41587-020-0439-x).\n",
             "hasPart": [
                 {
                     "@id": "main.nf"
                 },
                 {
-                    "@id": "docs/images/nf-core-genomeqc_metro_map.png"
+                    "@id": "docs/images/nf-core-genomeqc_metro_map_v4_logo_dark.png"
                 },
                 {
                     "@id": "assets/"
@@ -108,7 +108,7 @@
             },
             "mentions": [
                 {
-                    "@id": "#753b14ab-b581-4ee5-8d44-a64a1213ea00"
+                    "@id": "#030481b8-dc52-4cfb-9381-41ce0bc40800"
                 }
             ],
             "name": "nf-core/genomeqc"
@@ -143,16 +143,16 @@
                     "@id": "https://orcid.org/0009-0003-2093-1734"
                 },
                 {
-                    "@id": "#5fe7bbf7-7cd0-4866-b7e7-aa26dfac965e"
+                    "@id": "#32ad0b33-bd68-4b9c-8641-02667bbe2d35"
                 },
                 {
-                    "@id": "#beba4f58-b02b-46f0-929f-8d77ceb74058"
+                    "@id": "https://orcid.org/0000-0001-5932-880X"
                 },
                 {
                     "@id": "https://orcid.org/0009-0000-9575-9818"
                 },
                 {
-                    "@id": "#07bdf9f0-469d-4a66-995c-2ef7104bb00a"
+                    "@id": "#42a8629e-fd63-498b-8d87-e3e073966974"
                 },
                 {
                     "@id": "https://orcid.org/0000-0002-6629-0173"
@@ -160,17 +160,32 @@
             ],
             "contributor": [
                 {
-                    "@id": "#2d957144-eec0-422d-a78f-6b7add5e26f6"
+                    "@id": "#32ad0b33-bd68-4b9c-8641-02667bbe2d35"
                 },
                 {
-                    "@id": "#704ca643-56a9-4256-ab03-17ecfb6722a3"
+                    "@id": "https://orcid.org/0000-0001-5932-880X"
+                },
+                {
+                    "@id": "https://orcid.org/0009-0000-9575-9818"
+                },
+                {
+                    "@id": "#42a8629e-fd63-498b-8d87-e3e073966974"
+                },
+                {
+                    "@id": "https://orcid.org/0000-0002-6629-0173"
+                },
+                {
+                    "@id": "https://orcid.org/0000-0003-1675-0677"
+                },
+                {
+                    "@id": "https://orcid.org/0000-0002-1109-5493"
                 }
             ],
             "dateCreated": "",
-            "dateModified": "2026-07-24T12:35:45Z",
+            "dateModified": "2026-09-10T14:28:50Z",
             "dct:conformsTo": "https://bioschemas.org/profiles/ComputationalWorkflow/1.0-RELEASE/",
             "image": {
-                "@id": "docs/images/nf-core-genomeqc_metro_map.png"
+                "@id": "docs/images/nf-core-genomeqc_metro_map_v4_logo_dark.png"
             },
             "keywords": [
                 "nf-core",
@@ -202,10 +217,10 @@
             },
             "url": [
                 "https://github.com/nf-core/genomeqc",
-                "https://nf-co.re/genomeqc/1.0.0/"
+                "https://nf-co.re/genomeqc/dev/"
             ],
             "version": [
-                "1.0.0"
+                "1.0.1dev"
             ]
         },
         {
@@ -221,11 +236,19 @@
             "version": "!>=25.10.4"
         },
         {
-            "@id": "#753b14ab-b581-4ee5-8d44-a64a1213ea00",
+            "@id": "docs/images/nf-core-genomeqc_metro_map_v4_logo_dark.png",
+            "@type": [
+                "File",
+                "ImageObject"
+            ],
+            "name": "Workflow diagram"
+        },
+        {
+            "@id": "#030481b8-dc52-4cfb-9381-41ce0bc40800",
             "@type": "TestSuite",
             "instance": [
                 {
-                    "@id": "#38ad0d7e-cbe1-4153-b615-cb9fd425d828"
+                    "@id": "#c4fea8dc-8612-4b29-9137-267a5e598b79"
                 }
             ],
             "mainEntity": {
@@ -234,7 +257,7 @@
             "name": "Test suite for nf-core/genomeqc"
         },
         {
-            "@id": "#38ad0d7e-cbe1-4153-b615-cb9fd425d828",
+            "@id": "#c4fea8dc-8612-4b29-9137-267a5e598b79",
             "@type": "TestInstance",
             "name": "GitHub Actions workflow for testing nf-core/genomeqc",
             "resource": "repos/nf-core/genomeqc/actions/workflows/nf-test.yml",
@@ -389,7 +412,7 @@
             "url": "https://github.com/FernandoDuarteF"
         },
         {
-            "@id": "#5fe7bbf7-7cd0-4866-b7e7-aa26dfac965e",
+            "@id": "#32ad0b33-bd68-4b9c-8641-02667bbe2d35",
             "@type": "Person",
             "affiliation": "Colossal Biosciences",
             "email": "vustephen@gmail.com",
@@ -397,7 +420,7 @@
             "url": "https://github.com/stephenturner"
         },
         {
-            "@id": "#beba4f58-b02b-46f0-929f-8d77ceb74058",
+            "@id": "https://orcid.org/0000-0001-5932-880X",
             "@type": "Person",
             "affiliation": "Institute of Agrifood Research and Technology (IRTA)",
             "name": "Felipe Perez Cobos",
@@ -411,7 +434,7 @@
             "url": "https://github.com/LaurenHuet"
         },
         {
-            "@id": "#07bdf9f0-469d-4a66-995c-2ef7104bb00a",
+            "@id": "#42a8629e-fd63-498b-8d87-e3e073966974",
             "@type": "Person",
             "affiliation": "Nextflow Ambassador",
             "email": "simondonaldmurray@gmail.com",
@@ -434,7 +457,7 @@
             "url": "https://github.com/mahesh-panchal"
         },
         {
-            "@id": "#094e12fd-7a01-4d2b-b4aa-5ccb480a5c3f",
+            "@id": "https://orcid.org/0000-0002-1109-5493",
             "@type": "Person",
             "affiliation": "The New Zealand Institute for Plant and Food Research",
             "name": "Usman Rashid",
