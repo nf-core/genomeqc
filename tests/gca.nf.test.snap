@@ -69,7 +69,7 @@
                     "pigz": 2.8
                 },
                 "Workflow": {
-                    "nf-core/genomeqc": "v1.0.0"
+                    "nf-core/genomeqc": "v1.0.1dev"
                 }
             },
             [
