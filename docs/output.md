@@ -347,7 +347,7 @@ The pipeline supports both OrthoFinder v2 and v3 (selected via `--ortho_version`
 <details markdown="1">
 <summary>Output files</summary>
 
-- `orthofinder/v2/<prefix>/` or `orthofinder/v3/input/OrthoFinder/Results_<prefix>/` (depending on `--ortho_version`)
+- `orthofinder/v2/input/OrthoFinder/Results_<prefix>/` or `orthofinder/v3/input/OrthoFinder/Results_<prefix>/` (depending on `--ortho_version`)
   - `Orthogroups/`
     - Orthogroup assignments from MCL clustering (present in both v2 and v3).
   - `Species_Tree/`
