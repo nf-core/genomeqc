@@ -4,7 +4,6 @@ lint:
     - assets/nf-core-genomeqc_logo_light.png
     - docs/images/nf-core-genomeqc_logo_light.png
     - docs/images/nf-core-genomeqc_logo_dark.png
-  schema_params: false
 nf_core_version: 4.1.0
 repository_type: pipeline
 template:
