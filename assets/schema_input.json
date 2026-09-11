@@ -7,27 +7,41 @@
     "items": {
         "type": "object",
         "properties": {
-            "sample": {
+            "assembly": {
                 "type": "string",
+                "errorMessage": "Assembly name must be provided and cannot contain spaces",
                 "pattern": "^\\S+$",
-                "errorMessage": "Sample name must be provided and cannot contain spaces",
                 "meta": ["id"]
             },
-            "fastq_1": {
+            "ncbi": {
                 "type": "string",
-                "format": "file-path",
-                "exists": true,
-                "pattern": "^([\\S\\s]*\\/)?[^\\s\\/]+\\.f(ast)?q\\.gz$",
-                "errorMessage": "FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+                "pattern": "^GC[AF]_[0-9]{9}\\.[0-9]+$",
+                "errorMessage": "NCBI assembly accession number. Should start with GCF_ (RefSeq) or GCA_ (GenBank), followed by 9 digits and the version number, and cannot contain spaces"
             },
-            "fastq_2": {
+            "fasta": {
                 "type": "string",
                 "format": "file-path",
-                "exists": true,
-                "pattern": "^([\\S\\s]*\\/)?[^\\s\\/]+\\.f(ast)?q\\.gz$",
-                "errorMessage": "FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+                "pattern": "^\\S+\\.(fa|fasta|fna)(\\.gz)?$",
+                "errorMessage": "FASTA file with genome assembly, GZIP-compressed or uncompressed, cannot contain spaces and must have extension '.fa', '.fa.gz', '.fna', '.fna.gz', '.fasta' or '.fasta.gz'"
+            },
+            "gff": {
+                "type": "string",
+                "format": "file-path",
+                "pattern": "^\\S+\\.(gff3?|gtf)(\\.gz)?$",
+                "errorMessage": "GFF/GTF file with genome annotation, GZIP-compressed or uncompressed, cannot contain spaces and must have extension '.gtf', '.gtf.gz', '.gff', '.gff.gz', '.gff3', '.gff3.gz'"
+            },
+            "fastq": {
+                "type": "string",
+                "format": "file-path",
+                "pattern": "^\\S+\\.f(ast)?q(\\.gz)?$",
+                "errorMessage": "FastQ file to run Merqury, GZIP-compressed or uncompressed,  contain spaces and must have extension '.fq', '.fq.gz', '.fastq' or '.fastq.gz'"
+            },
+            "taxid": {
+                "type": "integer",
+                "meta": ["taxid"],
+                "errorMessage": "Species taxid for decontamination screening, must be a valid NCBI taxid (numeric string without spaces)"
             }
         },
-        "required": ["sample", "fastq_1"]
+        "required": ["assembly"]
     }
 }

@@ -1,0 +1,56 @@
+nextflow_process {
+
+    name "Test Process REPEATMASKER_DOWNLOADDB"
+    script "../main.nf"
+    process "REPEATMASKER_DOWNLOADDB"
+
+    tag "modules"
+    tag "modules_local"
+    tag "repeatmasker"
+    tag "repeatmasker/downloaddb"
+
+    // Uses a file:// URL to a local fixture instead of a real remote server.
+    test("repeatmasker_downloaddb - local file url - checksum ok") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test' ], // meta map
+                    "file://\${baseDir}/modules/local/repeatmasker/downloaddb/tests/test_db.h5.gz"
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    test("repeatmasker_downloaddb - local file url - checksum ok - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test' ], // meta map
+                    "file://\${baseDir}/modules/local/repeatmasker/downloaddb/tests/test_db.h5.gz"
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

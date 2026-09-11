@@ -1,0 +1,55 @@
+nextflow_process {
+
+    name "Test Process TABLE_TE"
+    script "../main.nf"
+    process "TABLE_TE"
+
+    tag "modules"
+    tag "modules_local"
+    tag "table"
+    tag "table/te"
+
+    test("table_te - single tbl") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test' ], // meta map
+                    file("\${baseDir}/modules/local/table/te/tests/test.tbl", checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    test("table_te - single tbl - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test' ], // meta map
+                    file("\${baseDir}/modules/local/table/te/tests/test.tbl", checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

@@ -1,0 +1,112 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "fasta_annotate_te"
+description: |
+  Annotates transposable elements (TEs) in a genome assembly. Two mutually exclusive
+  strategies are supported, selected via `params.te`:
+  - `hite`: de novo annotation with HITE.
+  - `repeatmasker`: a Dfam (famdb) repeat library, optionally combined with a per-genome
+    de novo library built by RepeatModeler, is clustered (cd-hit-est, MMseqs2 easycluster
+    or easylinclust) and used to soft-mask the genome with RepeatMasker.
+  In both cases, the resulting RepeatMasker/HITE `.tbl` summaries are parsed into a single
+  TSV table for downstream reporting.
+keywords:
+  - genomics
+  - transposable elements
+  - repeat annotation
+  - repeatmasker
+  - repeatmodeler
+  - hite
+components:
+  - repeatmasker/downloaddb
+  - famdbpyembl
+  - repeatmodeler/builddatabase
+  - repeatmodeler/repeatmodeler
+  - find/concatenate
+  - cdhit/cdhitest
+  - mmseqs/easycluster
+  - mmseqs/easylinclust
+  - repeatmasker/repeatmasker
+  - hite
+  - table/te
+input:
+  - ch_fasta:
+      type: file
+      description: |
+        Input assembly
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - ch_rm_db:
+      type: file
+      description: |
+        Dfam partition download URL(s) for famdb. Channel.empty() if no download is needed.
+        Structure: [ val(meta), val(db_url) ]
+  - ch_famdb_lib:
+      type: file
+      description: |
+        Pre-staged Dfam h5 partition file(s). Channel.empty() if none are pre-staged.
+        Structure: [ val(meta), path(h5) ]
+  - val_famdb_lineage:
+      type: string
+      description: |
+        Lineage string used to extract the repeat library from famdb (e.g. 'hymenoptera'),
+        or '' to use the full database
+  - val_run_repeatmodeler:
+      type: boolean
+      description: |
+        Whether to run de novo RepeatModeler in addition to the famdb library
+        (slow, adds 24-48 h per genome)
+  - val_te_clusterer:
+      type: string
+      description: |
+        Clustering tool used to deduplicate the repeat library before RepeatMasker:
+        'linclust' (default), 'mmseqs' or 'cdhit'
+output:
+  - masked:
+      type: file
+      description: |
+        Soft-masked genome assembly (repeatmasker path only)
+        Structure: [ val(meta), path(masked) ]
+      pattern: "*.masked"
+  - out:
+      type: file
+      description: |
+        RepeatMasker annotation output (repeatmasker path only)
+        Structure: [ val(meta), path(out) ]
+      pattern: "*.out"
+  - tbl:
+      type: file
+      description: |
+        Per-genome repeat summary table from RepeatMasker (repeatmasker path) or HITE
+        (hite path)
+        Structure: [ val(meta), path(tbl) ]
+      pattern: "*.tbl"
+  - tbl_collected:
+      type: file
+      description: |
+        All per-genome `.tbl` summaries collected into a single list
+        Structure: [ path(tbl) ]
+      pattern: "*.tbl"
+  - tbl_tsv:
+      type: file
+      description: |
+        Combined TE summary table parsed from all `.tbl` files, for downstream reporting
+        Structure: [ val(meta), path(tsv) ]; meta is always [ id:'te_table' ]
+      pattern: "*.tsv"
+  - gff:
+      type: file
+      description: |
+        RepeatMasker annotation as GFF (repeatmasker path only)
+        Structure: [ val(meta), path(gff) ]
+      pattern: "*.gff"
+  - repeat_library:
+      type: file
+      description: |
+        Clustered repeat library used to mask the genome (repeatmasker path only)
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.fasta"
+authors:
+  - "@FernandoDuarteF"
+  - "@chriswyatt1"
+maintainers:
+  - "@FernandoDuarteF"
+  - "@chriswyatt1"

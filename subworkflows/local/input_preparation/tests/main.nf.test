@@ -1,0 +1,114 @@
+nextflow_workflow {
+
+    name "Test Workflow INPUT_PREPARATION"
+    script "../main.nf"
+    workflow "INPUT_PREPARATION"
+    config './nextflow.config'
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "subworkflows/input_preparation"
+    tag "input_preparation"
+    tag "createpath"
+    tag "ncbigenomedownload"
+    tag "pigz/uncompress"
+    tag "busco/download"
+
+    test("sarscov2-local_fasta_gxf_fastq") {
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.empty()
+                input[1] = Channel.of(
+                    [
+                        [ id:'test', taxid:'2697049' ],
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.fasta.gz', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.gff3.gz', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true)
+                    ]
+                )
+                input[2] = 'all'
+                input[3] = null
+                input[4] = 'bacteria_odb10'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(
+                    workflow.out.fasta,
+                    workflow.out.input,
+                    workflow.out.input_decon,
+                    path(workflow.out.busco_db[0]).list().sort()
+                ).match() }
+            )
+        }
+    }
+
+    test("bacteria-ncbi_refseq_accession") {
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [ id:'test_ncbi' ],
+                        'GCF_000013425.1',
+                        []
+                    ]
+                )
+                input[1] = Channel.empty()
+                input[2] = 'bacteria'
+                input[3] = null
+                input[4] = 'bacteria_odb10'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(
+                    workflow.out.fasta,
+                    workflow.out.input_decon
+                ).match() }
+            )
+        }
+    }
+
+    test("sarscov2-local_fasta_gxf_fastq-stub") {
+
+        // NCBIGENOMEDOWNLOAD has no stub: block, so the NCBI-accession path is
+        // covered by the real-run test above instead of being exercised here.
+        options '-stub'
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.empty()
+                input[1] = Channel.of(
+                    [
+                        [ id:'test', taxid:'2697049' ],
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.fasta.gz', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.gff3.gz', checkIfExists: true),
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/fastq/test_1.fastq.gz', checkIfExists: true)
+                    ]
+                )
+                input[2] = 'all'
+                input[3] = null
+                input[4] = 'bacteria_odb10'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+}

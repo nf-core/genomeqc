@@ -1,0 +1,4 @@
+##[["FCS genome report", 2, 1], {"git-rev": "v0.5.5-9-gfc836c1", "run-date": "Mon Aug 10 22:16:41 2026", "db": {"build-date": "2022-11-03", "seqs": 3042, "Gbp": 0.28336}, "run-info": {"agg-cvg": 0.0410454, "asserted-div": "virs:viruses", "inferred-primary-divs": ["prok:CFB group bacteria"], "corrected-primary-divs": ["virs:viruses", "virs:eukaryotic viruses", "virs:prokaryotic viruses"], "genome-hash": "0d1fb08932fd1623"}}]
+#seq_id	start_pos	end_pos	seq_len	action	div	agg_cont_cov	top_tax_name
+seq_00238	1	1000	1000	EXCLUDE	prok:CFB group bacteria	87	Bacteroides cutis
+seq_00289	1	1000	1000	EXCLUDE	prok:CFB group bacteria	88	Bacteroides gallinaceum

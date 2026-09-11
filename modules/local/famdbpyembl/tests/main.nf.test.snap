@@ -1,0 +1,84 @@
+{
+    "famdbpyembl - descendants of test taxon": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "3.fasta:md5,388e6896d00a060925c841019cb41d45"
+                    ]
+                ],
+                "1": [
+                    [
+                        "FAMDBPYEMBL",
+                        "repeatmasker",
+                        "4.2.2"
+                    ]
+                ],
+                "famdb_lib": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "3.fasta:md5,388e6896d00a060925c841019cb41d45"
+                    ]
+                ],
+                "versions_repeatmasker": [
+                    [
+                        "FAMDBPYEMBL",
+                        "repeatmasker",
+                        "4.2.2"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-20T14:29:26.254275",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    },
+    "famdbpyembl - descendants of test taxon - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "3.fasta:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        "FAMDBPYEMBL",
+                        "repeatmasker",
+                        "4.2.2"
+                    ]
+                ],
+                "famdb_lib": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "3.fasta:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions_repeatmasker": [
+                    [
+                        "FAMDBPYEMBL",
+                        "repeatmasker",
+                        "4.2.2"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-20T14:29:36.269012",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    }
+}

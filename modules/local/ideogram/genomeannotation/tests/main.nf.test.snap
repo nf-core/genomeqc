@@ -1,0 +1,129 @@
+{
+    "ideogram_genomeannotation - protein-mode busco table": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "lineage": "bacteria_odb10"
+                    },
+                    "test.csv:md5,d149209e0330a0ab9561de87bb2ee9e0"
+                ]
+            ],
+            {
+                "versions_r_base": [
+                    [
+                        "IDEOGRAM_GENOMEANNOTATION",
+                        "r_base",
+                        "4.4.1"
+                    ]
+                ],
+                "versions_rideogram": [
+                    [
+                        "IDEOGRAM_GENOMEANNOTATION",
+                        "r_rideogram",
+                        "0.2.2"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-20T14:17:07.856735",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    },
+    "ideogram_genomeannotation - protein-mode busco table - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "lineage": "bacteria_odb10"
+                        },
+                        "test.svg:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test",
+                            "lineage": "bacteria_odb10"
+                        },
+                        "test.png:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "test",
+                            "lineage": "bacteria_odb10"
+                        },
+                        "test.csv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "3": [
+                    [
+                        "IDEOGRAM_GENOMEANNOTATION",
+                        "r_base",
+                        "4.4.1"
+                    ]
+                ],
+                "4": [
+                    [
+                        "IDEOGRAM_GENOMEANNOTATION",
+                        "r_rideogram",
+                        "0.2.2"
+                    ]
+                ],
+                "busco_mappings": [
+                    [
+                        {
+                            "id": "test",
+                            "lineage": "bacteria_odb10"
+                        },
+                        "test.csv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "png": [
+                    [
+                        {
+                            "id": "test",
+                            "lineage": "bacteria_odb10"
+                        },
+                        "test.png:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "svg": [
+                    [
+                        {
+                            "id": "test",
+                            "lineage": "bacteria_odb10"
+                        },
+                        "test.svg:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions_r_base": [
+                    [
+                        "IDEOGRAM_GENOMEANNOTATION",
+                        "r_base",
+                        "4.4.1"
+                    ]
+                ],
+                "versions_rideogram": [
+                    [
+                        "IDEOGRAM_GENOMEANNOTATION",
+                        "r_rideogram",
+                        "0.2.2"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-20T14:17:19.44358",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    }
+}

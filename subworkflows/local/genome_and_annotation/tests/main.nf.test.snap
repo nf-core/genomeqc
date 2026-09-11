@@ -1,0 +1,105 @@
+{
+    "sarscov2-single_genome_and_annotation": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.quast.tsv:md5,40e321250db460120563bd0449d76fe3"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.stats.txt:md5,fbfc515d8a6374df46cee401c2adbf0c"
+                ]
+            ]
+        ],
+        "timestamp": "2026-08-10T22:42:57.269432",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    },
+    "sarscov2-single_genome_and_annotation-stub": {
+        "content": [
+            [],
+            [
+                [
+                    "test.counts.tsv",
+                    "test.quast.tsv"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    [
+                        [
+                            "GC_content_plot.pdf:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "Nx_plot.pdf:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "cumulative_plot.pdf:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "genome_GC_content_plot.pdf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ],
+                        "icarus.html:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        [
+                            "contig_size_viewer.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ],
+                        "quast.log:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "report.html:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "report.pdf:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "report.tex:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "report.tsv:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "report.txt:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "transposed_report.tex:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "transposed_report.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test-bacteria_odb10-genome-busco.batch_summary_modified.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test-bacteria_odb10-proteins-busco.batch_summary_modified.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.quast.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.stats.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ]
+            ],
+            null,
+            [],
+            []
+        ],
+        "timestamp": "2026-08-11T20:11:07.106646",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.07.0"
+        }
+    }
+}

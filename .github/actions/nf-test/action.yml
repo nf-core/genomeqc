@@ -56,10 +56,23 @@ runs:
         channel-priority: strict
         conda-remove-defaults: true
 
+    # Reads .github/skip_nf_test.json for the current profile (same file/format as
+    # nf-core/modules) and exports it as a comma-separated string. nf-test.config turns
+    # each entry into an `ignore` glob, since this repo's CI relies on nf-test's own
+    # --changed-since/--shard discovery rather than an externally-filtered path list,
+    # so `ignore` (not a pre-filtered `paths` argument) is what actually excludes them.
+    - name: Get skip list for profile
+      id: skip_list
+      shell: bash
+      run: |
+        SKIP_PATHS=$(jq -r --arg profile "${{ inputs.profile }}" '.[$profile] // [] | join(",")' .github/skip_nf_test.json)
+        echo "skip_paths=$SKIP_PATHS" >> $GITHUB_OUTPUT
+
     - name: Run nf-test
       shell: bash
       env:
-        NFT_WORKDIR: ${{ env.NFT_WORKDIR }}
+        NFT_SKIP_PATHS: ${{ steps.skip_list.outputs.skip_paths }}
+        NFT_PROFILE: ${{ inputs.profile }}
       run: |
         nf-test test \
           --profile=+${{ inputs.profile }} \

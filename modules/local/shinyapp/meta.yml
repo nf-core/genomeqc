@@ -1,0 +1,90 @@
+name: "shinyapp"
+description: Packages QC tables and the tree file into a launchable Shiny app
+  container script
+keywords:
+  - shiny
+  - tree
+  - report
+  - interactive
+tools:
+  - "shiny_app":
+      description: "In-house step that bundles per-species QC tables, the tree file,
+        and the pipeline's Shiny app R scripts into a directory with a launcher script
+        that starts the app in a container and opens it in the browser."
+      homepage: "https://github.com/nf-core/genomeqc"
+      documentation: "https://github.com/nf-core/genomeqc"
+      licence:
+        - "MIT"
+      identifier: ""
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. [ id:'test' ]
+    - tables:
+        type: file
+        description: Per-species QC summary TSV files to bundle into the app
+        pattern: "*.tsv"
+        ontologies:
+          - edam: http://edamontology.org/format_3475
+    - tree:
+        type: file
+        description: Newick tree file to bundle into the app
+        pattern: "tree.nw"
+        ontologies: []
+  - functions:
+      type: file
+      description: tree_functions.R helper script bundled into the app
+      pattern: "*.R"
+      ontologies:
+        - edam: http://edamontology.org/format_3999
+  - app:
+      type: file
+      description: shiny_app.R Shiny application script bundled into the app
+      pattern: "*.R"
+      ontologies:
+        - edam: http://edamontology.org/format_3999
+output:
+  shiny_app:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test' ]
+      - app/shiny_app.sh:
+          type: file
+          description: Launcher script that starts the Shiny app container and
+            opens it in the browser
+          pattern: "app/shiny_app.sh"
+          ontologies: []
+  shiny_app_files:
+    - app:
+        type: directory
+        description: Directory containing the bundled tables, tree, R scripts, and
+          launcher script
+  versions_shiny:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - cat:
+          type: string
+          description: The name of the tool
+      - cat --version 2>&1 | head -n 1 | sed 's/^.*coreutils) //; s/ .*\$//':
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - cat:
+          type: string
+          description: The name of the tool
+      - cat --version 2>&1 | head -n 1 | sed 's/^.*coreutils) //; s/ .*\$//':
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@FernandoDuarteF"
+maintainers:
+  - "@chriswyatt1"

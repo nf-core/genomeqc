@@ -1,0 +1,84 @@
+{
+    "mmseqs_easylinclust - sarscov2 - proteome": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_rep_seq.fasta:md5,abd3e38818a26ac3970ec0c7ec769740"
+                    ]
+                ],
+                "1": [
+                    [
+                        "MMSEQS_EASYLINCLUST",
+                        "mmseqs",
+                        "18.8cc5c"
+                    ]
+                ],
+                "representatives": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_rep_seq.fasta:md5,abd3e38818a26ac3970ec0c7ec769740"
+                    ]
+                ],
+                "versions_mmseqs": [
+                    [
+                        "MMSEQS_EASYLINCLUST",
+                        "mmseqs",
+                        "18.8cc5c"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-08T07:47:27.974755896",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    },
+    "mmseqs_easylinclust - sarscov2 - proteome - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_rep_seq.fasta:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        "MMSEQS_EASYLINCLUST",
+                        "mmseqs",
+                        "18.8cc5c"
+                    ]
+                ],
+                "representatives": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_rep_seq.fasta:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions_mmseqs": [
+                    [
+                        "MMSEQS_EASYLINCLUST",
+                        "mmseqs",
+                        "18.8cc5c"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-08T07:47:36.053589133",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}

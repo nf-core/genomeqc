@@ -1,0 +1,88 @@
+nextflow_workflow {
+
+    name "Test Workflow FASTA_QV_MERQURY"
+    script "../main.nf"
+    workflow "FASTA_QV_MERQURY"
+    config './nextflow.config'
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "subworkflows/fasta_qv_merqury"
+    tag "fasta_qv_merqury"
+    tag "meryl/count"
+    tag "meryl/unionsum"
+    tag "merqury/merqury"
+
+    test("homo_sapiens-genome-fastq") {
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [ id:'test' ],
+                        file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                    ]
+                )
+                input[1] = Channel.of(
+                    [
+                        [ id:'test' ],
+                        [
+                            file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                            file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                        ]
+                    ]
+                )
+                input[2] = 21
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(
+                    workflow.out.ch_merqury_qv,
+                    workflow.out.ch_merqury_stats,
+                    workflow.out.ch_merqury_spectra_cn_fl_png.collect { meta, png -> [ meta, file(png).name ] },
+                    workflow.out.ch_merqury_spectra_asm_fl_png.collect { meta, png -> [ meta, file(png).name ] }
+                ).match() }
+            )
+        }
+    }
+
+    test("homo_sapiens-genome-fastq-stub") {
+
+        options '-stub'
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [ id:'test' ],
+                        file(params.modules_testdata_base_path + 'genomics/homo_sapiens/genome/genome.fasta', checkIfExists: true)
+                    ]
+                )
+                input[1] = Channel.of(
+                    [
+                        [ id:'test' ],
+                        [
+                            file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/fastq/test_1.fastq.gz', checkIfExists: true),
+                            file(params.modules_testdata_base_path + 'genomics/homo_sapiens/illumina/fastq/test_2.fastq.gz', checkIfExists: true)
+                        ]
+                    ]
+                )
+                input[2] = 21
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+}

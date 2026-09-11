@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "genome_only"
+description: |
+  Runs genome-only QC on an assembly: QUAST for assembly statistics and, unless BUSCO is
+  skipped, BUSCO completeness assessment plus a BUSCO ideogram plot. Single-copy BUSCO
+  proteins across samples are used to infer orthology with OrthoFinder (v2 or v3), and the
+  BUSCO full table is converted to GFF so that OrthoFinder's orthogroups can be mapped back
+  onto sequences with orthoseqcount.
+keywords:
+  - genomics
+  - genome
+  - busco
+  - quast
+  - orthofinder
+  - orthology
+components:
+  - quast
+  - busco/busco
+  - ideogram/genome
+  - orthofinder
+  - orthofinderv2
+  - busco/tsvtogff
+  - orthoseqcount
+  - gawk
+input:
+  - ch_fasta:
+      type: file
+      description: |
+        Input assembly/assemblies
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - ch_busco_db:
+      type: file
+      description: |
+        Path to a pre-downloaded BUSCO lineage dataset, or `[]` to let BUSCO
+        auto-select/download its lineage
+output:
+  - orthofinder:
+      type: directory
+      description: |
+        OrthoFinder results directory; empty channel if BUSCO was skipped or fewer than
+        3 genomes had usable single-copy BUSCO proteins
+        Structure: [ val(meta), path(orthofinder) ]; meta is always
+        [ id:'orthofinder', mode:'genome' ]
+  - tree_data:
+      type: file
+      description: |
+        QUAST and BUSCO batch-summary tables collected for the tree-summary report;
+        empty channel if BUSCO was skipped
+        Structure: [ path(tsv) ]
+      pattern: "*.tsv"
+  - quast_results:
+      type: directory
+      description: |
+        Full QUAST results directory
+        Structure: [ val(meta), path(results) ]
+  - busco_short_summaries:
+      type: file
+      description: |
+        BUSCO short summary text file(s); empty channel if BUSCO was skipped
+        Structure: [ val(meta), path(txt) ]
+      pattern: "short_summary*.txt"
+  - buscos_per_seqs:
+      type: file
+      description: |
+        Per-sequence BUSCO counts used for the ideogram plot, sorted by filename;
+        empty channel if BUSCO was skipped
+        Structure: [ path(csv) ]
+      pattern: "*.csv"
+  - busco_batch_summaries:
+      type: file
+      description: |
+        Species-named BUSCO batch summary table; empty channel if BUSCO was skipped
+        Structure: [ val(meta), path(tsv) ]
+      pattern: "*.tsv"
+  - quast_tsv:
+      type: file
+      description: |
+        QUAST report in TSV format
+        Structure: [ val(meta), path(tsv) ]
+      pattern: "*.tsv"
+authors:
+  - "@FernandoDuarteF"
+  - "@chriswyatt1"
+maintainers:
+  - "@FernandoDuarteF"
+  - "@chriswyatt1"

@@ -1,0 +1,99 @@
+name: "geneoverlaps"
+description: Finds overlapping genes in a GFF and summarises sense/antisense
+  overlap counts
+keywords:
+  - gene overlaps
+  - genomicranges
+  - annotation
+  - gff
+tools:
+  - "gene_overlaps":
+      description: "In-house R script built on Bioconductor GenomicRanges that detects
+        overlapping gene features in a GFF and reports per-gene overlap details plus
+        summary counts, split by sense/antisense orientation."
+      homepage: "https://github.com/nf-core/genomeqc"
+      documentation: "https://github.com/nf-core/genomeqc"
+      licence:
+        - "MIT"
+      identifier: ""
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. [ id:'test' ]
+    - gff:
+        type: file
+        description: Genome annotation GFF to scan for overlapping gene features
+        pattern: "*.{gff,gff3}"
+        ontologies: []
+output:
+  overlap_detailed_summary:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test' ]
+      - "*.summary.tsv":
+          type: file
+          description: Per-gene detail of overlapping gene pairs
+          pattern: "*.summary.tsv"
+          ontologies:
+            - edam: http://edamontology.org/format_3475
+  overlap_counts:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test' ]
+      - "*.counts.tsv":
+          type: file
+          description: Summary counts of overlapping genes, including
+            sense/antisense breakdown
+          pattern: "*.counts.tsv"
+          ontologies:
+            - edam: http://edamontology.org/format_3475
+  versions_r_base:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - r_base:
+          type: string
+          description: The name of the tool
+      - Rscript -e "cat(as.character(getRversion()))":
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_genomicranges:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - genomicranges:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''GenomicRanges'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - r_base:
+          type: string
+          description: The name of the tool
+      - Rscript -e "cat(as.character(getRversion()))":
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - genomicranges:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''GenomicRanges'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@chriswyatt1"
+maintainers:
+  - "@chriswyatt1"

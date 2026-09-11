@@ -1,0 +1,1 @@
+(speciesA.prot.fa.largestIsoform:0.1,speciesB.prot.fa.largestIsoform:0.2)N0;

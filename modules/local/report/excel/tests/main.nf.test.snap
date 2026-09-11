@@ -1,0 +1,49 @@
+{
+    "report_excel - no optional inputs - stub": {
+        "content": [
+            {
+                "0": [
+                    "genomeqc_tables.xlsx:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "1": [
+                    [
+                        "REPORT_EXCEL",
+                        "python",
+                        "3.9.5"
+                    ]
+                ],
+                "excel": [
+                    "genomeqc_tables.xlsx:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "versions_python": [
+                    [
+                        "REPORT_EXCEL",
+                        "python",
+                        "3.9.5"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-20T14:14:58.424419",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    },
+    "report_excel - no optional inputs": {
+        "content": [
+            [
+                [
+                    "REPORT_EXCEL",
+                    "python",
+                    "3.9.5"
+                ]
+            ]
+        ],
+        "timestamp": "2026-08-20T14:14:48.292347",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    }
+}

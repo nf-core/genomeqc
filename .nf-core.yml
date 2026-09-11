@@ -1,4 +1,5 @@
 lint:
+  schema_params: false # TEMP: nf-core/tools crashes comparing the RM_db array default (https://github.com/nf-core/tools/issues/4367, fix pending in https://github.com/nf-core/tools/pull/4392) - re-enable once that's released
   files_unchanged:
     - assets/nf-core-genomeqc_logo_light.png
     - docs/images/nf-core-genomeqc_logo_light.png
@@ -14,4 +15,4 @@ template:
   name: genomeqc
   org: nf-core
   outdir: .
-  version: 1.0.0
+  version: 1.0.1dev

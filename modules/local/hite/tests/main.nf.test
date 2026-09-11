@@ -1,0 +1,62 @@
+nextflow_process {
+
+    name "Test Process HITE"
+    script "../main.nf"
+    process "HITE"
+    config "./nextflow.config"
+
+    tag "modules"
+    tag "modules_local"
+    tag "hite"
+
+    test("hite - tiny genome - zero TEs found") {
+
+        // Named test.fasta to match meta.id 'test': regression test for the input/output filename collision.
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test' ], // meta map
+                    file("\${baseDir}/modules/local/hite/tests/test.fasta", checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert path(process.out.hite_results[0][1]).exists() },
+                { assert path(process.out.tbl[0][1]).exists() },
+                { assert process.out.versions_python[0][2] },
+                { assert process.out.versions_hite[0][2] == '3.3.3' },
+                { assert process.out.versions_repeatmasker[0][2] },
+                { assert process.out.versions_repeatmodeler[0][2] },
+                { assert process.out.versions_ltrpipeline[0][2] }
+            )
+        }
+    }
+
+    test("hite - tiny genome - zero TEs found - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test' ], // meta map
+                    file("\${baseDir}/modules/local/hite/tests/test.fasta", checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

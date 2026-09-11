@@ -1,0 +1,16 @@
+##gff-version 3
+HiC_scaffold_7	AUGUSTUS	gene	9568	11518	.	+	.	ID=g2
+HiC_scaffold_7	AUGUSTUS	transcript	9568	11518	1	+	.	ID=g2.t1;Parent=g2
+HiC_scaffold_7	AUGUSTUS	exon	9568	9838	.	+	.	ID=agat-exon-5;Parent=g2.t1;gene_id=g2;transcript_id=g2.t1
+HiC_scaffold_7	AUGUSTUS	exon	10013	10252	.	+	.	ID=agat-exon-6;Parent=g2.t1;gene_id=g2;transcript_id=g2.t1
+HiC_scaffold_7	AUGUSTUS	exon	10618	11000	.	+	.	ID=agat-exon-7;Parent=g2.t1;gene_id=g2;transcript_id=g2.t1
+HiC_scaffold_7	AUGUSTUS	exon	11414	11518	.	+	.	ID=agat-exon-8;Parent=g2.t1;gene_id=g2;transcript_id=g2.t1
+HiC_scaffold_7	AUGUSTUS	CDS	9568	9838	1	+	0	ID=agat-cds-5;Parent=g2.t1;gene_id=g2;transcript_id=g2.t1
+HiC_scaffold_7	AUGUSTUS	CDS	10013	10252	1	+	2	ID=agat-cds-6;Parent=g2.t1;gene_id=g2;transcript_id=g2.t1
+HiC_scaffold_7	AUGUSTUS	CDS	10618	11000	1	+	2	ID=agat-cds-7;Parent=g2.t1;gene_id=g2;transcript_id=g2.t1
+HiC_scaffold_7	AUGUSTUS	CDS	11414	11518	1	+	0	ID=agat-cds-8;Parent=g2.t1;gene_id=g2;transcript_id=g2.t1
+HiC_scaffold_7	AUGUSTUS	intron	9839	10012	1	+	.	ID=agat-intron-4;Parent=g2.t1;gene_id=g2;transcript_id=g2.t1
+HiC_scaffold_7	AUGUSTUS	intron	10253	10617	1	+	.	ID=agat-intron-5;Parent=g2.t1;gene_id=g2;transcript_id=g2.t1
+HiC_scaffold_7	AUGUSTUS	intron	11001	11413	1	+	.	ID=agat-intron-6;Parent=g2.t1;gene_id=g2;transcript_id=g2.t1
+HiC_scaffold_7	AUGUSTUS	start_codon	9568	9570	.	+	0	ID=agat-start_codon-2;Parent=g2.t1;gene_id=g2;transcript_id=g2.t1
+HiC_scaffold_7	AUGUSTUS	stop_codon	11516	11518	.	+	0	ID=agat-stop_codon-2;Parent=g2.t1;gene_id=g2;transcript_id=g2.t1

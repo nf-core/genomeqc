@@ -1,0 +1,80 @@
+{
+    "orthoseqcount - two species": {
+        "content": [
+            [
+                "Species\tSyntenic_Chromosomes",
+                "speciesA\t2",
+                "speciesB\t2"
+            ],
+            [
+                "Species1\tChr1\tSpecies2\tChr2\tOrthogroup_Count",
+                "speciesA\tchr1\tspeciesB\tchrX\t2",
+                "speciesA\tchr1\tspeciesB\tchrY\t1",
+                "speciesA\tchr2\tspeciesB\tchrX\t1",
+                "speciesA\tchr2\tspeciesB\tchrY\t1"
+            ]
+        ],
+        "timestamp": "2026-08-20T14:29:48.31891",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    },
+    "orthoseqcount - two species - stub": {
+        "content": [
+            {
+                "0": [
+                    "species_ortho_seq_count.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "1": [
+                    "pairwise_ortho_seq_count.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "2": [
+                    "debug_gene_mapping.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "3": [
+                    [
+                        "ORTHOSEQCOUNT",
+                        "python",
+                        "3.13.5"
+                    ]
+                ],
+                "4": [
+                    [
+                        "ORTHOSEQCOUNT",
+                        "pandas",
+                        "2.3.1"
+                    ]
+                ],
+                "debug_info": [
+                    "debug_gene_mapping.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "pairwise_summary": [
+                    "pairwise_ortho_seq_count.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "species_summary": [
+                    "species_ortho_seq_count.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "versions_pandas": [
+                    [
+                        "ORTHOSEQCOUNT",
+                        "pandas",
+                        "2.3.1"
+                    ]
+                ],
+                "versions_python": [
+                    [
+                        "ORTHOSEQCOUNT",
+                        "python",
+                        "3.13.5"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-20T14:29:59.034165",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    }
+}

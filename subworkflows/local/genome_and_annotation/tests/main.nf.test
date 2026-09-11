@@ -1,0 +1,120 @@
+nextflow_workflow {
+
+    name "Test Workflow GENOME_AND_ANNOTATION"
+    script "../main.nf"
+    workflow "GENOME_AND_ANNOTATION"
+    config './nextflow.config'
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "subworkflows/genome_and_annotation"
+    tag "genome_and_annotation"
+    tag "agat/convertspgxf2gxf"
+    tag "agat/spkeeplongestisoform"
+    tag "agat/spstatistics"
+    tag "busco/busco"
+    tag "quast"
+    tag "gffread"
+    tag "gawk"
+    tag "ideogram/genomeannotation"
+
+    // A single genome never reaches the >=3-genome threshold for OrthoFinder, so that
+    // branch (and orthologous_chromosomes downstream of it) is exercised by the stub test
+    // only. BUSCO is also skipped here: sarscov2 is viral, so no BUSCO lineage has real
+    // markers to match, and a zero-hit BUSCO table crashes IDEOGRAM_GENOMEANNOTATION's
+    // plotting script; that path is covered by the stub test instead. This real run covers
+    // AGAT, QUAST and GFFread.
+    test("sarscov2-single_genome_and_annotation") {
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [ id:'test' ],
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.fasta', checkIfExists: true)
+                    ]
+                )
+                input[1] = Channel.of(
+                    [
+                        [ id:'test' ],
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.gtf', checkIfExists: true)
+                    ]
+                )
+                input[2] = []
+                input[3] = 'agat'
+                input[4] = 'v3'
+                input[5] = true
+                input[6] = 'hymenoptera_odb10'
+                input[7] = null
+                input[8] = null
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.orthofinder == [] },
+                { assert workflow.out.busco_short_summaries_geno == [] },
+                { assert workflow.out.busco_short_summaries_prot == [] },
+                { assert snapshot(
+                    workflow.out.quast_tsv,
+                    workflow.out.agat_stats
+                ).match() }
+            )
+        }
+    }
+
+    test("sarscov2-single_genome_and_annotation-stub") {
+
+        options '-stub'
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of(
+                    [
+                        [ id:'test' ],
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.fasta', checkIfExists: true)
+                    ]
+                )
+                input[1] = Channel.of(
+                    [
+                        [ id:'test' ],
+                        file(params.modules_testdata_base_path + 'genomics/sarscov2/genome/genome.gtf', checkIfExists: true)
+                    ]
+                )
+                input[2] = []
+                input[3] = 'agat'
+                input[4] = 'v3'
+                input[5] = false
+                input[6] = 'bacteria_odb10'
+                input[7] = null
+                input[8] = null
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                // tree_data is built by mix()-ing GENEOVERLAPS' and QUAST's outputs, which
+                // does not guarantee element order, so it's sorted before snapshotting
+                // instead of relying on raw workflow.out order.
+                { assert snapshot(
+                    workflow.out.orthofinder,
+                    workflow.out.tree_data.collect { files -> files.collect { file(it).name }.sort() },
+                    workflow.out.quast_results,
+                    workflow.out.busco_short_summaries_geno,
+                    workflow.out.busco_short_summaries_prot,
+                    workflow.out.quast_tsv,
+                    workflow.out.agat_stats,
+                    workflow.out.orthologous_chromosomes,
+                    workflow.out.buscos_per_seqs,
+                    workflow.out.versions
+                ).match() }
+            )
+        }
+    }
+}

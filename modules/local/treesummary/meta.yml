@@ -1,0 +1,303 @@
+name: "treesummary"
+description: Combines per-species QC tables (BUSCO, QUAST, gene overlaps,
+  orthologous chromosomes, TE composition) and renders the phylogenetic tree
+  summary plot
+keywords:
+  - tree
+  - phylogenetics
+  - busco
+  - quast
+  - summary
+tools:
+  - "treesummary":
+      description: "In-house step that assembles the various per-species QC tables produced
+        across the pipeline into the inputs expected by plot_tree_summary.R, and renders
+        the combined phylogenetic tree summary figure (PDF/SVG)."
+      homepage: "https://github.com/nf-core/genomeqc"
+      documentation: "https://github.com/nf-core/genomeqc"
+      licence:
+        - "MIT"
+      identifier: ""
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information, including "mode" (genome or genome_anno)
+          e.g. [ id:'test', mode:'genome_anno' ]
+    - tree:
+        type: directory
+        description: OrthoFinder results directory, used for its
+          Species_Tree/SpeciesTree_rooted_node_labels.txt
+  - - meta1:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. [ id:'test' ]
+    - geno_busco:
+        type: file
+        description: Combined genome-mode BUSCO batch_summary_modified.txt files
+          (optional; pass an empty list to omit)
+        pattern: "*-genome-busco.batch_summary_modified.txt"
+        ontologies: []
+  - - meta2:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. [ id:'test' ]
+    - prot_busco:
+        type: file
+        description: Combined protein-mode BUSCO batch_summary_modified.txt files
+          (optional; pass an empty list to omit)
+        pattern: "*-proteins-busco.batch_summary_modified.txt"
+        ontologies: []
+  - - meta3:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. [ id:'test' ]
+    - te_table:
+        type: file
+        description: Combined TE-composition summary TSV, as produced by
+          table_te (optional; pass an empty list to omit)
+        pattern: "*.tsv"
+        ontologies:
+          - edam: http://edamontology.org/format_3475
+  - multiqc_files:
+      type: file
+      description: Per-species QUAST TSVs and gene-overlap counts TSVs to combine
+      pattern: "*.{quast.tsv,counts.tsv}"
+      ontologies: []
+output:
+  figure:
+    - "*.pdf":
+        type: file
+        description: Tree summary figure (PDF)
+        pattern: "*.pdf"
+        ontologies: []
+  figure_svg:
+    - "*.svg":
+        type: file
+        description: Tree summary figure (SVG)
+        pattern: "*.svg"
+        ontologies: []
+  tables:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test' ]
+      - "*.tsv":
+          type: file
+          description: Combined per-species QC tables used to build the tree
+            summary plot
+          pattern: "*.tsv"
+          ontologies:
+            - edam: http://edamontology.org/format_3475
+  tree:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test' ]
+      - "tree.nw":
+          type: file
+          description: Newick species tree, extracted from the OrthoFinder results
+            and used by SHINYAPP
+          pattern: "tree.nw"
+          ontologies: []
+  versions_r_base:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - r_base:
+          type: string
+          description: The name of the tool
+      - Rscript -e "cat(as.character(getRversion()))":
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_python:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - python3 --version | sed "s/Python //g":
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_ggtree:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - ggtree:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''ggtree'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_ggplot2:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - ggplot2:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''ggplot2'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_patchwork:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - patchwork:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''patchwork'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_argparse:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - argparse:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''argparse'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_dplyr:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - dplyr:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''dplyr'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_tidyr:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - tidyr:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''tidyr'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_scatterpie:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - scatterpie:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''scatterpie'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_scales:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - scales:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''scales'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - r_base:
+          type: string
+          description: The name of the tool
+      - Rscript -e "cat(as.character(getRversion()))":
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - python3 --version | sed "s/Python //g":
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - ggtree:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''ggtree'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - ggplot2:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''ggplot2'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - patchwork:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''patchwork'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - argparse:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''argparse'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - dplyr:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''dplyr'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - tidyr:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''tidyr'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - scatterpie:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''scatterpie'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - scales:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''scales'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@FernandoDuarteF"
+maintainers:
+  - "@chriswyatt1"

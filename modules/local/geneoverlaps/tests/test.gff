@@ -1,0 +1,6 @@
+##gff-version 3
+chr1	test	gene	100	500	.	+	.	ID=gene1
+chr1	test	gene	200	400	.	+	.	ID=gene2
+chr1	test	gene	600	900	.	-	.	ID=gene3
+chr1	test	mRNA	600	900	.	-	.	ID=mrna1;Parent=gene3
+chr1	test	gene	1000	1200	.	+	.	ID=gene4

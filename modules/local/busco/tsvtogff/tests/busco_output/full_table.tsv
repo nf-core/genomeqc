@@ -1,0 +1,5 @@
+# Busco id	Status	Sequence	Gene Start	Gene End	Strand	Score	Length	OrthoDB url	Description
+BUSCOID1	Complete	chr1	100	500	+	123.4	400	url	desc one
+BUSCOID2	Duplicated	chr1	600	900	-	99.1	300	url	desc two
+BUSCOID3	Fragmented	chr2	10	50	+	50.0	40	url	desc three
+BUSCOID4	Missing	NA	NA	NA	NA	NA	NA	url	desc four

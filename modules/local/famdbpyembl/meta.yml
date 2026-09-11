@@ -1,0 +1,70 @@
+name: "famdbpyembl"
+description: Exports a Dfam repeat family library for a lineage from a local
+  famdb database and converts it to RepeatMasker-compatible FASTA
+keywords:
+  - repeatmasker
+  - dfam
+  - transposable elements
+  - repeat library
+tools:
+  - "famdb.py":
+      description: "famdb.py, bundled with RepeatMasker, queries a local Dfam famdb
+        database and exports repeat family sequences for a given taxonomic lineage in
+        EMBL format, which is then converted to FASTA."
+      homepage: "https://www.repeatmasker.org/"
+      documentation: "https://github.com/Dfam-consortium/FamDB"
+      licence:
+        - "Open Software License v. 2.1"
+      identifier: ""
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. [ id:'test' ]
+    - h5_dir:
+        type: directory
+        description: Directory containing the Dfam famdb HDF5 database file(s)
+  - lineage:
+      type: string
+      description: Taxonomic lineage/term to fetch descendant repeat families for
+        (defaults to 'root' if empty)
+output:
+  famdb_lib:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test' ]
+      - "*.fasta":
+          type: file
+          description: RepeatMasker-compatible FASTA of the exported repeat family
+            library
+          pattern: "*.fasta"
+          ontologies: []
+  versions_repeatmasker:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - repeatmasker:
+          type: string
+          description: The name of the tool
+      - 'RepeatMasker | grep version | cut -f 3 -d " "':
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@FernandoDuarteF"
+  - "@chriswyatt1"
+maintainers:
+  - "@chriswyatt1"
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - repeatmasker:
+          type: string
+          description: The name of the tool
+      - 'RepeatMasker | grep version | cut -f 3 -d " "':
+          type: eval
+          description: The expression to obtain the version of the tool

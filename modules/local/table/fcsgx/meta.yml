@@ -1,0 +1,67 @@
+name: "table_fcsgx"
+description: Parses NCBI FCS-GX genome reports into a combined per-species
+  contamination-summary TSV
+keywords:
+  - fcs-gx
+  - decontamination
+  - contamination
+  - fcs
+tools:
+  - "fcsgx_report_2_table":
+      description: "In-house parser that converts one or more NCBI FCS-GX
+        *.fcs_gx_report.txt genome reports into a combined TSV suitable for
+        pie-chart/ring plotting in the tree summary."
+      homepage: "https://github.com/nf-core/genomeqc"
+      documentation: "https://github.com/nf-core/genomeqc"
+      licence:
+        - "MIT"
+      identifier: ""
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. [ id:'test' ]
+    - reports:
+        type: file
+        description: One or more FCS-GX *.fcs_gx_report.txt genome reports
+        pattern: "*.fcs_gx_report.txt"
+        ontologies: []
+output:
+  table:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test' ]
+      - "*.tsv":
+          type: file
+          description: Combined FCS-GX contamination-summary TSV
+          pattern: "*.tsv"
+          ontologies:
+            - edam: http://edamontology.org/format_3475
+  versions_python:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - 'python3 --version | sed "s/Python //g"':
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@chriswyatt1"
+maintainers:
+  - "@chriswyatt1"
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - 'python3 --version | sed "s/Python //g"':
+          type: eval
+          description: The expression to obtain the version of the tool

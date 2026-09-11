@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "fasta_qv_merqury"
+description: |
+  Computes assembly quality value (QV) and k-mer completeness statistics with Merqury.
+  Illumina reads are counted into a Meryl database per read set with meryl/count, the
+  per-set databases are combined with meryl/unionsum, and the resulting union database is
+  compared against the input assembly with merqury/merqury to produce QV, completeness
+  and spectra-cn plots.
+keywords:
+  - genomics
+  - assembly
+  - quality value
+  - qv
+  - kmer
+  - merqury
+  - meryl
+components:
+  - meryl/count
+  - meryl/unionsum
+  - merqury/merqury
+input:
+  - ch_fasta:
+      type: file
+      description: |
+        Input assembly
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta,fa.gz,fasta.gz}"
+  - ch_fastq:
+      type: file
+      description: |
+        Illumina reads used to build the Meryl k-mer database
+        Structure: [ val(meta), path(reads) ]
+      pattern: "*.{fastq,fq}.gz"
+  - kvalue:
+      type: integer
+      description: |
+        K-mer size used for Meryl counting and Merqury QV estimation
+output:
+  - ch_merqury_qv:
+      type: file
+      description: |
+        Assembly-wide QV estimate
+        Structure: [ val(meta), path(qv) ]
+      pattern: "*.qv"
+  - ch_merqury_stats:
+      type: file
+      description: |
+        K-mer completeness statistics
+        Structure: [ val(meta), path(stats) ]
+      pattern: "*.completeness.stats"
+  - ch_merqury_spectra_cn_fl_png:
+      type: file
+      description: |
+        Full-length copy-number spectra plot
+        Structure: [ val(meta), path(png) ]
+      pattern: "*.spectra-cn.fl.png"
+  - ch_merqury_spectra_asm_fl_png:
+      type: file
+      description: |
+        Full-length assembly spectra plot
+        Structure: [ val(meta), path(png) ]
+      pattern: "*.spectra-asm.fl.png"
+  - ch_hapmers_blob_png:
+      type: file
+      description: |
+        Hapmer blob plot (trio mode only)
+        Structure: [ val(meta), path(png) ]
+      pattern: "*.hapmers.blob.png"
+authors:
+  - "@FernandoDuarteF"
+maintainers:
+  - "@FernandoDuarteF"

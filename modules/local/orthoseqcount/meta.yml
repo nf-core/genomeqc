@@ -1,0 +1,99 @@
+name: "orthoseqcount"
+description: Counts, per species, how many sequences (chromosomes/scaffolds/contigs)
+  carry a gene orthologous to another species, from an OrthoFinder orthogroups table
+  and per-species GFF files
+keywords:
+  - orthology
+  - synteny
+  - contiguity
+  - orthofinder
+tools:
+  - "ortho_seq_count":
+      description: "In-house script that maps orthogroup genes onto the sequences
+        (chromosomes/scaffolds/contigs) they sit on via the per-species GFFs, then
+        tallies how often sequence pairs co-occur across species."
+      homepage: "https://github.com/nf-core/genomeqc"
+      documentation: "https://github.com/nf-core/genomeqc"
+      licence:
+        - "MIT"
+      identifier: ""
+input:
+  - orthogroups_tsv:
+      type: file
+      description: OrthoFinder orthogroups TSV (e.g. N0.tsv)
+      pattern: "*.tsv"
+      ontologies:
+        - edam: http://edamontology.org/format_3475
+  - gff_files:
+      type: file
+      description: Per-species GFF files used to map orthogroup genes to
+        sequences
+      pattern: "*.gff"
+      ontologies: []
+output:
+  species_summary:
+    - "species_ortho_seq_count.tsv":
+        type: file
+        description: Per-species count of sequences involved in cross-species
+          synteny
+        pattern: "species_ortho_seq_count.tsv"
+        ontologies:
+          - edam: http://edamontology.org/format_3475
+  pairwise_summary:
+    - "pairwise_ortho_seq_count.tsv":
+        type: file
+        description: Pairwise sequence-to-sequence orthology counts between
+          species
+        pattern: "pairwise_ortho_seq_count.tsv"
+        ontologies:
+          - edam: http://edamontology.org/format_3475
+  debug_info:
+    - "debug_gene_mapping.txt":
+        type: file
+        description: Debug log of gene-to-sequence mapping decisions
+        pattern: "debug_gene_mapping.txt"
+        ontologies: []
+  versions_python:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - python --version | sed "s/Python //g":
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_pandas:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - pandas:
+          type: string
+          description: The name of the tool
+      - python -c "import pandas as pd; print(pd.__version__)":
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - python --version | sed "s/Python //g":
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - pandas:
+          type: string
+          description: The name of the tool
+      - python -c "import pandas as pd; print(pd.__version__)":
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@chriswyatt1"
+maintainers:
+  - "@chriswyatt1"

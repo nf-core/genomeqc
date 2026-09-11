@@ -10,3 +10,37 @@ multiqc/multiqc_plots/{svg,pdf,png}/*.{svg,pdf,png}
 multiqc/multiqc_report.html
 fastqc/*_fastqc.{html,zip}
 pipeline_info/*.{html,json,txt,yml}
+orthofinder/v3/**
+orthofinder/v2/**
+busco/*/*/stats/short_summary.specific.*.txt
+# Ideogram PNGs render byte-different between conda's and docker's graphics stacks even
+# for identical content - the matching .svg (vector, checked separately) proves that.
+busco/*/*/ideogram/*.png
+# pngs for merqury are not deterministic
+merqury/*/*.png
+busco/busco_downloads/lineages/*/refseq_db.faa.gz
+quast/**/quast.log
+quast/**/report.html
+quast/**/report.pdf
+# debug_gene_mapping.txt's content isn't repeatable (order-dependent on GFF processing), so it's excluded rather than snapshotted.
+ortho_seq_count/debug_gene_mapping.txt
+**/*.pdf
+agat/Mycoplasmoides_gallisepticum/stats/Mycoplasmoides_gallisepticum.stats.txt
+**/tree.nw
+**/tree_plot.*
+**/*.xlsx
+**/*.html
+decontamination/fcs-gx/test_combo.taxonomy.rpt
+decontamination/fcs-gx/test_combo.summary.txt
+decontamination/fcs-adaptor/test_combo.fcs_adaptor.log
+decontamination/fcs-gx/test_combo.fcs_gx_report.txt
+# These tables from the te subworkflow are not deterministic
+repeatmasker/*/*.tbl
+# -srand RepeatModeler still doesn't make these fully reproducible
+repeatmasker/*/*.masked
+repeatmasker/*/*.out
+**/te_table_output.tsv
+**/te_table.tsv
+# These are not deterministic if running on the genome branch
+ortho_seq_count/pairwise_ortho_seq_count.tsv
+ortho_seq_count/species_ortho_seq_count.tsv

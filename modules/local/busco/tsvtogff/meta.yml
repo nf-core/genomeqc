@@ -1,0 +1,58 @@
+name: "busco_tsvtogff"
+description: Converts a BUSCO full_table.tsv into a GFF3 of BUSCO gene locations
+  plus a JSON summary of BUSCO status counts
+keywords:
+  - busco
+  - gff
+  - completeness
+tools:
+  - "busco_tsv_to_gff":
+      description: "In-house converter that turns a BUSCO full_table.tsv into coordinate-based
+        GFF3 gene records and a JSON stats summary, used to plot BUSCO gene locations
+        on chromosome ideograms."
+      homepage: "https://github.com/nf-core/genomeqc"
+      documentation: "https://github.com/nf-core/genomeqc"
+      licence:
+        - "MIT"
+      identifier: ""
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. [ id:'test' ]
+    - busco_dir:
+        type: directory
+        description: BUSCO output directory containing a full_table.tsv (searched
+          recursively)
+output:
+  gff:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test' ]
+      - ${meta.id}_busco.gff:
+          type: file
+          description: GFF3 file of BUSCO gene locations, using coordinate-based
+            IDs
+          pattern: "*_busco.gff"
+          ontologies: []
+  stats:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test' ]
+      - ${meta.id}_busco_stats.json:
+          type: file
+          description: JSON summary of BUSCO status counts
+            (complete/duplicated/fragmented/missing)
+          pattern: "*_busco_stats.json"
+          ontologies:
+            - edam: http://edamontology.org/format_3464
+authors:
+  - "@FernandoDuarteF"
+  - "@chriswyatt1"
+maintainers:
+  - "@chriswyatt1"

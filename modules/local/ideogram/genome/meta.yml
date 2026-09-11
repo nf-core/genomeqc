@@ -1,0 +1,114 @@
+name: "ideogram_genome"
+description: Plots a chromosome ideogram of genome-mode BUSCO gene locations
+keywords:
+  - busco
+  - ideogram
+  - completeness
+  - rideogram
+tools:
+  - "genomebuscoideogram":
+      description: "In-house step that builds a chromosome karyotype from the genome
+        FASTA and renders an RIdeogram plot of genome-mode BUSCO gene locations, taken
+        directly from the BUSCO full_table.tsv coordinates."
+      homepage: "https://github.com/nf-core/genomeqc"
+      documentation: "https://github.com/nf-core/genomeqc"
+      licence:
+        - "MIT"
+      identifier: ""
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. [ id:'test' ]
+    - genome:
+        type: file
+        description: Genome FASTA, used to build the chromosome karyotype
+        pattern: "*.{fa,fasta,fna}"
+        ontologies: []
+    - busco_full_table:
+        type: file
+        description: Genome-mode BUSCO full_table.tsv, including Gene Start/End
+          coordinate columns
+        pattern: "full_table.tsv"
+        ontologies:
+          - edam: http://edamontology.org/format_3475
+output:
+  svg:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test' ]
+      - "*.svg":
+          type: file
+          description: SVG chromosome ideogram of genome-mode BUSCO gene locations
+          pattern: "*.svg"
+          ontologies: []
+  png:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test' ]
+      - "*.png":
+          type: file
+          description: PNG chromosome ideogram of genome-mode BUSCO gene locations
+          pattern: "*.png"
+          ontologies: []
+  busco_mappings:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test' ]
+      - "*.csv":
+          type: file
+          description: Per-chromosome count of Complete BUSCOs
+          pattern: "*.csv"
+          ontologies:
+            - edam: http://edamontology.org/format_3752
+  versions_r_base:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - r_base:
+          type: string
+          description: The name of the tool
+      - Rscript -e "cat(as.character(getRversion()))":
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_rideogram:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - r_rideogram:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''RIdeogram'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - r_base:
+          type: string
+          description: The name of the tool
+      - Rscript -e "cat(as.character(getRversion()))":
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - r_rideogram:
+          type: string
+          description: The name of the tool
+      - 'Rscript -e "cat(as.character(packageVersion(''RIdeogram'')))"':
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@FernandoDuarteF"
+maintainers:
+  - "@chriswyatt1"

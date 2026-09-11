@@ -17,17 +17,34 @@ nextflow_pipeline {
             def stable_path = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}'])
             // stable_content: All files in ${params.outdir}/ with stable content
             def stable_content = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+            def software_versions = removeNextflowVersion("$outputDir/pipeline_info/nf_core_genomeqc_software_mqc_versions.yml")
+            // SHINY_APP's `cat` (coreutils) version comes from the container OS package under docker/singularity
+            // (Ubuntu 22.04 ships 8.32) vs. conda-forge under conda (pinned 8.31 - conda-forge's linux-64 channel
+            // has no 8.32 build at all, jumping straight from 8.31 to 9.0), so no single pin can make the two
+            // profiles agree. Drop it from the comparison rather than snapshot a value that's profile-dependent.
+            software_versions.SHINY_APP_GENOME_ANNO?.remove('cat')
             assert workflow.success
             assertAll(
                 { assert snapshot(
-                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
-                    removeNextflowVersion("$outputDir/pipeline_info/nf_core_genomeqc_software_mqc_versions.yml"),
+                    software_versions,
                     // All stable path name, with a relative path
                     stable_path,
                     // All files with stable contents
                     stable_content
                 ).match() }
             )
+        }
+
+        cleanup {
+            // Only prune/delete on CI - keeping local VM state intact prevents
+            // cross-test launchDir wipes that break nf-test snapshot walks.
+            if (System.getenv("CI") == "true") {
+                if (System.getenv("NFT_PROFILE")?.contains("docker")) {
+                    "docker system prune -a -f --volumes".execute().waitFor()
+                }
+                new File("${launchDir}").deleteDir()
+            }
         }
     }
 }

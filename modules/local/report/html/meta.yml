@@ -1,0 +1,102 @@
+name: "report_html"
+description: Builds a self-contained HTML QC report from whichever per-tool
+  summary tables are available
+keywords:
+  - report
+  - html
+  - qc
+  - summary
+tools:
+  - "report_html":
+      description: "In-house report generator that assembles an interactive, self-contained
+        HTML QC report from whichever per-tool tables were produced by the pipeline.
+        All inputs are optional; tabs are hidden for tools that were skipped."
+      homepage: "https://github.com/nf-core/genomeqc"
+      documentation: "https://github.com/nf-core/genomeqc"
+      licence:
+        - "MIT"
+      identifier: ""
+input:
+  - busco_tables:
+      type: file
+      description: Genome BUSCO batch_summary_modified.txt files, one per species
+        (optional)
+      pattern: "*.txt"
+      ontologies: []
+  - busco_prot_tables:
+      type: file
+      description: Protein BUSCO batch_summary_modified.txt files, one per species
+        (optional)
+      pattern: "*.txt"
+      ontologies: []
+  - tidk_tsvs:
+      type: file
+      description: tidk aposteriori search TSV files (optional)
+      pattern: "*.tsv"
+      ontologies:
+        - edam: http://edamontology.org/format_3475
+  - tidk_apriori_tsvs:
+      type: file
+      description: tidk apriori search TSV files (optional)
+      pattern: "*.tsv"
+      ontologies:
+        - edam: http://edamontology.org/format_3475
+  - fcsgx_reports:
+      type: file
+      description: FCS-GX report files (optional)
+      pattern: "*.txt"
+      ontologies: []
+  - fcsadp_reports:
+      type: file
+      description: FCS-Adaptor report files (optional)
+      pattern: "*.txt"
+      ontologies: []
+  - tiara_reports:
+      type: file
+      description: Tiara classification files (optional)
+      pattern: "*.txt"
+      ontologies: []
+  - busco_seqs_table:
+      type: file
+      description: ortho_seqs.py output table of sequences above the BUSCO
+        threshold (optional)
+      pattern: "*.tsv"
+      ontologies:
+        - edam: http://edamontology.org/format_3475
+  - repeatmasker_tbls:
+      type: file
+      description: RepeatMasker *.tbl repeat-composition summary files (optional)
+      pattern: "*.tbl"
+      ontologies: []
+output:
+  report:
+    - "genomeqc_report.html":
+        type: file
+        description: Self-contained HTML QC report
+        pattern: "genomeqc_report.html"
+        ontologies: []
+  versions_python:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - python3 --version | sed "s/Python //g":
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - python3 --version | sed "s/Python //g":
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@FernandoDuarteF"
+maintainers:
+  - "@chriswyatt1"

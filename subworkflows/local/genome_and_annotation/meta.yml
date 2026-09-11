@@ -1,0 +1,120 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "genome_and_annotation"
+description: |
+  Runs genome+annotation QC on an assembly and its GXF annotation. The annotation is
+  standardised with AGAT or GFFread (`params.val_tool`) and reduced to the longest isoform
+  per gene with AGAT, then AGAT stats, gene-overlap counts and QUAST are computed. Protein
+  and transcript FASTAs are extracted with GFFread and, when at least 3 genomes are
+  present, used to infer orthology with OrthoFinder (v2 or v3); OrthoFinder's orthogroups
+  are mapped back onto sequences with orthoseqcount. Unless BUSCO is skipped,
+  BUSCO completeness is assessed on both the genome and the proteins, and a combined BUSCO
+  ideogram is plotted.
+keywords:
+  - genomics
+  - annotation
+  - busco
+  - quast
+  - orthofinder
+  - orthology
+  - agat
+  - gffread
+components:
+  - agat/convertspgxf2gxf
+  - agat/spkeeplongestisoform
+  - agat/spstatistics
+  - busco/busco
+  - quast
+  - ideogram/genomeannotation
+  - gffread
+  - orthofinder
+  - orthofinderv2
+  - geneoverlaps
+  - orthoseqcount
+  - gawk
+input:
+  - ch_fasta:
+      type: file
+      description: |
+        Input assembly/assemblies
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - ch_gxf:
+      type: file
+      description: |
+        Genome annotation(s) matching ch_fasta by meta.id
+        Structure: [ val(meta), path(gxf) ]
+      pattern: "*.{gff,gff3,gtf}"
+  - ch_busco_db:
+      type: file
+      description: |
+        Path to a pre-downloaded BUSCO lineage dataset, or `[]` to let BUSCO
+        auto-select/download its lineage
+output:
+  - orthofinder:
+      type: directory
+      description: |
+        OrthoFinder results directory; empty channel if fewer than 3 genomes had
+        extracted protein FASTAs
+        Structure: [ val(meta), path(orthofinder) ]; meta is always
+        [ id:'orthofinder', mode:'genome_anno' ]
+  - tree_data:
+      type: file
+      description: |
+        QUAST and gene-overlap tables collected for the tree-summary report
+        Structure: [ path(tsv) ]
+      pattern: "*.tsv"
+  - quast_results:
+      type: directory
+      description: |
+        Full QUAST results directory
+        Structure: [ val(meta), path(results) ]
+  - busco_short_summaries_geno:
+      type: file
+      description: |
+        BUSCO short summary text file(s) for the genome; empty channel if BUSCO was skipped
+        Structure: [ val(meta), path(txt) ]
+      pattern: "short_summary*.txt"
+  - busco_short_summaries_prot:
+      type: file
+      description: |
+        BUSCO short summary text file(s) for the extracted proteins; empty channel if
+        BUSCO was skipped
+        Structure: [ val(meta), path(txt) ]
+      pattern: "short_summary*.txt"
+  - quast_tsv:
+      type: file
+      description: |
+        QUAST report in TSV format
+        Structure: [ val(meta), path(tsv) ]
+      pattern: "*.tsv"
+  - agat_stats:
+      type: file
+      description: |
+        AGAT annotation statistics report
+        Structure: [ val(meta), path(txt) ]
+      pattern: "*.txt"
+  - ortho_seq_count:
+      type: file
+      description: |
+        Per-species summary of orthologous sequence mappings
+        Structure: [ path(tsv) ]
+      pattern: "*.tsv"
+  - buscos_per_seqs:
+      type: file
+      description: |
+        Per-sequence BUSCO counts used for the ideogram plot, sorted by filename;
+        empty channel if BUSCO was skipped
+        Structure: [ path(csv) ]
+      pattern: "*.csv"
+  - versions:
+      type: file
+      description: |
+        File containing software versions
+        Structure: [ path(versions.yml) ]
+      pattern: "versions.yml"
+authors:
+  - "@FernandoDuarteF"
+  - "@chriswyatt1"
+maintainers:
+  - "@FernandoDuarteF"
+  - "@chriswyatt1"

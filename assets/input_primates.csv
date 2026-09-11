@@ -1,0 +1,16 @@
+assembly,ncbi,fasta,gff,fastq,taxid
+Homo_sapiens,GCF_000001405.40,,,,9606
+Pan_troglodytes,GCF_028858775.2,,,,9598
+Pan_paniscus,GCF_029289425.2,,,,9597
+Gorilla_gorilla_gorilla,GCF_029281585.2,,,,9595
+Pongo_pygmaeus,GCF_028885625.2,,,,9600
+Symphalangus_syndactylus,GCF_028878055.3,,,,9590
+Nomascus_leucogenys,GCF_006542625.1,,,,61853
+Macaca_mulatta,GCF_049350105.2,,,,9544
+Macaca_fascicularis,GCF_037993035.2,,,,9541
+Papio_anubis,GCF_008728515.1,,,,9555
+Chlorocebus_sabaeus,GCF_047675955.1,,,,60711
+Rhinopithecus_roxellana,GCF_007565055.1,,,,61622
+Piliocolobus_tephrosceles,GCF_002776525.5,,,,591936
+Microcebus_murinus,GCF_040939455.1,,,,30608
+Lemur_catta,GCF_020740605.2,,,,9447

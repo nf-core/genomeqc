@@ -1,0 +1,2 @@
+Input_file	Dataset	Complete	Single	Duplicated	Fragmented	Missing	n_markers	Domain
+speciesB	bacteria_odb10	89.0	87.0	2.0	5.0	6.0	100	prokaryota

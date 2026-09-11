@@ -1,0 +1,105 @@
+{
+    "bacteroides_fragilis-single_genome-stub": {
+        "content": [
+            [
+                
+            ],
+            [
+                [
+                    "test-bacteria_odb10-genome-busco.batch_summary_modified.txt",
+                    "test.quast.tsv"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    [
+                        [
+                            "GC_content_plot.pdf:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "Nx_plot.pdf:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "cumulative_plot.pdf:md5,d41d8cd98f00b204e9800998ecf8427e",
+                            "genome_GC_content_plot.pdf:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ],
+                        "icarus.html:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        [
+                            "contig_size_viewer.html:md5,d41d8cd98f00b204e9800998ecf8427e"
+                        ],
+                        "quast.log:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "report.html:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "report.pdf:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "report.tex:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "report.tsv:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "report.txt:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "transposed_report.tex:md5,d41d8cd98f00b204e9800998ecf8427e",
+                        "transposed_report.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ]
+            ],
+            [
+                
+            ],
+            [
+                
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test-bacteria_odb10-genome-busco.batch_summary_modified.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.quast.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ]
+            ]
+        ],
+        "timestamp": "2026-08-10T22:49:18.322029",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    },
+    "bacteroides_fragilis-single_genome": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test.quast.tsv:md5,7f90393e374fbed66330f11f276a12a2"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "short_summary.specific.bacteria_odb10.genome.fna.txt"
+                ]
+            ],
+            [
+                "test.csv"
+            ],
+            [
+                [
+                    {
+                        "id": "test"
+                    },
+                    "test-bacteria_odb10-genome-busco.batch_summary_modified.txt:md5,564954b5772c0750ee2ea92806663f7f"
+                ]
+            ]
+        ],
+        "timestamp": "2026-08-10T22:49:04.012261",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    }
+}

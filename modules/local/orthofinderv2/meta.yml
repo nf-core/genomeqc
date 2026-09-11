@@ -1,0 +1,76 @@
+name: "orthofinderv2"
+description: Infers orthogroups and a rooted species tree across a set of
+  proteomes using OrthoFinder 2
+keywords:
+  - orthology
+  - orthogroups
+  - phylogenetics
+  - proteome
+tools:
+  - "orthofinder":
+      description: "OrthoFinder is a fast, accurate and comprehensive platform for comparative
+        genomics, orthology inference, and phylogenetics."
+      homepage: "https://github.com/davidemms/OrthoFinder"
+      documentation: "https://github.com/davidemms/OrthoFinder"
+      tool_dev_url: "https://github.com/davidemms/OrthoFinder"
+      doi: "10.1186/s13059-019-1832-y"
+      licence:
+        - "GPL v3"
+      identifier: "biotools:orthofinder"
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. [ id:'test' ]
+    - fastas:
+        type: file
+        description: Protein FASTA files, one per species, to run OrthoFinder
+          across
+        pattern: "*.{fa,fasta,faa}"
+        ontologies: []
+output:
+  orthofinder:
+    - - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. [ id:'test' ]
+      - $prefix:
+          type: directory
+          description: Full OrthoFinder results directory (renamed from OrthoFinder's own Results_$prefix)
+  orthologues:
+    - $prefix/Phylogenetic_Hierarchical_Orthogroups/N0.tsv:
+        type: file
+        description: Hierarchical orthogroups table (N0.tsv)
+        pattern: "N0.tsv"
+  speciestree:
+    - $prefix/Species_Tree/SpeciesTree_rooted_node_labels.txt:
+        type: file
+        description: Rooted species tree with internal node labels
+        pattern: "SpeciesTree_rooted_node_labels.txt"
+  versions_orthofinder:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - orthofinder:
+          type: string
+          description: The name of the tool
+      - orthofinder -h | sed -n 's/.*version \(.*\) Copy.*/\1/p':
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - orthofinder:
+          type: string
+          description: The name of the tool
+      - orthofinder -h | sed -n 's/.*version \(.*\) Copy.*/\1/p':
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@chriswyatt1"
+maintainers:
+  - "@chriswyatt1"

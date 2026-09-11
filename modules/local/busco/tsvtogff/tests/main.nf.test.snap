@@ -1,0 +1,79 @@
+{
+    "busco_tsvtogff - full_table": {
+        "content": [
+            {
+                "id": "test"
+            },
+            [
+                "##gff-version 3",
+                "##source BUSCO analysis for test",
+                "##description BUSCO gene predictions with coordinate-based IDs",
+                "chr1\tBUSCO\tgene\t100\t500\t123.4\t+\t.\tID=chr1_100-500|+;Name=chr1_100-500|+;BUSCO_ID=BUSCOID1;Status=Complete;Type=BUSCO_gene;Score=123.4;Length=400;Description=desc one",
+                "chr1\tBUSCO\tgene\t600\t900\t99.1\t-\t.\tID=chr1_600-900|-;Name=chr1_600-900|-;BUSCO_ID=BUSCOID2;Status=Duplicated;Type=BUSCO_gene;Score=99.1;Length=300;Description=desc two",
+                "chr2\tBUSCO\tgene\t10\t50\t50.0\t+\t.\tID=chr2_10-50|+;Name=chr2_10-50|+;BUSCO_ID=BUSCOID3;Status=Fragmented;Type=BUSCO_gene;Score=50.0;Length=40;Description=desc three"
+            ],
+            {
+                "id": "test"
+            },
+            {
+                "sample_id": "test",
+                "input_file": "full_table.tsv",
+                "total_buscos": 4,
+                "complete_buscos": 2,
+                "complete_single_copy": 1,
+                "complete_duplicated": 1,
+                "fragmented_buscos": 1,
+                "missing_buscos": 1,
+                "output_gff": "test_busco.gff"
+            }
+        ],
+        "timestamp": "2026-08-20T14:24:30.366139",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    },
+    "busco_tsvtogff - full_table - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_busco.gff:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_busco_stats.json:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "gff": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_busco.gff:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "stats": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_busco_stats.json:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-20T14:24:40.402292",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    }
+}

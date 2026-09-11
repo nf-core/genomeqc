@@ -18,18 +18,6 @@
 include { GENOMEQC  } from './workflows/genomeqc'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_genomeqc_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_genomeqc_pipeline'
-include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_genomeqc_pipeline'
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    GENOME PARAMETER VALUES
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-// TODO nf-core: Remove this line if you don't need a FASTA file
-//   This is an example of how to use getGenomeAttribute() to fetch parameters
-//   from igenomes.config using `--genome`
-params.fasta = getGenomeAttribute('fasta')
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -56,6 +44,28 @@ workflow NFCORE_GENOMEQC {
         params.multiqc_logo,
         params.multiqc_methods_description,
         params.outdir,
+        params.groups,
+        params.busco_lineages_path,
+        params.busco_lineage,
+        params.gxdb,
+        params.gxdb_manifest,
+        params.ramdisk,
+        params.repeat,
+        params.skip_tidk,
+        params.kvalue,
+        params.RM_download_db,
+        params.RM_db,
+        params.famdb_library,
+        params.famdb_lineage,
+        params.run_repeatmodeler,
+        params.te_clusterer,
+        params.te,
+        params.skip_busco,
+        params.busco_config,
+        params.busco_clean,
+        params.ortho_version,
+        params.val_tool,
+        params.container_engine,
     )
     emit:
     multiqc_report = GENOMEQC.out.multiqc_report // channel: /path/to/multiqc_report.html

@@ -1,0 +1,43 @@
+process MMSEQS_EASYLINCLUST {
+    tag "${meta.id}"
+    label 'process_medium'
+
+    conda "${moduleDir}/environment.yml"
+    container "${workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container
+        ? 'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/fe/fe49c17754753d6cd9a31e5894117edaf1c81e3d6053a12bf6dc8f3af1dffe23/data'
+        : 'community.wave.seqera.io/library/mmseqs2:18.8cc5c--af05c9a98d9f6139'}"
+
+    input:
+    tuple val(meta), path(fasta)
+
+    output:
+    tuple val(meta), path("*_rep_seq.fasta"), emit: representatives
+    tuple val("${task.process}"), val('mmseqs'), eval('mmseqs version'), topic: versions, emit: versions_mmseqs
+
+    when:
+    task.ext.when == null || task.ext.when
+
+    script:
+    def args = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: "${meta.id}"
+
+    """
+    # Cluster sequences with MMseqs2 easy-linclust and keep one representative per cluster
+    mmseqs \\
+        easy-linclust \\
+        ${fasta} \\
+        ${prefix} \\
+        tmp \\
+        ${args} \\
+        --threads ${task.cpus}
+    """
+
+    stub:
+    def prefix = task.ext.prefix ?: "${meta.id}"
+
+    """
+    touch ${prefix}_rep_seq.fasta
+    touch ${prefix}_all_seqs.fasta
+    touch ${prefix}_cluster.tsv
+    """
+}

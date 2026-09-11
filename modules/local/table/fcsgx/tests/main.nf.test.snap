@@ -1,0 +1,84 @@
+{
+    "table_fcsgx - two reports, one clean - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        "TABLE_FCSGX",
+                        "python",
+                        "3.9.5"
+                    ]
+                ],
+                "table": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions_python": [
+                    [
+                        "TABLE_FCSGX",
+                        "python",
+                        "3.9.5"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-20T14:15:38.044339",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    },
+    "table_fcsgx - two reports, one clean": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.tsv:md5,86cccb562b521d064f9055c68d45836d"
+                    ]
+                ],
+                "1": [
+                    [
+                        "TABLE_FCSGX",
+                        "python",
+                        "3.9.5"
+                    ]
+                ],
+                "table": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.tsv:md5,86cccb562b521d064f9055c68d45836d"
+                    ]
+                ],
+                "versions_python": [
+                    [
+                        "TABLE_FCSGX",
+                        "python",
+                        "3.9.5"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-08-20T14:15:28.214483",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    }
+}
