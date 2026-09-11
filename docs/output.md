@@ -78,7 +78,7 @@ We recommend ignoring the cleaned genome assembly output by this module, as the 
 
 #### FCS-GX clean genome
 
-[FCS-GX clean genome]() is based on a command of the NCBI's FCS toolkit which applies the recommended cleaning actions to the genome assembly based on the screening results.
+[FCS-GX clean genome](https://github.com/ncbi/fcs) is based on a command of the NCBI's FCS toolkit which applies the recommended cleaning actions to the genome assembly based on the screening results.
 
 It outputs a cleaned version of the genome assembly based on the recommended actions from **FCS-GX** and **FCS-Adaptor**, with the contaminant sequences removed and sequences with local contaminants trimmed.
 
