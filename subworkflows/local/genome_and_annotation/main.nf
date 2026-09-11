@@ -149,11 +149,13 @@ workflow GENOME_AND_ANNOTATION {
             [[],[]]
         )
         ch_orthofinder = ORTHOFINDER_V3.out.orthofinder
+        ch_orthofinder_tsv = ORTHOFINDER_V3.out.orthogroups
     } else if (val_ortho_version == 'v2' ) {
         ORTHOFINDERV2 (
             ortho_ch
         )
         ch_orthofinder = ORTHOFINDERV2.out.orthofinder
+        ch_orthofinder_tsv = ORTHOFINDERV2.out.orthogroups
     }
 
     //
@@ -161,8 +163,8 @@ workflow GENOME_AND_ANNOTATION {
     //
 
     ORTHOSEQCOUNT (
-        ch_orthofinder.map { _meta, folder ->
-            file("${folder}/Orthogroups/Orthogroups.tsv")
+        ch_orthofinder_tsv.map { _meta, tsv ->
+            file(tsv)
         },
         AGAT_SPKEEPLONGESTISOFORM.out.gff.map { _meta, gff -> gff }.collect()
     )
