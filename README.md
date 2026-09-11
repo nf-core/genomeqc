@@ -138,12 +138,26 @@ nf-core/genomeqc was originally written by [Chris Wyatt](https://github.com/chri
 
 We thank the following people for their extensive assistance in the development of this pipeline:
 
-- [Mahesh Binzer-Panchal](https://github.com/mahesh-panchal) ([National Bioinformatics Infrastructure Sweden](https://nbis.se/))
-- [Usman Rashid](https://github.com/GallVp) ([The New Zealand Institute for Plant and Food Research](https://www.plantandfood.com/en-nz/))
+### Code contributions
+
 - [Lauren Huet](https://github.com/LaurenHuet) ([Schmidt Ocean Institute](https://schmidtocean.org/))
 - [Stephen Turner](https://github.com/stephenturner/) ([Colossal Biosciences](https://colossal.com/))
 - [Felipe Perez Cobos](https://github.com/fperezcobos) ([Institute of Agrifood Research and Technology](https://www.irta.cat/en/))
 - [Simon Murray](https://github.com/SimonDMurray) ([Nextflow Ambassador](https://www.nextflow.io/our_ambassadors.html))
+
+### Guidance
+
+- [Usman Rashid](https://github.com/GallVp) ([The New Zealand Institute for Plant and Food Research](https://www.plantandfood.com/en-nz/))
+- [Mahesh Binzer-Panchal](https://github.com/mahesh-panchal) ([National Bioinformatics Infrastructure Sweden](https://nbis.se/))
+
+### Review
+
+- [Victoria Begley](https://github.com/Vicbeg)
+- [awgymer](https://github.com/awgymer)
+- [Sébastien Guizard](https://github.com/sguizard) (The Roslin Institute)
+- [Matthias Hörtenhuber](https://github.com/mashehu) (SciLifeLab Data Centre)
+- [Famke Bäuerle](https://github.com/famosab) (University of Tuebingen)
+- [Jacques Dainat](https://github.com/Juke34) (IRD)
 
 ## Contributions and Support
 
