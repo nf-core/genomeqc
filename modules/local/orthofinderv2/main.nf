@@ -13,6 +13,7 @@ process ORTHOFINDERV2 {
     output:
     tuple val(meta), path("$prefix")                                          , emit: orthofinder
     path("$prefix/Phylogenetic_Hierarchical_Orthogroups/N0.tsv")              , emit: orthologues
+    path("$prefix/Orthogroups/Orthogroups.tsv")                               , emit: orthogroups
     path("$prefix/Species_Tree/SpeciesTree_rooted_node_labels.txt")           , emit: speciestree
     tuple val("${task.process}"), val('orthofinder'), eval("orthofinder -h | sed -n 's/.*version \\(.*\\) Copy.*/\\1/p'"), emit: versions_orthofinder, topic: versions
 

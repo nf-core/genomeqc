@@ -101,11 +101,13 @@ workflow GENOME_ONLY {
                 [[],[]]
             )
             ch_orthofinder = ORTHOFINDER_V3.out.orthofinder
+            ch_orthofinder_tsv = ORTHOFINDER_V3.out.orthogroups
         } else if (val_ortho_version == 'v2' ) {
             ORTHOFINDERV2 (
                 ch_busco_proteins
             )
             ch_orthofinder = ORTHOFINDERV2.out.orthofinder
+            ch_orthofinder_tsv = ORTHOFINDERV2.out.orthogroups
         }
         // Transform tsv to gff for orthoseqcount module
         BUSCO_TSVTOGFF (
@@ -117,8 +119,8 @@ workflow GENOME_ONLY {
         //
 
         ORTHOSEQCOUNT (
-            ch_orthofinder.map { _meta, folder ->
-                file("${folder}/Orthogroups/Orthogroups.tsv")
+            ch_orthofinder_tsv.map { _meta, tsv ->
+                file(tsv)
             },
             BUSCO_TSVTOGFF.out.gff.map { _meta, gff -> gff }.collect()
         )
