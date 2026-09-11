@@ -36,22 +36,22 @@ output:
           description: |
             Groovy Map containing sample information
             e.g. [ id:'test' ]
-      - $prefix:
+      - $results_dir:
           type: directory
-          description: Full OrthoFinder results directory (renamed from OrthoFinder's own Results_$prefix)
+          description: Full OrthoFinder results directory (OrthoFinder's own Results_$prefix, unrenamed)
   orthologues:
-    - $prefix/Phylogenetic_Hierarchical_Orthogroups/N0.tsv:
+    - $results_dir/Phylogenetic_Hierarchical_Orthogroups/N0.tsv:
         type: file
         description: Hierarchical orthogroups table (N0.tsv)
         pattern: "N0.tsv"
   orthogroups:
-    - $prefix/Orthogroups/Orthogroups.tsv:
+    - $results_dir/Orthogroups/Orthogroups.tsv:
         type: file
         description: Tab-separated file listing the genes belonging to each orthogroup,
           one row per orthogroup and one column per species.
         pattern: "Orthogroups.tsv"
   speciestree:
-    - $prefix/Species_Tree/SpeciesTree_rooted_node_labels.txt:
+    - $results_dir/Species_Tree/SpeciesTree_rooted_node_labels.txt:
         type: file
         description: Rooted species tree with internal node labels
         pattern: "SpeciesTree_rooted_node_labels.txt"

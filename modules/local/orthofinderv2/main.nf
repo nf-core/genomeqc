@@ -11,10 +11,10 @@ process ORTHOFINDERV2 {
     tuple val(meta), path(fastas, stageAs: 'input/')
 
     output:
-    tuple val(meta), path("$prefix")                                          , emit: orthofinder
-    path("$prefix/Phylogenetic_Hierarchical_Orthogroups/N0.tsv")              , emit: orthologues
-    path("$prefix/Orthogroups/Orthogroups.tsv")                               , emit: orthogroups
-    path("$prefix/Species_Tree/SpeciesTree_rooted_node_labels.txt")           , emit: speciestree
+    tuple val(meta), path("$results_dir")                                          , emit: orthofinder
+    path("$results_dir/Phylogenetic_Hierarchical_Orthogroups/N0.tsv")              , emit: orthologues
+    path("$results_dir/Orthogroups/Orthogroups.tsv")                               , emit: orthogroups
+    path("$results_dir/Species_Tree/SpeciesTree_rooted_node_labels.txt")           , emit: speciestree
     tuple val("${task.process}"), val('orthofinder'), eval("orthofinder -h | sed -n 's/.*version \\(.*\\) Copy.*/\\1/p'"), emit: versions_orthofinder, topic: versions
 
     when:
@@ -23,6 +23,7 @@ process ORTHOFINDERV2 {
     script:
     def args = task.ext.args ?: ''
     prefix   = task.ext.prefix ?: "${meta.id}"
+    results_dir = "input/OrthoFinder/Results_${prefix}"
 
     """
     # Infer orthogroups and a species tree across the input proteomes with OrthoFinder2
@@ -35,35 +36,32 @@ process ORTHOFINDERV2 {
         -p temp_pickle \\
         -f input \\
         -n $prefix
-
-    mv \\
-    input/OrthoFinder/Results_$prefix \\
-    $prefix
     """
 
     stub:
     def args = task.ext.args ?: ''
     prefix = task.ext.prefix ?: "${meta.id}"
+    results_dir = "input/OrthoFinder/Results_${prefix}"
 
     """
     echo $args
 
-    mkdir -p    $prefix/Comparative_Genomics_Statistics
-    mkdir       $prefix/Gene_Duplication_Events
-    mkdir       $prefix/Gene_Trees
-    mkdir       $prefix/Orthogroup_Sequences
-    mkdir       $prefix/Orthogroups
-    mkdir       $prefix/Orthologues
-    mkdir       $prefix/Phylogenetic_Hierarchical_Orthogroups
-    mkdir       $prefix/Phylogenetically_Misplaced_Genes
-    mkdir       $prefix/Putative_Xenologs
-    mkdir       $prefix/Resolved_Gene_Trees
-    mkdir       $prefix/Single_Copy_Orthologue_Sequences
-    mkdir       $prefix/Species_Tree
-    mkdir       $prefix/WorkingDirectory
-    touch       $prefix/Log.txt
-    touch       $prefix/Orthogroups/Orthogroups.tsv
-    touch       $prefix/Species_Tree/SpeciesTree_rooted_node_labels.txt
-    touch       $prefix/Phylogenetic_Hierarchical_Orthogroups/N0.tsv
+    mkdir -p    $results_dir/Comparative_Genomics_Statistics
+    mkdir       $results_dir/Gene_Duplication_Events
+    mkdir       $results_dir/Gene_Trees
+    mkdir       $results_dir/Orthogroup_Sequences
+    mkdir       $results_dir/Orthogroups
+    mkdir       $results_dir/Orthologues
+    mkdir       $results_dir/Phylogenetic_Hierarchical_Orthogroups
+    mkdir       $results_dir/Phylogenetically_Misplaced_Genes
+    mkdir       $results_dir/Putative_Xenologs
+    mkdir       $results_dir/Resolved_Gene_Trees
+    mkdir       $results_dir/Single_Copy_Orthologue_Sequences
+    mkdir       $results_dir/Species_Tree
+    mkdir       $results_dir/WorkingDirectory
+    touch       $results_dir/Log.txt
+    touch       $results_dir/Orthogroups/Orthogroups.tsv
+    touch       $results_dir/Species_Tree/SpeciesTree_rooted_node_labels.txt
+    touch       $results_dir/Phylogenetic_Hierarchical_Orthogroups/N0.tsv
     """
 }

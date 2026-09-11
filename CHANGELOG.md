@@ -3,6 +3,17 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v1.0.1 - [12 Sepetember 2026]
+
+### `Fixed`
+
+- Fixed `ORTHO_SEQ_COUNT` reading `Orthogroups.tsv` via a manually-built path into OrthoFinder's output directory, which is unsafe on cloud storage. It now uses OrthoFinder's emited channel `orthogroups` as input.
+
+### `Dependencies`
+
+- Updated `ORTHOFINDER` module ([nf-core/modules#12899](https://github.com/nf-core/modules/pull/12899)).
+- Updated `QUAST` module ([nf-core/modules#12905](https://github.com/nf-core/modules/pull/12905)) to pin `python=3.11`. `-profile conda` was failing before.
+
 ## v1.0.0 - [28 August 2026]
 
 First release of nf-core/genomeqc, which compares the quality of multiple genomes and their annotations. The pipeline runs in two modes depending on the inputs provided: **Genome only** (FASTA files) and **Genome and Annotation** (FASTA plus GTF/GFF files).
