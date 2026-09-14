@@ -76,6 +76,9 @@
                 "REPEATMASKER_DOWNLOADDB": {
                     "<curl>": "7.80.0"
                 },
+                "REPEATMASKER_REPEATMASKER": {
+                    "repeatmasker": "4.1.5"
+                },
                 "REPORT_EXCEL": {
                     "python": "3.9.5"
                 },
@@ -117,7 +120,7 @@
                     "pigz": 2.8
                 },
                 "Workflow": {
-                    "nf-core/genomeqc": "v1.0.1dev"
+                    "nf-core/genomeqc": "v1.0.1"
                 }
             },
             [
@@ -1177,17 +1180,14 @@
                 "repeatmasker/Mycoplasmoides_fastidiosum/Mycoplasmoides_fastidiosum.masked",
                 "repeatmasker/Mycoplasmoides_fastidiosum/Mycoplasmoides_fastidiosum.out",
                 "repeatmasker/Mycoplasmoides_fastidiosum/Mycoplasmoides_fastidiosum.tbl",
-                "repeatmasker/Mycoplasmoides_fastidiosum/versions.yml",
                 "repeatmasker/Mycoplasmoides_gallisepticum",
                 "repeatmasker/Mycoplasmoides_gallisepticum/Mycoplasmoides_gallisepticum.masked",
                 "repeatmasker/Mycoplasmoides_gallisepticum/Mycoplasmoides_gallisepticum.out",
                 "repeatmasker/Mycoplasmoides_gallisepticum/Mycoplasmoides_gallisepticum.tbl",
-                "repeatmasker/Mycoplasmoides_gallisepticum/versions.yml",
                 "repeatmasker/Mycoplasmoides_genitalium",
                 "repeatmasker/Mycoplasmoides_genitalium/Mycoplasmoides_genitalium.masked",
                 "repeatmasker/Mycoplasmoides_genitalium/Mycoplasmoides_genitalium.out",
                 "repeatmasker/Mycoplasmoides_genitalium/Mycoplasmoides_genitalium.tbl",
-                "repeatmasker/Mycoplasmoides_genitalium/versions.yml",
                 "report",
                 "report/excel",
                 "report/excel/genomeqc_tables.xlsx",
@@ -1312,9 +1312,6 @@
                 "transposed_report.tex:md5,63d1cbf4caff67b3bff10a4b159506f2",
                 "transposed_report.tsv:md5,43573f1d2196a9456b770e4f4ae2edf3",
                 "transposed_report.txt:md5,997b368aabfd4912acb4e36c97188049",
-                "versions.yml:md5,eaaca3fbaaadb4d53bd2a1ac4383fd7b",
-                "versions.yml:md5,eaaca3fbaaadb4d53bd2a1ac4383fd7b",
-                "versions.yml:md5,eaaca3fbaaadb4d53bd2a1ac4383fd7b",
                 "Busco_combined_geno.tsv:md5,26f9c022760f12596975f8f1d85be3c7",
                 "Busco_combined_prot.tsv:md5,1762ec07b7b0bcf0e0e6ffbbb44cd311",
                 "Quast_to_plot.tsv:md5,8999cc8c39faffd39986947d60d65a1c",

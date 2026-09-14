@@ -129,7 +129,7 @@ workflow FASTA_ANNOTATE_TE {
         // Soft-mask repeat elements in each genome using its paired repeat library
         REPEATMASKER_REPEATMASKER (
             ch_fasta,
-            ch_clustered_lib
+            ch_clustered_lib.map { _meta, lib -> lib }
         )
 
         ch_te_masked = REPEATMASKER_REPEATMASKER.out.masked
