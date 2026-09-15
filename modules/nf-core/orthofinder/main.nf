@@ -38,6 +38,11 @@ process ORTHOFINDER {
         -n $prefix \\
         $include_command \\
         $args
+
+    if [ ! -s "$results_dir/Orthogroups/Orthogroups.tsv" ]; then
+        echo "ERROR: orthofinder did not produce $results_dir/Orthogroups/Orthogroups.tsv - see the log above for the underlying failure." >&2
+        exit 1
+    fi
     """
 
     stub:
