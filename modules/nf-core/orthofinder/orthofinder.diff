@@ -1,0 +1,22 @@
+Changes in component 'nf-core/orthofinder'
+'modules/nf-core/orthofinder/environment.yml' is unchanged
+'modules/nf-core/orthofinder/meta.yml' is unchanged
+Changes in 'orthofinder/main.nf':
+--- modules/nf-core/orthofinder/main.nf
++++ modules/nf-core/orthofinder/main.nf
+@@ -38,6 +38,11 @@
+         -n $prefix \\
+         $include_command \\
+         $args
++
++    if [ ! -s "$results_dir/Orthogroups/Orthogroups.tsv" ]; then
++        echo "ERROR: orthofinder did not produce $results_dir/Orthogroups/Orthogroups.tsv - see the log above for the underlying failure." >&2
++        exit 1
++    fi
+     """
+ 
+     stub:
+
+'modules/nf-core/orthofinder/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/orthofinder/tests/main.nf.test' is unchanged
+************************************************************

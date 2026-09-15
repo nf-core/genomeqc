@@ -113,7 +113,8 @@
                     "orthofinder": {
                         "branch": "master",
                         "git_sha": "b80f9f534316d36fec85fa36cf6b4c60ab8c5b96",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/orthofinder/orthofinder.diff"
                     },
                     "pigz/uncompress": {
                         "branch": "master",
