@@ -42,7 +42,8 @@ nextflow_process {
 
             def stable_file_names = [
                 'Statistics_PerSpecies.tsv',
-                'SpeciesTree_rooted.txt'
+                'SpeciesTree_rooted.txt',
+                'Orthogroups.tsv'
             ]
             def stable_files = all_files.findAll { it.name in stable_file_names }
 
@@ -56,6 +57,7 @@ nextflow_process {
                 { assert overall_stats_file != null },
                 { assert path(process.out.orthologues[0]).exists() },
                 { assert path(process.out.speciestree[0]).exists() },
+                { assert path(process.out.orthogroups[0]).exists() },
                 { assert snapshot(
                     stable_files.toSorted { it.name },
                     overall_stats_lines,

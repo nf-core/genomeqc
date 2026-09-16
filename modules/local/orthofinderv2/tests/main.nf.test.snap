@@ -2,6 +2,7 @@
     "orthofinderv2 - sarscov2 - candidatus_portiera_aleyrodidarum - proteome": {
         "content": [
             [
+                "Orthogroups.tsv:md5,b06cb0585d8349f6138f46c753fe6fb5",
                 "SpeciesTree_rooted.txt:md5,4d5ea525feebe479fca0c0768271ba81",
                 "Statistics_PerSpecies.tsv:md5,984b5011a34d54527fe17896bfa36a2d"
             ],
@@ -66,10 +67,10 @@
                 ]
             }
         ],
-        "timestamp": "2026-08-08T08:32:16.811438",
+        "timestamp": "2026-09-11T16:55:56.889745263",
         "meta": {
-            "nf-test": "0.9.4",
-            "nextflow": "25.10.4"
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
         }
     },
     "orthofinderv2 - sarscov2 - candidatus_portiera_aleyrodidarum - proteome - stub": {
@@ -128,9 +129,12 @@
                     "N0.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
                 ],
                 "2": [
-                    "SpeciesTree_rooted_node_labels.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    "Orthogroups.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
                 ],
                 "3": [
+                    "SpeciesTree_rooted_node_labels.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "4": [
                     [
                         "ORTHOFINDERV2",
                         "orthofinder",
@@ -186,6 +190,9 @@
                         ]
                     ]
                 ],
+                "orthogroups": [
+                    "Orthogroups.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
                 "orthologues": [
                     "N0.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
                 ],
@@ -201,10 +208,10 @@
                 ]
             }
         ],
-        "timestamp": "2026-08-07T09:42:46.386917",
+        "timestamp": "2026-09-11T16:56:06.159610223",
         "meta": {
-            "nf-test": "0.9.4",
-            "nextflow": "25.10.4"
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.6"
         }
     }
 }
