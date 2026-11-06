@@ -1,0 +1,27 @@
+Changes in component 'nf-core/ncbigenomedownload'
+'modules/nf-core/ncbigenomedownload/environment.yml' is unchanged
+'modules/nf-core/ncbigenomedownload/meta.yml' is unchanged
+Changes in 'ncbigenomedownload/main.nf':
+--- modules/nf-core/ncbigenomedownload/main.nf
++++ modules/nf-core/ncbigenomedownload/main.nf
+@@ -46,6 +46,15 @@
+         --parallel $task.cpus \\
+         $groups
+ 
++    # NCBI can return an HTML error page (e.g. 503) saved under the expected .gz name
++    for f in *.gz; do
++        [ -e "\$f" ] || continue
++        if ! gzip -t "\$f" 2>/dev/null; then
++            echo "ERROR: \$f is not a valid gzip file (NCBI may have returned an error page):" >&2
++            head -c 500 "\$f" >&2
++            exit 1
++        fi
++    done
+     """
+ 
+     stub:
+
+'modules/nf-core/ncbigenomedownload/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/ncbigenomedownload/tests/nextflow.config' is unchanged
+'modules/nf-core/ncbigenomedownload/tests/main.nf.test' is unchanged
+************************************************************
