@@ -3,8 +3,9 @@ lint:
     - assets/nf-core-genomeqc_logo_light.png
     - docs/images/nf-core-genomeqc_logo_light.png
     - docs/images/nf-core-genomeqc_logo_dark.png
+    - .github/PULL_REQUEST_TEMPLATE.md
   schema_params: false
-nf_core_version: 4.2.1
+nf_core_version: 4.2.2
 repository_type: pipeline
 template:
   author: Chris Wyatt, Fernando Duarte
