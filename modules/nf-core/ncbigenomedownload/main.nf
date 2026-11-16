@@ -15,7 +15,7 @@ process NCBIGENOMEDOWNLOAD {
 
     output:
     tuple val(meta), path("*_genomic.gbff.gz")        , emit: gbk     , optional: true
-    tuple val(meta), path("*_genomic.fna.gz")         , emit: fna     , optional: true
+    tuple val(meta), path("*_genomic.fna.gz")         , emit: fna
     tuple val(meta), path("*_rm.out.gz")              , emit: rm      , optional: true
     tuple val(meta), path("*_feature_table.txt.gz")   , emit: features, optional: true
     tuple val(meta), path("*_genomic.gff.gz")         , emit: gff     , optional: true
