@@ -15,7 +15,7 @@ process NCBIGENOMEDOWNLOAD {
 
     output:
     tuple val(meta), path("*_genomic.gbff.gz")        , emit: gbk     , optional: true
-    tuple val(meta), path("*_genomic.fna.gz")         , emit: fna     , optional: true
+    tuple val(meta), path("*_genomic.fna.gz")         , emit: fna
     tuple val(meta), path("*_rm.out.gz")              , emit: rm      , optional: true
     tuple val(meta), path("*_feature_table.txt.gz")   , emit: features, optional: true
     tuple val(meta), path("*_genomic.gff.gz")         , emit: gff     , optional: true
@@ -46,6 +46,15 @@ process NCBIGENOMEDOWNLOAD {
         --parallel $task.cpus \\
         $groups
 
+    # NCBI can return an HTML error page (e.g. 503) saved under the expected .gz name
+    for f in *.gz; do
+        [ -e "\$f" ] || continue
+        if ! gzip -t "\$f" 2>/dev/null; then
+            echo "ERROR: \$f is not a valid gzip file (NCBI may have returned an error page):" >&2
+            head -c 500 "\$f" >&2
+            exit 1
+        fi
+    done
     """
 
     stub:

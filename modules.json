@@ -108,7 +108,8 @@
                     "ncbigenomedownload": {
                         "branch": "master",
                         "git_sha": "46cee3233c7c56524e3c32a52cec089316e09ee5",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/ncbigenomedownload/ncbigenomedownload.diff"
                     },
                     "orthofinder": {
                         "branch": "master",
