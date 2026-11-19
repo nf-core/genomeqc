@@ -166,6 +166,21 @@
                     "help_text": "Use 'v2' on arm64 (Apple Silicon) hosts, where OrthoFinder v3 does not work.",
                     "enum": ["v2", "v3"]
                 },
+                "species_tree": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "pattern": "^\\S+$",
+                    "description": "Newick species tree to use for the tree summary plots instead of OrthoFinder's. OrthoFinder is then not run.",
+                    "help_text": "The tree's tip labels must match the sample names in the samplesheet's `assembly` column. Tips for samples that are not in the run are dropped, so one tree can serve several runs; a sample that is missing from the tree stops the pipeline with a message naming it. Branch lengths are optional. Without OrthoFinder, the orthogroup counts per sequence (`ortho_seq_count/`) are not made and no OrthoFinder results are saved. Useful for large numbers of genomes, where OrthoFinder's all-against-all search becomes slow, or when a better tree is already available.",
+                    "fa_icon": "fas fa-tree"
+                },
+                "skip_tree": {
+                    "type": "boolean",
+                    "description": "Skip the species tree: do not run OrthoFinder or draw the tree summary plots and Shiny app.",
+                    "help_text": "For when only the per-assembly statistics are needed. OrthoFinder, the orthogroup counts per sequence (`ortho_seq_count/`), the tree summary plots (`tree/`) and the Shiny app (`shiny/`) are skipped; every other module runs as usual, and the HTML and Excel reports and MultiQC are made as before. Overrides `--species_tree`.",
+                    "fa_icon": "fas fa-ban"
+                },
                 "save_orthofinder_results": {
                     "type": "boolean",
                     "description": "Publish orthofinder results.",

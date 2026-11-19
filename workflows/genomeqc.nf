@@ -59,6 +59,8 @@ workflow GENOMEQC {
     val_busco_config         // val: path to a BUSCO config file, or []
     val_busco_clean          // val: boolean - clean up intermediate BUSCO files, or []
     val_ortho_version        // val: OrthoFinder version - 'v2' or 'v3'
+    val_species_tree         // val: path to a Newick species tree to use instead of running OrthoFinder, or null
+    val_skip_tree            // val: boolean - no species tree: skip OrthoFinder, ORTHOSEQCOUNT, the tree plots and the Shiny app
     val_validation_tool      // val: GXF validation/standardisation tool - 'agat' or 'gffread'
     val_container_engine     // val: container engine used to launch the interactive Shiny app - 'docker' or 'podman'
 
@@ -204,10 +206,12 @@ workflow GENOMEQC {
         val_busco_lineage,
         val_busco_config,
         val_busco_clean,
-        val_ortho_version
+        val_ortho_version,
+        val_species_tree,
+        val_skip_tree
     )
     ch_geno_busco_summary = GENOME_ONLY.out.busco_short_summaries
-    ch_geno_orthofinder   = GENOME_ONLY.out.orthofinder
+    ch_geno_species_tree  = GENOME_ONLY.out.species_tree
 
     GENOME_AND_ANNOTATION (
         ch_input_anno.fasta,
@@ -218,13 +222,15 @@ workflow GENOMEQC {
         val_skip_busco,
         val_busco_lineage,
         val_busco_config,
-        val_busco_clean
+        val_busco_clean,
+        val_species_tree,
+        val_skip_tree
     )
 
     // Define channels for tree summary and shiny app subworkflow
     ch_geno_anno_busco_summary = GENOME_AND_ANNOTATION.out.busco_short_summaries_geno
     ch_prot_anno_busco_summary = GENOME_AND_ANNOTATION.out.busco_short_summaries_prot
-    ch_geno_anno_orthofinder   = GENOME_AND_ANNOTATION.out.orthofinder
+    ch_geno_anno_species_tree  = GENOME_AND_ANNOTATION.out.species_tree
 
 
     ch_multiqc_files = ch_multiqc_files
@@ -271,21 +277,24 @@ workflow GENOMEQC {
 
     //
     // SUBWORKFLOW: Run static and interactive tree summary plots
+    // (not with --skip_tree; nothing downstream uses their outputs)
     //
 
-    TREE_SUMMARY_SHINY_APP (
-        ch_geno_anno_busco_summary,
-        ch_prot_anno_busco_summary,
-        ch_geno_busco_summary,
-        ch_tree_genome_anno,
-        ch_tree_genome,
-        ch_geno_anno_orthofinder,
-        ch_geno_orthofinder,
-        ch_te_table.ifEmpty([[],[]]),
-        ch_fcs_table.ifEmpty([[],[]]),
-        val_skip_busco,
-        val_container_engine,
-    )
+    if (!val_skip_tree) {
+        TREE_SUMMARY_SHINY_APP (
+            ch_geno_anno_busco_summary,
+            ch_prot_anno_busco_summary,
+            ch_geno_busco_summary,
+            ch_tree_genome_anno,
+            ch_tree_genome,
+            ch_geno_anno_species_tree,
+            ch_geno_species_tree,
+            ch_te_table.ifEmpty([[],[]]),
+            ch_fcs_table.ifEmpty([[],[]]),
+            val_skip_busco,
+            val_container_engine,
+        )
+    }
 
     //
     // MODULE: Run HTML REPORT (genome + annotation mode)

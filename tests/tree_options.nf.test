@@ -1,0 +1,105 @@
+nextflow_pipeline {
+
+    name "Test pipeline species tree options (--species_tree, --skip_tree)"
+    script "../main.nf"
+    tag "pipeline"
+    tag "species_tree"
+    tag "skip_tree"
+
+    test("-profile test --species_tree") {
+
+        when {
+            params {
+                outdir            = "$outputDir"
+                // The tree has the three test assemblies plus a tip that is not in the run
+                species_tree      = "${projectDir}/tests/myco_species_tree.nwk"
+                // TE annotation is covered by the default test
+                te                = null
+                RM_download_db    = false
+                run_repeatmodeler = false
+            }
+        }
+
+        then {
+            def tree = path("$outputDir/tree/genome_anno/tree.nw").text.trim()
+            // pipeline versions.yml file for multiqc, with the Nextflow version removed (as in tests/default.nf.test)
+            def software_versions = removeNextflowVersion("$outputDir/pipeline_info/nf_core_genomeqc_software_mqc_versions.yml")
+            software_versions.SHINY_APP_GENOME_ANNO?.remove('cat') // differs between container and conda profiles
+            assert workflow.success
+            assertAll(
+                // Software versions: no OrthoFinder
+                { assert snapshot(software_versions).match() },
+                // OrthoFinder and the orthogroup counts are not run
+                { assert !workflow.trace.tasks().any { it.name.contains('ORTHOFINDER') } },
+                { assert !workflow.trace.tasks().any { it.name.contains('ORTHOSEQCOUNT') } },
+                { assert !file("$outputDir/orthofinder").exists() },
+                { assert !file("$outputDir/ortho_seq_count").exists() },
+                // The tree summary uses the supplied tree, pruned to the samples in the run
+                { assert file("$outputDir/tree/genome_anno/tree_plot.pdf").exists() },
+                { assert tree.contains('Mycoplasmoides_genitalium') },
+                { assert tree.contains('Mycoplasmoides_gallisepticum') },
+                { assert tree.contains('Mycoplasmoides_fastidiosum') },
+                { assert !tree.contains('Not_in_this_run') }
+            )
+        }
+
+        cleanup {
+            if (System.getenv("CI") == "true") {
+                if (System.getenv("NFT_PROFILE")?.contains("docker")) {
+                    "docker system prune -a -f --volumes".execute().waitFor()
+                }
+                new File("${launchDir}").deleteDir()
+            }
+        }
+    }
+
+    test("-profile test --skip_tree") {
+
+        when {
+            params {
+                outdir            = "$outputDir"
+                skip_tree         = true
+                // TE annotation is covered by the default test
+                te                = null
+                RM_download_db    = false
+                run_repeatmodeler = false
+            }
+        }
+
+        then {
+            def tasks = workflow.trace.tasks().collect { it.name }
+            // pipeline versions.yml file for multiqc, with the Nextflow version removed (as in tests/default.nf.test)
+            def software_versions = removeNextflowVersion("$outputDir/pipeline_info/nf_core_genomeqc_software_mqc_versions.yml")
+            software_versions.SHINY_APP_GENOME_ANNO?.remove('cat') // differs between container and conda profiles
+            assert workflow.success
+            assertAll(
+                // Software versions: no OrthoFinder, tree summary or Shiny app
+                { assert snapshot(software_versions).match() },
+                // No species tree: OrthoFinder, the orthogroup counts, the tree plots and the Shiny app are skipped
+                { assert !tasks.any { it.contains('ORTHOFINDER') } },
+                { assert !tasks.any { it.contains('ORTHOSEQCOUNT') } },
+                { assert !tasks.any { it.contains('TREE_SUMMARY') } },
+                { assert !tasks.any { it.contains('SHINY_APP') } },
+                { assert !file("$outputDir/orthofinder").exists() },
+                { assert !file("$outputDir/ortho_seq_count").exists() },
+                { assert !file("$outputDir/tree").exists() },
+                { assert !file("$outputDir/shiny").exists() },
+                // Everything else still runs, and the reports are made
+                { assert tasks.any { it.contains('BUSCO_GENOME') } },
+                { assert tasks.any { it.contains('QUAST') } },
+                { assert file("$outputDir/report/html").list().size() > 0 },
+                { assert file("$outputDir/report/excel").list().size() > 0 },
+                { assert file("$outputDir/multiqc/multiqc_report.html").exists() }
+            )
+        }
+
+        cleanup {
+            if (System.getenv("CI") == "true") {
+                if (System.getenv("NFT_PROFILE")?.contains("docker")) {
+                    "docker system prune -a -f --volumes".execute().waitFor()
+                }
+                new File("${launchDir}").deleteDir()
+            }
+        }
+    }
+}

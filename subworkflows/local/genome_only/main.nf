@@ -17,9 +17,14 @@ workflow GENOME_ONLY {
     val_busco_config  // val: path to a BUSCO config file, or []
     val_busco_clean   // val: boolean - clean up intermediate BUSCO files, or []
     val_ortho_version // val: OrthoFinder version - 'v2' or 'v3'
+    val_species_tree  // val: path to a Newick species tree to use instead of OrthoFinder's, or null
+    val_skip_tree     // val: boolean - no species tree at all: skip OrthoFinder, ORTHOSEQCOUNT and the tree plot
 
     main:
     ch_fasta.view { meta, _fasta -> "Running ${meta.id} on genome only mode"}
+
+    ch_orthofinder  = channel.empty()
+    ch_species_tree = channel.empty()
 
 
     // For tree plot
@@ -75,60 +80,73 @@ workflow GENOME_ONLY {
         )
 
         //
-        // Orthofinder
+        // Species tree: none (--skip_tree), the user's (--species_tree), or OrthoFinder's on the BUSCO proteins
         //
 
-        // Prepare data
-        ch_busco_proteins = BUSCO_GENOME.out.single_copy_faa
-                          | flatMap { meta, faas ->
-                                         faas.collect { faa -> [meta, file(faa)]  }
-                          }
-                          | collectFile { meta, faas ->
-                                            [ "${meta.id}.fasta", faas ]
-                          }
-                          | collect
-                          | filter { file_paths ->
-                                        file_paths.size() >= 3 // Ensure there are enough BUSCO proteins, otherwise skip orthofinder
-                          }
-                          | map { file_paths ->
-                                    [[ id: 'orthofinder', mode: 'genome' ], file_paths.toSorted { a, b -> a.name <=> b.name }] // for deterministic behaviour
-                          }
+        if (val_skip_tree) {
+            // No species tree, so OrthoFinder and ORTHOSEQCOUNT are not run
+        } else if (val_species_tree) {
+            // Like OrthoFinder, only for 3 or more genomes
+            ch_species_tree = ch_fasta
+                            | count
+                            | filter { n -> n >= 3 }
+                            | map { _n -> [ [ id: 'species_tree', mode: 'genome' ], file(val_species_tree, checkIfExists: true) ] }
+        } else {
 
-        //Run orthofinder
-        if (val_ortho_version == 'v3') {
-            ORTHOFINDER_V3 (
-                ch_busco_proteins,
-                [[],[]]
+            // Prepare data
+            ch_busco_proteins = BUSCO_GENOME.out.single_copy_faa
+                              | flatMap { meta, faas ->
+                                             faas.collect { faa -> [meta, file(faa)]  }
+                              }
+                              | collectFile { meta, faas ->
+                                                [ "${meta.id}.fasta", faas ]
+                              }
+                              | collect
+                              | filter { file_paths ->
+                                            file_paths.size() >= 3 // Ensure there are enough BUSCO proteins, otherwise skip orthofinder
+                              }
+                              | map { file_paths ->
+                                        [[ id: 'orthofinder', mode: 'genome' ], file_paths.toSorted { a, b -> a.name <=> b.name }] // for deterministic behaviour
+                              }
+
+            //Run orthofinder
+            if (val_ortho_version == 'v3') {
+                ORTHOFINDER_V3 (
+                    ch_busco_proteins,
+                    [[],[]]
+                )
+                ch_orthofinder = ORTHOFINDER_V3.out.orthofinder
+                ch_orthofinder_tsv = ORTHOFINDER_V3.out.orthogroups
+            } else if (val_ortho_version == 'v2' ) {
+                ORTHOFINDERV2 (
+                    ch_busco_proteins
+                )
+                ch_orthofinder = ORTHOFINDERV2.out.orthofinder
+                ch_orthofinder_tsv = ORTHOFINDERV2.out.orthogroups
+            }
+            // Transform tsv to gff for orthoseqcount module
+            BUSCO_TSVTOGFF (
+                BUSCO_GENOME.out.busco_dir
             )
-            ch_orthofinder = ORTHOFINDER_V3.out.orthofinder
-            ch_orthofinder_tsv = ORTHOFINDER_V3.out.orthogroups
-        } else if (val_ortho_version == 'v2' ) {
-            ORTHOFINDERV2 (
-                ch_busco_proteins
+
+            //
+            // MODULE: Run ORTHOSEQCOUNT
+            //
+
+            ORTHOSEQCOUNT (
+                ch_orthofinder_tsv.map { _meta, tsv ->
+                    file(tsv)
+                },
+                BUSCO_TSVTOGFF.out.gff.map { _meta, gff -> gff }.collect()
             )
-            ch_orthofinder = ORTHOFINDERV2.out.orthofinder
-            ch_orthofinder_tsv = ORTHOFINDERV2.out.orthogroups
+            //ch_tree_data = ch_tree_data.mix(ORTHOSEQCOUNT.out.species_summary)
+            ch_species_tree = ch_orthofinder
         }
-        // Transform tsv to gff for orthoseqcount module
-        BUSCO_TSVTOGFF (
-            BUSCO_GENOME.out.busco_dir
-        )
-
-        //
-        // MODULE: Run ORTHOSEQCOUNT
-        //
-
-        ORTHOSEQCOUNT (
-            ch_orthofinder_tsv.map { _meta, tsv ->
-                file(tsv)
-            },
-            BUSCO_TSVTOGFF.out.gff.map { _meta, gff -> gff }.collect()
-        )
-        //ch_tree_data = ch_tree_data.mix(ORTHOSEQCOUNT.out.species_summary)
     }
 
     emit:
-    orthofinder             = !val_skip_busco ? ch_orthofinder : channel.empty()        // channel: [ val(meta), [folder] ]
+    orthofinder             = ch_orthofinder                      // channel: [ val(meta), [folder] ] - empty with --species_tree or --skip_tree
+    species_tree            = ch_species_tree                     // channel: [ val(meta), folder | newick ] - for the tree summary plot; empty with --skip_tree
     tree_data               = !val_skip_busco ? ch_tree_data.flatten().collect().map { files -> files.toSorted { a, b -> a.name <=> b.name } } : channel.empty() // sort for deterministic behaviour
     quast_results           = QUAST.out.results                   // channel: [ val(meta), [tsv] ]
     busco_short_summaries   = !val_skip_busco ? BUSCO_GENOME.out.short_summaries_txt : channel.empty() // channel: [ val(meta), [txt] ]
