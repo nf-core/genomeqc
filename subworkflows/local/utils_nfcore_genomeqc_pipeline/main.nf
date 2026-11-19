@@ -176,6 +176,9 @@ def validateInputParameters() {
     if (hite && profile_conda) {
         error "The HiTE module does not support Conda. Please use Docker / Singularity / Podman instead or change the TE detection method to 'repeatmasker'"
     }
+    if (params.skip_tree && params.species_tree) {
+        log.warn "Both --skip_tree and --species_tree were given: --skip_tree wins, so no tree is drawn and --species_tree is ignored"
+    }
     // Add ways of validating input parameters, e.g. for groups in ncbigenomedownload
 }
 
@@ -234,10 +237,10 @@ def toolCitationText() {
             !params.skip_tidk ? "tidk (Brown et al. 2025)," : "",
             (params.gxdb || params.gxdb_manifest) ? "FCS-GX and FCS-adaptor (Astashyn et al. 2024)," : "",
             (params.gxdb || params.gxdb_manifest) ? "Tiara (Karlicki et al. 2022)," : "",
-            params.ortho_version == 'v2' ? "OrthoFinder (Emms and Kelly 2019)," : "OrthoFinder (Emms et al. 2026),",
+            (params.species_tree || params.skip_tree) ? "" : (params.ortho_version == 'v2' ? "OrthoFinder (Emms and Kelly 2019)," : "OrthoFinder (Emms et al. 2026),"),
             "RIdeogram (Hao et al. 2020),",
-            "ggtree (Yu et al. 2017),",
-            "ape (Paradis and Schliep 2019),",
+            params.skip_tree ? "" : "ggtree (Yu et al. 2017),",
+            params.skip_tree ? "" : "ape (Paradis and Schliep 2019),",
             "ggplot2 (Wickham 2016),",
             "GenomicRanges (Lawrence et al. 2013),",
             "the tidyverse (Wickham et al. 2019),",
@@ -264,10 +267,10 @@ def toolBibliographyText() {
             !params.skip_tidk ? "<li>Brown MR, González de la Rosa PM, Blaxter M. (2025) tidk: a toolkit to rapidly identify telomeric repeats from genomic datasets. Bioinformatics, 41(2), btaf049. doi: 10.1093/bioinformatics/btaf049</li>" : "",
             (params.gxdb || params.gxdb_manifest) ? "<li>Astashyn A, Tvedte ES, Sweeney D, et al. (2024) Rapid and sensitive detection of genome contamination at scale with FCS-GX. Genome Biol, 25(1), 60. doi: 10.1186/s13059-024-03198-7</li>" : "",
             (params.gxdb || params.gxdb_manifest) ? "<li>Karlicki M, Antonowicz S, Karnkowska A. (2022) Tiara: deep learning-based classification system for eukaryotic sequences. Bioinformatics, 38(2), 344-350. doi: 10.1093/bioinformatics/btab672</li>" : "",
-            params.ortho_version == 'v2' ? "<li>Emms DM, Kelly S. (2019) OrthoFinder: phylogenetic orthology inference for comparative genomics. Genome Biol, 20(1), 238. doi: 10.1186/s13059-019-1832-y</li>" : "<li>Emms DM, Liu Y, Belcher L, et al. (2026) OrthoFinder: improved phylogenetic orthology inference with enhanced accuracy and scalability. Nat Methods. doi: 10.1038/s41592-026-03126-6</li>",
+            (params.species_tree || params.skip_tree) ? "" : (params.ortho_version == 'v2' ? "<li>Emms DM, Kelly S. (2019) OrthoFinder: phylogenetic orthology inference for comparative genomics. Genome Biol, 20(1), 238. doi: 10.1186/s13059-019-1832-y</li>" : "<li>Emms DM, Liu Y, Belcher L, et al. (2026) OrthoFinder: improved phylogenetic orthology inference with enhanced accuracy and scalability. Nat Methods. doi: 10.1038/s41592-026-03126-6</li>"),
             "<li>Hao Z, Lv D, Ge Y, et al. (2020) RIdeogram: drawing SVG graphics to visualize and map genome-wide data on the idiograms. PeerJ Comput Sci, 6, e251. doi: 10.7717/peerj-cs.251</li>",
-            "<li>Yu G, Smith DK, Zhu H, Guan Y, Lam TT. (2017) ggtree: an R package for visualization and annotation of phylogenetic trees with their covariates and other associated data. Methods Ecol Evol, 8(1), 28-36. doi: 10.1111/2041-210X.12628</li>",
-            "<li>Paradis E, Schliep K. (2019) ape 5.0: an environment for modern phylogenetics and evolutionary analyses in R. Bioinformatics, 35(3), 526-528. doi: 10.1093/bioinformatics/bty633</li>",
+            params.skip_tree ? "" : "<li>Yu G, Smith DK, Zhu H, Guan Y, Lam TT. (2017) ggtree: an R package for visualization and annotation of phylogenetic trees with their covariates and other associated data. Methods Ecol Evol, 8(1), 28-36. doi: 10.1111/2041-210X.12628</li>",
+            params.skip_tree ? "" : "<li>Paradis E, Schliep K. (2019) ape 5.0: an environment for modern phylogenetics and evolutionary analyses in R. Bioinformatics, 35(3), 526-528. doi: 10.1093/bioinformatics/bty633</li>",
             "<li>Wickham H. (2016) ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York.</li>",
             "<li>Lawrence M, Huber W, Pagès H, et al. (2013) Software for Computing and Annotating Genomic Ranges. PLoS Comput Biol, 9(8), e1003118. doi: 10.1371/journal.pcbi.1003118</li>",
             "<li>Wickham H, Averick M, Bryan J, et al. (2019) Welcome to the tidyverse. J Open Source Softw, 4(43), 1686. doi: 10.21105/joss.01686</li>",

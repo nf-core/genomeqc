@@ -363,7 +363,7 @@ The pipeline supports both OrthoFinder v2 and v3 (selected via `--ortho_version`
 
 </details>
 
-This directory will only be present if `--save_orthofinder_results` flag is set.
+This directory will only be present if `--save_orthofinder_results` flag is set. OrthoFinder is not run when a tree is given with `--species_tree`, or with `--skip_tree`.
 
 ### Ortho seq count
 
@@ -379,9 +379,11 @@ This directory will only be present if `--save_orthofinder_results` flag is set.
 
 </details>
 
+This directory is not present when a tree is given with `--species_tree`, or with `--skip_tree`, as there are no OrthoFinder orthogroups to count.
+
 ### Tree summary
 
-**Tree summary** is a local module that takes the rooted trees species from Orthofinder, as well as the ouput statistics from the mentioned tools.
+**Tree summary** is a local module that takes the rooted species tree from Orthofinder, as well as the ouput statistics from the mentioned tools. With `--species_tree`, it uses that tree instead, keeping only the assemblies in the run (see [usage](usage.md#using-your-own-species-tree)). Not made with `--skip_tree`.
 
 The idea of the tree summary is to give some phylogenetic context to the quality stats, which might help users when evaluating the integrity of the assemblies.
 
@@ -410,7 +412,7 @@ The `circular` layout draws the same statistics as concentric rings instead:
 
 ### Shiny App
 
-**The shiny app** module uses [Shiny](https://shiny.posit.co/), a package to build interactive web apps from R, to create a dynamic plot adjuster to modify the tree plot in real time. It allows to change plot parameters such as margins, branch length, text size, etc., as well as adding and removing summary statistics next to the tree tips. The modified plot can be saved as a png/svg.
+**The shiny app** module uses [Shiny](https://shiny.posit.co/), a package to build interactive web apps from R, to create a dynamic plot adjuster to modify the tree plot in real time. It allows to change plot parameters such as margins, branch length, text size, etc., as well as adding and removing summary statistics next to the tree tips. The modified plot can be saved as a png/svg. Not made with `--skip_tree`.
 
 The tree style (conventional or circular) is also selectable in the app. For the circular layout, this includes a ring-thickness control, a quality-preset selector (with a custom option for per-metric Good/Warn thresholds), and a toggle to print values on the rings.
 

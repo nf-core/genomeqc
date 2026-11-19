@@ -28,6 +28,8 @@ workflow GENOME_AND_ANNOTATION {
     val_busco_lineage     // val: BUSCO lineage name (e.g. 'hymenoptera_odb10') or 'auto'
     val_busco_config      // val: path to a BUSCO config file, or []
     val_busco_clean       // val: boolean - clean up intermediate BUSCO files, or []
+    val_species_tree      // val: path to a Newick species tree to use instead of OrthoFinder's, or null
+    val_skip_tree         // val: boolean - no species tree at all: skip OrthoFinder, ORTHOSEQCOUNT and the tree plot
 
     main:
     ch_fasta.view { meta, _fasta -> "Running ${meta.id} on genome and annotation mode" }
@@ -127,49 +129,63 @@ workflow GENOME_AND_ANNOTATION {
     )
 
     //
-    // MODULE: Run Orthofinder
+    // Species tree: none (--skip_tree), the user's (--species_tree), or OrthoFinder's on the longest-isoform proteins
     //
 
-    // Prepare orthofinder input channel
-    ortho_ch     = GFFREAD.out.gffread_fasta
-        | map { _meta, fasta ->
-            fasta // We only need the fastas
-        }
-        | collect // Collect all fasta in a single tuple
-        | filter { fastas ->
-            fastas.size() >= 3 // Ensure we have at least 3 genomes for orthofinder, otherwise it won't run
-        }
-        | map { fastas ->
-            [[id:'orthofinder', mode:'genome_anno'], fastas.toSorted { a, b -> a.name <=> b.name }] // sort for deterministic behaviour
+    ch_orthofinder  = channel.empty()
+    ch_species_tree = channel.empty()
+    if (val_skip_tree) {
+        // No species tree, so OrthoFinder and ORTHOSEQCOUNT are not run
+    } else if (val_species_tree) {
+        // Like OrthoFinder, only for 3 or more genomes
+        ch_species_tree = ch_fasta
+                        | count
+                        | filter { n -> n >= 3 }
+                        | map { _n -> [ [ id: 'species_tree', mode: 'genome_anno' ], file(val_species_tree, checkIfExists: true) ] }
+    } else {
+
+        // Prepare orthofinder input channel
+        ortho_ch     = GFFREAD.out.gffread_fasta
+            | map { _meta, fasta ->
+                fasta // We only need the fastas
+            }
+            | collect // Collect all fasta in a single tuple
+            | filter { fastas ->
+                fastas.size() >= 3 // Ensure we have at least 3 genomes for orthofinder, otherwise it won't run
+            }
+            | map { fastas ->
+                [[id:'orthofinder', mode:'genome_anno'], fastas.toSorted { a, b -> a.name <=> b.name }] // sort for deterministic behaviour
+            }
+
+        // Run orthofinder
+        if (val_ortho_version == 'v3') {
+            ORTHOFINDER_V3 (
+                ortho_ch,
+                [[],[]]
+            )
+            ch_orthofinder = ORTHOFINDER_V3.out.orthofinder
+            ch_orthofinder_tsv = ORTHOFINDER_V3.out.orthogroups
+        } else if (val_ortho_version == 'v2' ) {
+            ORTHOFINDERV2 (
+                ortho_ch
+            )
+            ch_orthofinder = ORTHOFINDERV2.out.orthofinder
+            ch_orthofinder_tsv = ORTHOFINDERV2.out.orthogroups
         }
 
-    // Run orthofinder
-    if (val_ortho_version == 'v3') {
-        ORTHOFINDER_V3 (
-            ortho_ch,
-            [[],[]]
+        //
+        // MODULE: Run ORTHOSEQCOUNT
+        //
+
+        ORTHOSEQCOUNT (
+            ch_orthofinder_tsv.map { _meta, tsv ->
+                file(tsv)
+            },
+            AGAT_SPKEEPLONGESTISOFORM.out.gff.map { _meta, gff -> gff }.collect()
         )
-        ch_orthofinder = ORTHOFINDER_V3.out.orthofinder
-        ch_orthofinder_tsv = ORTHOFINDER_V3.out.orthogroups
-    } else if (val_ortho_version == 'v2' ) {
-        ORTHOFINDERV2 (
-            ortho_ch
-        )
-        ch_orthofinder = ORTHOFINDERV2.out.orthofinder
-        ch_orthofinder_tsv = ORTHOFINDERV2.out.orthogroups
+        //ch_tree_data = ch_tree_data.mix(ORTHOSEQCOUNT.out.species_summary)
+        ch_species_tree = ch_orthofinder
     }
-
-    //
-    // MODULE: Run ORTHOSEQCOUNT
-    //
-
-    ORTHOSEQCOUNT (
-        ch_orthofinder_tsv.map { _meta, tsv ->
-            file(tsv)
-        },
-        AGAT_SPKEEPLONGESTISOFORM.out.gff.map { _meta, gff -> gff }.collect()
-    )
-    //ch_tree_data = ch_tree_data.mix(ORTHOSEQCOUNT.out.species_summary)
 
     //
     // MODULE: Run BUSCO for genome annotation
@@ -267,14 +283,15 @@ workflow GENOME_AND_ANNOTATION {
     }
 
     emit:
-    orthofinder                = ch_orthofinder         // channel: [ val(meta), [folder] ]
+    orthofinder                = ch_orthofinder         // channel: [ val(meta), [folder] ] - empty with --species_tree or --skip_tree
+    species_tree               = ch_species_tree        // channel: [ val(meta), folder | newick ] - for the tree summary plot; empty with --skip_tree
     tree_data                  = ch_tree_data.flatten().collect().map { files -> files.toSorted { a, b -> a.name <=> b.name } } // sort for deterministic behaviour
     quast_results              = QUAST.out.results                   // channel: [ val(meta), [tsv] ]
     busco_short_summaries_geno = !val_skip_busco ? GAWK_GENO.out.output : channel.empty()
     busco_short_summaries_prot = !val_skip_busco ? GAWK_PROT.out.output : channel.empty()
     quast_tsv                  = QUAST.out.tsv                       // channel: [ val(meta), path(tsv) ]
     agat_stats                 = AGAT_SPSTATISTICS.out.stats_txt     // channel: [ val(meta), path(txt) ]
-    ortho_seq_count            = ORTHOSEQCOUNT.out.species_summary // channel: [ path(tsv) ]
+    ortho_seq_count            = (!val_species_tree && !val_skip_tree) ? ORTHOSEQCOUNT.out.species_summary : channel.empty() // channel: [ path(tsv) ] - empty with --species_tree or --skip_tree
     ideogram_svg_geno          = !val_skip_busco ? IDEOGRAM_GENOME.out.svg : channel.empty()           // channel: [ val(meta), path(svg) ]
     ideogram_svg_prot          = !val_skip_busco ? IDEOGRAM_GENOMEANNOTATION.out.svg : channel.empty() // channel: [ val(meta), path(svg) ], meta has id and lineage
     buscos_per_seqs            = !val_skip_busco ? IDEOGRAM_GENOMEANNOTATION.out.busco_mappings.collect { _meta, table -> table}.map { tables -> tables.toSorted { a, b -> a.name <=> b.name } } : channel.empty() // channel: [ val(meta), [csv] ]
