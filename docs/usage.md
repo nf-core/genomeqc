@@ -381,6 +381,20 @@ If you only need the statistics for each assembly, turn the tree off completely 
 
 OrthoFinder, the orthogroup counts per sequence (`ortho_seq_count/`), the tree summary plots (`tree/`) and the Shiny app (`shiny/`) are then skipped. Every other module runs as usual, and the HTML and Excel reports and the MultiQC report are made as before. This saves the time and memory OrthoFinder needs, which grow quickly with the number and size of the genomes. `--skip_tree` overrides `--species_tree`.
 
+### Building the tree with Mash
+
+For many genomes, or when OrthoFinder would take too long, build the species tree from Mash distances instead:
+
+```bash
+--tree_method mash
+```
+
+Every genome is sketched with [Mash](https://github.com/marbl/Mash), all pairwise Mash distances are computed, and a neighbour-joining tree is built from them and rooted at its midpoint. One tree is built from all the assemblies, and each tree plot uses the part of it for its own assemblies. This takes minutes even for hundreds of genomes, whereas OrthoFinder compares every genome with every other at the protein level.
+
+The tree is approximate. Mash estimates how many k-mers two genomes share, so it is most reliable between closely related genomes (roughly the same genus or family); between distant genomes the distances saturate and the branching order becomes unreliable. For distant taxa, use OrthoFinder or give a tree with `--species_tree`.
+
+As with `--species_tree`, OrthoFinder and the orthogroup counts per sequence (`ortho_seq_count/`) are not run. The sketch size is 10,000 by default; change it with `ext.args` for the `MASH_TRIANGLE` process in a custom config. `--tree_method` is ignored when a tree is given with `--species_tree`, or with `--skip_tree`.
+
 ### Circular tree quality scoring
 
 With `--tree_style circular`, sequence count, N50, BUSCO completeness/duplication, and (if decontamination was run) FCS-GX contamination are scored Good/Warn/Poor against `--quality_preset` (default `generic`; also `vertebrate`, `insect`, `plant`, `fungi`, `bacteria`). Pick the preset matching your taxa: e.g. `bacteria` expects a scaffold N50 ≥ 500 kb and ≤ 100 sequences for "Good", while `vertebrate` expects ≥ 10 Mb and ≤ 1000 sequences. These cut-offs are starting points and should be tuned per project. The FCS-GX contamination cut-offs (≥99.5% non-contaminant = Good, 98-99.5% = Warn, <98% = Poor) are fixed across every preset, since there's no taxon-dependent expectation for how much of an assembly should be foreign contamination.

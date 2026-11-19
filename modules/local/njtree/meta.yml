@@ -1,0 +1,83 @@
+name: "njtree"
+description: Builds a neighbour-joining tree from a mash triangle distance
+  matrix and roots it at its midpoint
+keywords:
+  - phylogeny
+  - neighbour-joining
+  - mash
+  - tree
+tools:
+  - "nj_tree.R":
+      description: "In-house script: neighbour joining with ape::nj, negative
+        branch lengths set to zero, then rooted at the midpoint of the longest
+        tip-to-tip path."
+      homepage: "https://github.com/nf-core/genomeqc"
+      documentation: "https://github.com/nf-core/genomeqc"
+      licence:
+        - "MIT"
+      identifier: ""
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map with information about the set of genomes
+          e.g. [ id:'mash' ]
+    - distances:
+        type: file
+        description: mash triangle lower-triangle distance matrix
+        pattern: "*.tsv"
+        ontologies: []
+output:
+  tree:
+    - - meta:
+          type: map
+          description: Groovy Map with information about the set of genomes
+      - "*.nwk":
+          type: file
+          description: Midpoint-rooted neighbour-joining tree in Newick format
+          pattern: "*.nwk"
+          ontologies: []
+  versions_r_base:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - r_base:
+          type: string
+          description: The name of the tool
+      - Rscript -e "cat(as.character(getRversion()))":
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_ape:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - ape:
+          type: string
+          description: The name of the tool
+      - Rscript -e "cat(as.character(packageVersion('ape')))":
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - r_base:
+          type: string
+          description: The name of the tool
+      - Rscript -e "cat(as.character(getRversion()))":
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - ape:
+          type: string
+          description: The name of the tool
+      - Rscript -e "cat(as.character(packageVersion('ape')))":
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@chriswyatt1"
+maintainers:
+  - "@chriswyatt1"

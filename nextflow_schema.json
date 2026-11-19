@@ -181,6 +181,14 @@
                     "help_text": "For when only the per-assembly statistics are needed. OrthoFinder, the orthogroup counts per sequence (`ortho_seq_count/`), the tree summary plots (`tree/`) and the Shiny app (`shiny/`) are skipped; every other module runs as usual, and the HTML and Excel reports and MultiQC are made as before. Overrides `--species_tree`.",
                     "fa_icon": "fas fa-ban"
                 },
+                "tree_method": {
+                    "type": "string",
+                    "default": "orthofinder",
+                    "description": "How to build the species tree when none is given with `--species_tree`.",
+                    "help_text": "`orthofinder` (default) infers the tree from orthologous genes. `mash` instead sketches every genome with Mash, computes all pairwise Mash distances and builds a neighbour-joining tree rooted at its midpoint. It takes minutes even for hundreds of genomes, whereas OrthoFinder's all-against-all search grows with the square of the number of genomes, but the tree is approximate: Mash distances are most reliable between closely related genomes (roughly the same genus or family) and saturate between distant ones. With `mash`, OrthoFinder and the orthogroup counts per sequence (`ortho_seq_count/`) are not run. Ignored with `--species_tree` or `--skip_tree`.",
+                    "enum": ["orthofinder", "mash"],
+                    "fa_icon": "fas fa-project-diagram"
+                },
                 "save_orthofinder_results": {
                     "type": "boolean",
                     "description": "Publish orthofinder results.",

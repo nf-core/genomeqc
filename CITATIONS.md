@@ -46,6 +46,10 @@
 
 > Yu G, Smith DK, Zhu H, Guan Y, Lam TT. ggtree: an R package for visualization and annotation of phylogenetic trees with their covariates and other associated data. Methods Ecol Evol. 2017;8(1):28-36. doi: 10.1111/2041-210X.12628.
 
+- [Mash](https://doi.org/10.1186/s13059-016-0997-x)
+
+> Ondov BD, Treangen TJ, Melsted P, Mallonee AB, Bergman NH, Koren S, Phillippy AM. Mash: fast genome and metagenome distance estimation using MinHash. Genome Biol. 2016;17(1):132. doi: 10.1186/s13059-016-0997-x.
+
 - [Merqury](https://doi.org/10.1186/s13059-020-02134-9)
 
 > Rhie A, Walenz BP, Koren S, Phillippy AM. Merqury: reference-free quality, completeness, and phasing assessment for genome assemblies. Genome Biol. 2020;21(1):245. doi: 10.1186/s13059-020-02134-9.

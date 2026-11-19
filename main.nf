@@ -66,6 +66,7 @@ workflow NFCORE_GENOMEQC {
         params.ortho_version,
         params.species_tree,
         params.skip_tree,
+        params.tree_method,
         params.val_tool,
         params.container_engine,
     )

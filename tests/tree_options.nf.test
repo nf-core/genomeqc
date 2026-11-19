@@ -1,10 +1,11 @@
 nextflow_pipeline {
 
-    name "Test pipeline species tree options (--species_tree, --skip_tree)"
+    name "Test pipeline species tree options (--species_tree, --skip_tree, --tree_method mash)"
     script "../main.nf"
     tag "pipeline"
     tag "species_tree"
     tag "skip_tree"
+    tag "tree_method"
 
     test("-profile test --species_tree") {
 
@@ -90,6 +91,50 @@ nextflow_pipeline {
                 { assert file("$outputDir/report/html").list().size() > 0 },
                 { assert file("$outputDir/report/excel").list().size() > 0 },
                 { assert file("$outputDir/multiqc/multiqc_report.html").exists() }
+            )
+        }
+
+        cleanup {
+            if (System.getenv("CI") == "true") {
+                if (System.getenv("NFT_PROFILE")?.contains("docker")) {
+                    "docker system prune -a -f --volumes".execute().waitFor()
+                }
+                new File("${launchDir}").deleteDir()
+            }
+        }
+    }
+
+    test("-profile test --tree_method mash") {
+
+        when {
+            params {
+                outdir            = "$outputDir"
+                tree_method       = 'mash'
+                // TE annotation is covered by the default test
+                te                = null
+                RM_download_db    = false
+                run_repeatmodeler = false
+            }
+        }
+
+        then {
+            def tasks     = workflow.trace.tasks().collect { it.name }
+            def mash_tree = path("$outputDir/mash/mash_tree.nwk").text.trim()
+            def tree      = path("$outputDir/tree/genome_anno/tree.nw").text.trim()
+            def samples   = ['Mycoplasmoides_fastidiosum', 'Mycoplasmoides_genitalium', 'Mycoplasmoides_gallisepticum']
+            assert workflow.success
+            assertAll(
+                // The tree comes from Mash, not OrthoFinder
+                { assert tasks.any { it.contains('MASH_TRIANGLE') } },
+                { assert tasks.any { it.contains('NJTREE') } },
+                { assert !tasks.any { it.contains('ORTHOFINDER') } },
+                { assert !tasks.any { it.contains('ORTHOSEQCOUNT') } },
+                { assert !file("$outputDir/orthofinder").exists() },
+                { assert file("$outputDir/mash/mash_distances.tsv").exists() },
+                // The Mash tree has every assembly, and the tree plot uses it
+                { assert samples.every { mash_tree.contains(it) } },
+                { assert samples.every { tree.contains(it) } },
+                { assert file("$outputDir/tree/genome_anno/tree_plot.pdf").exists() }
             )
         }
 

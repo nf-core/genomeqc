@@ -1,0 +1,78 @@
+name: "mash_triangle"
+description: Sketches a set of genomes with Mash and computes all pairwise Mash
+  distances as a lower-triangle matrix, labelled by sample id
+keywords:
+  - mash
+  - distance
+  - minhash
+  - phylogeny
+tools:
+  - "mash":
+      description: "Fast sequence distance estimator that uses MinHash"
+      homepage: "https://github.com/marbl/Mash"
+      documentation: "https://mash.readthedocs.io/en/latest/"
+      doi: "10.1186/s13059-016-0997-x"
+      licence:
+        - "custom"
+      identifier: biotools:mash
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map with information about the set of genomes
+          e.g. [ id:'mash' ]
+    - ids:
+        type: list
+        description: Sample ids, in the same order as the FASTA files; used to
+          label the genomes in the sketch and the distance matrix
+    - fastas:
+        type: file
+        description: Genome FASTA files (plain or gzipped)
+        pattern: "*.{fa,fasta,fna,fa.gz,fasta.gz,fna.gz}"
+        ontologies: []
+output:
+  distances:
+    - - meta:
+          type: map
+          description: Groovy Map with information about the set of genomes
+      - "*.tsv":
+          type: file
+          description: mash triangle output - the number of genomes, then one
+            line per genome with its id and its distances to the genomes before
+            it
+          pattern: "*_distances.tsv"
+          ontologies: []
+  sketch:
+    - - meta:
+          type: map
+          description: Groovy Map with information about the set of genomes
+      - "*.msh":
+          type: file
+          description: Mash sketch of all the genomes
+          pattern: "*.msh"
+          ontologies: []
+  versions_mash:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - mash:
+          type: string
+          description: The name of the tool
+      - mash --version 2>&1:
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - mash:
+          type: string
+          description: The name of the tool
+      - mash --version 2>&1:
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@chriswyatt1"
+maintainers:
+  - "@chriswyatt1"

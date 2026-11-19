@@ -17,6 +17,8 @@ include { BUSCO_SEQS as BUSCO_SEQS_GENOME          } from '../modules/local/busc
 include { REPORT_HTML                              } from '../modules/local/report/html/main'
 include { REPORT_EXCEL                             } from '../modules/local/report/excel/main'
 include { FASTA_ANNOTATE_TE                        } from '../subworkflows/local/fasta_annotate_te/main'
+include { MASH_TRIANGLE                            } from '../modules/local/mash/triangle/main'
+include { NJTREE                                   } from '../modules/local/njtree/main'
 include { MULTIQC                                  } from '../modules/nf-core/multiqc/main'
 include { validateInputSamplesheet                 } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
 include { multimapChannel                          } from '../subworkflows/local/utils_nfcore_genomeqc_pipeline'
@@ -61,6 +63,7 @@ workflow GENOMEQC {
     val_ortho_version        // val: OrthoFinder version - 'v2' or 'v3'
     val_species_tree         // val: path to a Newick species tree to use instead of running OrthoFinder, or null
     val_skip_tree            // val: boolean - no species tree: skip OrthoFinder, ORTHOSEQCOUNT, the tree plots and the Shiny app
+    val_tree_method          // val: how to build the species tree when none is given - 'orthofinder' or 'mash'
     val_validation_tool      // val: GXF validation/standardisation tool - 'agat' or 'gffread'
     val_container_engine     // val: container engine used to launch the interactive Shiny app - 'docker' or 'podman'
 
@@ -196,6 +199,38 @@ workflow GENOMEQC {
     }
 
     //
+    // Species tree for the tree summary plots, in order of precedence: none (--skip_tree),
+    // the user's (--species_tree), a Mash tree (--tree_method mash), or OrthoFinder's,
+    // which the genome only and genome + annotation subworkflows build
+    //
+
+    def val_tree_source = 'orthofinder'
+    if (val_skip_tree) {
+        val_tree_source = 'none'
+    } else if (val_species_tree || val_tree_method == 'mash') {
+        val_tree_source = 'file'
+    }
+    ch_tree_file = channel.empty()
+    if (val_tree_source == 'file' && val_species_tree) {
+        ch_tree_file = channel.value(file(val_species_tree, checkIfExists: true))
+    } else if (val_tree_source == 'file') {
+        // One tree from all assemblies, both modes; each tree plot prunes it to its own assemblies
+        ch_mash_input = ch_fasta
+                      | toSortedList { a, b -> a[0].id <=> b[0].id } // sort for deterministic behaviour
+                      | filter { pairs -> pairs.size() >= 3 }       // like OrthoFinder, only for 3 or more genomes
+                      | map { pairs -> [ [ id: 'mash' ], pairs.collect { p -> p[0].id }, pairs.collect { p -> p[1] } ] }
+
+        MASH_TRIANGLE (
+            ch_mash_input
+        )
+
+        NJTREE (
+            MASH_TRIANGLE.out.distances
+        )
+        ch_tree_file = NJTREE.out.tree.map { _meta, tree -> tree }.first()
+    }
+
+    //
     // SUBWORKFLOW: Run genome only or genome + annotation subworkflows to get QC metrics
     //
 
@@ -207,8 +242,8 @@ workflow GENOMEQC {
         val_busco_config,
         val_busco_clean,
         val_ortho_version,
-        val_species_tree,
-        val_skip_tree
+        val_tree_source,
+        ch_tree_file
     )
     ch_geno_busco_summary = GENOME_ONLY.out.busco_short_summaries
     ch_geno_species_tree  = GENOME_ONLY.out.species_tree
@@ -223,8 +258,8 @@ workflow GENOMEQC {
         val_busco_lineage,
         val_busco_config,
         val_busco_clean,
-        val_species_tree,
-        val_skip_tree
+        val_tree_source,
+        ch_tree_file
     )
 
     // Define channels for tree summary and shiny app subworkflow
