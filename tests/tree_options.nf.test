@@ -22,8 +22,13 @@ nextflow_pipeline {
 
         then {
             def tree = path("$outputDir/tree/genome_anno/tree.nw").text.trim()
+            // pipeline versions.yml file for multiqc, with the Nextflow version removed (as in tests/default.nf.test)
+            def software_versions = removeNextflowVersion("$outputDir/pipeline_info/nf_core_genomeqc_software_mqc_versions.yml")
+            software_versions.SHINY_APP_GENOME_ANNO?.remove('cat') // differs between container and conda profiles
             assert workflow.success
             assertAll(
+                // Software versions: no OrthoFinder
+                { assert snapshot(software_versions).match() },
                 // OrthoFinder and the orthogroup counts are not run
                 { assert !workflow.trace.tasks().any { it.name.contains('ORTHOFINDER') } },
                 { assert !workflow.trace.tasks().any { it.name.contains('ORTHOSEQCOUNT') } },
@@ -63,8 +68,13 @@ nextflow_pipeline {
 
         then {
             def tasks = workflow.trace.tasks().collect { it.name }
+            // pipeline versions.yml file for multiqc, with the Nextflow version removed (as in tests/default.nf.test)
+            def software_versions = removeNextflowVersion("$outputDir/pipeline_info/nf_core_genomeqc_software_mqc_versions.yml")
+            software_versions.SHINY_APP_GENOME_ANNO?.remove('cat') // differs between container and conda profiles
             assert workflow.success
             assertAll(
+                // Software versions: no OrthoFinder, tree summary or Shiny app
+                { assert snapshot(software_versions).match() },
                 // No species tree: OrthoFinder, the orthogroup counts, the tree plots and the Shiny app are skipped
                 { assert !tasks.any { it.contains('ORTHOFINDER') } },
                 { assert !tasks.any { it.contains('ORTHOSEQCOUNT') } },

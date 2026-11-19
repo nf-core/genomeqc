@@ -48,6 +48,8 @@ nextflow_workflow {
                 input[6] = 'hymenoptera_odb10'
                 input[7] = null
                 input[8] = null
+                input[9] = null   // species_tree: build the tree with OrthoFinder
+                input[10] = false // skip_tree
                 """
             }
         }
@@ -92,6 +94,8 @@ nextflow_workflow {
                 input[6] = 'bacteria_odb10'
                 input[7] = null
                 input[8] = null
+                input[9] = null   // species_tree: build the tree with OrthoFinder
+                input[10] = false // skip_tree
                 """
             }
         }
