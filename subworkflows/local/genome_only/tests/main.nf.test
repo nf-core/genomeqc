@@ -35,8 +35,8 @@ nextflow_workflow {
                 input[4] = null
                 input[5] = null
                 input[6] = 'v3'
-                input[7] = null  // species_tree: build the tree with OrthoFinder
-                input[8] = false // skip_tree
+                input[7] = 'orthofinder'   // tree source: build the tree with OrthoFinder
+                input[8] = Channel.empty() // no ready-made tree file
                 """
             }
         }
@@ -74,8 +74,8 @@ nextflow_workflow {
                 input[4] = null
                 input[5] = null
                 input[6] = 'v3'
-                input[7] = null  // species_tree: build the tree with OrthoFinder
-                input[8] = false // skip_tree
+                input[7] = 'orthofinder'   // tree source: build the tree with OrthoFinder
+                input[8] = Channel.empty() // no ready-made tree file
                 """
             }
         }

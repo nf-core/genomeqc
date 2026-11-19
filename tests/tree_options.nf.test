@@ -122,8 +122,13 @@ nextflow_pipeline {
             def mash_tree = path("$outputDir/mash/mash_tree.nwk").text.trim()
             def tree      = path("$outputDir/tree/genome_anno/tree.nw").text.trim()
             def samples   = ['Mycoplasmoides_fastidiosum', 'Mycoplasmoides_genitalium', 'Mycoplasmoides_gallisepticum']
+            // pipeline versions.yml file for multiqc, with the Nextflow version removed (as in tests/default.nf.test)
+            def software_versions = removeNextflowVersion("$outputDir/pipeline_info/nf_core_genomeqc_software_mqc_versions.yml")
+            software_versions.SHINY_APP_GENOME_ANNO?.remove('cat') // differs between container and conda profiles
             assert workflow.success
             assertAll(
+                // Software versions: Mash and the tree builder, no OrthoFinder
+                { assert snapshot(software_versions).match() },
                 // The tree comes from Mash, not OrthoFinder
                 { assert tasks.any { it.contains('MASH_TRIANGLE') } },
                 { assert tasks.any { it.contains('NJTREE') } },
