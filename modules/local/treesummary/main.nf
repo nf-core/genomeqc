@@ -8,7 +8,7 @@ process TREESUMMARY {
         : 'community.wave.seqera.io/library/python_pandas_r-base_bioconductor-ggtreeextra_pruned:5327fed29a6ac09f'}"
 
     input:
-    tuple val(meta), path(tree)
+    tuple val(meta), path(tree, stageAs: 'species_tree/*') // OrthoFinder results folder, or a Newick file (--species_tree)
     tuple val(meta1), path(geno_busco)
     tuple val(meta2), path(prot_busco)
     tuple val(meta3), path(te_table)
@@ -48,8 +48,16 @@ process TREESUMMARY {
 
     """
     # Combine per-species QC tables and render the phylogenetic tree summary plot
-    #Remove unwanted extensions in the tree file
-    sed \'s/\\.prot\\.fa\\.largestIsoform//g\' ${tree}/Species_Tree/SpeciesTree_rooted_node_labels.txt > tree.nw
+    # The species tree is either OrthoFinder's rooted species tree, or a tree the
+    # user supplied with --species_tree, pruned to the samples in this run
+    if [ -d "${tree}" ]; then
+        # Remove unwanted extensions in the tree file
+        sed \'s/\\.prot\\.fa\\.largestIsoform//g\' ${tree}/Species_Tree/SpeciesTree_rooted_node_labels.txt > tree.nw
+    else
+        # Sample ids as quast_2_table.py derives them: the QUAST file name up to the first dot
+        for f in *quast.tsv; do basename "\$f" | sed 's/\\..*\$//'; done > samples_in_run.txt
+        prune_tree.R "${tree}" samples_in_run.txt tree.nw
+    fi
 
     echo $ortho_file
 

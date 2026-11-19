@@ -12,8 +12,8 @@ workflow TREE_SUMMARY_SHINY_APP {
     ch_geno_busco_summary
     ch_tree_inputs_genome_anno
     ch_tree_inputs_genome
-    ch_geno_anno_orthofinder
-    ch_geno_orthofinder
+    ch_geno_anno_species_tree // channel: [ val(meta), folder | newick ] - OrthoFinder results, or the --species_tree file
+    ch_geno_species_tree      // channel: [ val(meta), folder | newick ]
     ch_te_table
     ch_fcs_table
     val_skip_busco       // val: boolean - skip genome-only tree summary/shiny app (needs BUSCO markers)
@@ -61,7 +61,7 @@ workflow TREE_SUMMARY_SHINY_APP {
 
     // Run TREE SUMMARY for genome and annotation
     TREE_SUMMARY_GENO_ANNO (
-        ch_geno_anno_orthofinder,
+        ch_geno_anno_species_tree,
         ch_busco_geno_anno.geno,
         ch_busco_geno_anno.prot,
         ch_te_table,
@@ -80,7 +80,7 @@ workflow TREE_SUMMARY_SHINY_APP {
     if (!val_skip_busco) { // Tree sumary on genome only is only run if BUSCO is not skipped (markers needed for tree summary)
         // Run TREE SUMMARY for genome only
         TREE_SUMMARY_GENO (
-            ch_geno_orthofinder,
+            ch_geno_species_tree,
             ch_busco_geno,
             [[],[]], // No busco proteins for genome only (busco runs on genome)
             ch_te_table,

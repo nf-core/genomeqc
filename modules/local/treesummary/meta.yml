@@ -25,9 +25,12 @@ input:
           Groovy Map containing sample information, including "mode" (genome or genome_anno)
           e.g. [ id:'test', mode:'genome_anno' ]
     - tree:
-        type: directory
-        description: OrthoFinder results directory, used for its
-          Species_Tree/SpeciesTree_rooted_node_labels.txt
+        type: file
+        description: |
+          Either an OrthoFinder results directory, used for its
+          Species_Tree/SpeciesTree_rooted_node_labels.txt, or a Newick species
+          tree supplied with --species_tree, whose tips are the sample ids. A
+          supplied tree is pruned to the samples in this run.
   - - meta1:
         type: map
         description: |

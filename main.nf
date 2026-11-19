@@ -64,6 +64,9 @@ workflow NFCORE_GENOMEQC {
         params.busco_config,
         params.busco_clean,
         params.ortho_version,
+        params.species_tree,
+        params.skip_tree,
+        params.tree_method,
         params.val_tool,
         params.container_engine,
     )

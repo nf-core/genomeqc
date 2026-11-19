@@ -48,6 +48,8 @@ nextflow_workflow {
                 input[6] = 'hymenoptera_odb10'
                 input[7] = null
                 input[8] = null
+                input[9] = 'orthofinder'    // tree source: build the tree with OrthoFinder
+                input[10] = Channel.empty() // no ready-made tree file
                 """
             }
         }
@@ -92,6 +94,8 @@ nextflow_workflow {
                 input[6] = 'bacteria_odb10'
                 input[7] = null
                 input[8] = null
+                input[9] = 'orthofinder'    // tree source: build the tree with OrthoFinder
+                input[10] = Channel.empty() // no ready-made tree file
                 """
             }
         }

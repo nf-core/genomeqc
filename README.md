@@ -48,7 +48,7 @@ The pipeline takes a list of genomes and annotations (from local files or ncbi a
    1. [AGAT](https://agat.readthedocs.io/en/latest/): Number of genes, features, length...
    2. **Gene Overlaps**: Finds the number of overlapping genes.
 4. Extracts longest protein isoform: [GffRead](https://github.com/gpertea/gffread).
-5. Finds orthologous genes: [Orthofinder](https://github.com/davidemms/OrthoFinder).
+5. Finds orthologous genes: [Orthofinder](https://github.com/davidemms/OrthoFinder), and uses its species tree for the plots. Alternatively, give your own tree with `--species_tree`, build a quick tree from [Mash](https://github.com/marbl/Mash) distances with `--tree_method mash`, or turn the tree off with `--skip_tree`; OrthoFinder is then not run.
 6. Plots an orthology-based - if annotation is given - or BUSCO marker-based - if no annotation is given - phylogenetic tree with summary statistics: **Tree Summary**. Selectable `--tree_style`: a conventional left-to-right tree, or a **circular** layout with the summary statistics drawn as concentric rings and quality metrics scored as a colour-blind-safe Good/Warn/Poor traffic light.
 7. Summary with **HTML and excel** custom reports.
 8. Summary with [MultiQC](http://multiqc.info).

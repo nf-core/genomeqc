@@ -31,6 +31,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - [TE annotation](#te-annotation) (optional) - Transposable element identification and masking.
 - [Orthofinder](#orthofinder) - Phylogenetic orthology inference.
 - [Ortho seq count](#ortho-seq-count) - Map orthologous genes onto sequences across assemblies.
+- [Mash tree](#mash-tree) - Species tree from Mash distances (`--tree_method mash`).
 - [Tree summary](#tree-summary) - Phylogenetic summary plot.
 - [Shiny app](#shiny-app) - Dynamic tree summary plot adjuster.
 - [MultiQC](#multiqc) - Aggregate report describing results and QC from the whole pipeline.
@@ -363,7 +364,7 @@ The pipeline supports both OrthoFinder v2 and v3 (selected via `--ortho_version`
 
 </details>
 
-This directory will only be present if `--save_orthofinder_results` flag is set.
+This directory will only be present if `--save_orthofinder_results` flag is set. OrthoFinder is not run when a tree is given with `--species_tree`, with `--tree_method mash`, or with `--skip_tree`.
 
 ### Ortho seq count
 
@@ -379,9 +380,24 @@ This directory will only be present if `--save_orthofinder_results` flag is set.
 
 </details>
 
+This directory is not present when a tree is given with `--species_tree`, with `--tree_method mash`, or with `--skip_tree`, as there are no OrthoFinder orthogroups to count.
+
+### Mash tree
+
+With `--tree_method mash`, the species tree for the tree summary plots is built from [Mash](https://github.com/marbl/Mash) distances instead of by OrthoFinder: every genome is sketched, all pairwise distances are computed, and a neighbour-joining tree is built and rooted at its midpoint.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `mash/`
+  - `mash_distances.tsv`: All pairwise Mash distances, as `mash triangle` writes them: the number of genomes, then one line per genome with its name and its distances to the genomes listed before it.
+  - `mash_tree.nwk`: Midpoint-rooted neighbour-joining tree of all the assemblies, in Newick format.
+
+</details>
+
 ### Tree summary
 
-**Tree summary** is a local module that takes the rooted trees species from Orthofinder, as well as the ouput statistics from the mentioned tools.
+**Tree summary** is a local module that takes the rooted species tree from Orthofinder, as well as the ouput statistics from the mentioned tools. With `--species_tree` or `--tree_method mash`, it uses that tree instead, keeping only the assemblies in the run (see [usage](usage.md#using-your-own-species-tree)). Not made with `--skip_tree`.
 
 The idea of the tree summary is to give some phylogenetic context to the quality stats, which might help users when evaluating the integrity of the assemblies.
 
@@ -410,7 +426,7 @@ The `circular` layout draws the same statistics as concentric rings instead:
 
 ### Shiny App
 
-**The shiny app** module uses [Shiny](https://shiny.posit.co/), a package to build interactive web apps from R, to create a dynamic plot adjuster to modify the tree plot in real time. It allows to change plot parameters such as margins, branch length, text size, etc., as well as adding and removing summary statistics next to the tree tips. The modified plot can be saved as a png/svg.
+**The shiny app** module uses [Shiny](https://shiny.posit.co/), a package to build interactive web apps from R, to create a dynamic plot adjuster to modify the tree plot in real time. It allows to change plot parameters such as margins, branch length, text size, etc., as well as adding and removing summary statistics next to the tree tips. The modified plot can be saved as a png/svg. Not made with `--skip_tree`.
 
 The tree style (conventional or circular) is also selectable in the app. For the circular layout, this includes a ring-thickness control, a quality-preset selector (with a custom option for per-metric Good/Warn thresholds), and a toggle to print values on the rings.
 

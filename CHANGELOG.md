@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### `Added`
 
 - Added a BUSCO ideogram tab to the HTML report ([#308](https://github.com/nf-core/genomeqc/issues/308)), with an assembly selector. It shows the genome BUSCO ideogram for every assembly, plus the protein BUSCO ideogram (one per BUSCO lineage) for assemblies with an annotation, cropped from RIdeogram's A4 page to the plotted area.
+- Added `--species_tree`, to give a Newick species tree for the tree summary plots instead of building one with OrthoFinder ([#168](https://github.com/nf-core/genomeqc/issues/168)). OrthoFinder and the orthogroup counts per sequence are then not run. Tip labels must match the samplesheet `assembly` names; tips for samples not in the run are dropped, and a sample missing from the tree stops the pipeline with a message naming it.
+- Added `--tree_method mash`, to build the species tree from Mash distances instead of with OrthoFinder ([#186](https://github.com/nf-core/genomeqc/issues/186)): every genome is sketched with Mash, and a neighbour-joining tree of all pairwise Mash distances, rooted at its midpoint, is used for the tree plots (`mash/`). It takes minutes for hundreds of genomes but is approximate, being most reliable between closely related genomes.
+- Added `--skip_tree`, to run without a species tree ([#46](https://github.com/nf-core/genomeqc/issues/46)): OrthoFinder, the orthogroup counts per sequence, the tree summary plots and the Shiny app are skipped, and every other module and report runs as before.
 - Genome and annotation mode now also draws the genome BUSCO ideogram (`busco/genome/<assembly_name>/ideogram/`), as genome only mode does, so every assembly gets one whether or not it has an annotation ([#308](https://github.com/nf-core/genomeqc/issues/308)).
 
 ### `Fixed`
